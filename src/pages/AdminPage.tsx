@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, Users, HelpCircle, BarChart3 } from "lucide-react";
+import { Plus, Pencil, Trash2, Users, HelpCircle, BarChart3, ImagePlus, X } from "lucide-react";
 
 interface Question {
   id: string;
@@ -21,6 +21,7 @@ interface Question {
   option_c: string;
   option_d: string;
   correct_option: string;
+  image_url: string | null;
   created_at: string;
 }
 
@@ -40,6 +41,7 @@ const emptyForm = {
   option_c: "",
   option_d: "",
   correct_option: "A",
+  image_url: "" as string,
 };
 
 export default function AdminPage() {
@@ -51,6 +53,30 @@ export default function AdminPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const filePath = `${crypto.randomUUID()}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from("question-images")
+        .upload(filePath, file);
+      if (uploadError) throw uploadError;
+      const { data: { publicUrl } } = supabase.storage
+        .from("question-images")
+        .getPublicUrl(filePath);
+      setForm((f) => ({ ...f, image_url: publicUrl }));
+      toast({ title: "Imagem enviada!" });
+    } catch (error: any) {
+      toast({ title: "Erro no upload", description: error.message, variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const fetchQuestions = async () => {
     const { data } = await supabase.from("questions").select("*").order("created_at", { ascending: false });
@@ -70,12 +96,16 @@ export default function AdminPage() {
   const handleSave = async () => {
     setLoading(true);
     try {
+      const payload = {
+        ...form,
+        image_url: form.image_url || null,
+      };
       if (editingId) {
-        const { error } = await supabase.from("questions").update(form).eq("id", editingId);
+        const { error } = await supabase.from("questions").update(payload).eq("id", editingId);
         if (error) throw error;
         toast({ title: "Pergunta atualizada!" });
       } else {
-        const { error } = await supabase.from("questions").insert({ ...form, created_by: user!.id });
+        const { error } = await supabase.from("questions").insert({ ...payload, created_by: user!.id });
         if (error) throw error;
         toast({ title: "Pergunta criada!" });
       }
@@ -98,6 +128,7 @@ export default function AdminPage() {
       option_c: q.option_c,
       option_d: q.option_d,
       correct_option: q.correct_option,
+      image_url: q.image_url || "",
     });
     setEditingId(q.id);
     setDialogOpen(true);
@@ -192,6 +223,37 @@ export default function AdminPage() {
                       placeholder="Digite a pergunta..."
                       rows={3}
                     />
+                  </div>
+                  <div>
+                    <Label>Imagem (opcional)</Label>
+                    {form.image_url ? (
+                      <div className="relative mt-2 rounded-lg overflow-hidden border">
+                        <img src={form.image_url} alt="Preview" className="w-full max-h-48 object-contain bg-muted" />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-2 right-2 h-7 w-7"
+                          onClick={() => setForm((f) => ({ ...f, image_url: "" }))}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <label className="mt-2 flex items-center gap-2 cursor-pointer border border-dashed rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                        <ImagePlus className="w-5 h-5 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">
+                          {uploading ? "Enviando..." : "Clique para adicionar imagem"}
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleImageUpload}
+                          disabled={uploading}
+                        />
+                      </label>
+                    )}
                   </div>
                   {(["A", "B", "C", "D"] as const).map((opt) => (
                     <div key={opt}>
