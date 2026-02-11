@@ -15,6 +15,7 @@ interface Question {
   option_c: string;
   option_d: string;
   correct_option: string;
+  image_url: string | null;
 }
 
 type QuizState = "idle" | "playing" | "finished";
@@ -185,6 +186,13 @@ export default function QuizPage() {
           <CardTitle className="font-display text-xl leading-relaxed">
             {currentQuestion?.question_text}
           </CardTitle>
+          {currentQuestion?.image_url && (
+            <img
+              src={currentQuestion.image_url}
+              alt="Imagem da questão"
+              className="mt-3 rounded-lg w-full max-h-64 object-contain bg-muted"
+            />
+          )}
         </CardHeader>
         <CardContent className="space-y-3">
           {options.map((opt) => {
