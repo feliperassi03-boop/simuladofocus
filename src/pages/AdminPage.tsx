@@ -1,0 +1,329 @@
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
+import { Plus, Pencil, Trash2, Users, HelpCircle, BarChart3 } from "lucide-react";
+
+interface Question {
+  id: string;
+  question_text: string;
+  option_a: string;
+  option_b: string;
+  option_c: string;
+  option_d: string;
+  correct_option: string;
+  created_at: string;
+}
+
+interface Attempt {
+  id: string;
+  user_id: string;
+  score: number;
+  total_questions: number;
+  completed_at: string | null;
+  created_at: string;
+}
+
+const emptyForm = {
+  question_text: "",
+  option_a: "",
+  option_b: "",
+  option_c: "",
+  option_d: "",
+  correct_option: "A",
+};
+
+export default function AdminPage() {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [attempts, setAttempts] = useState<Attempt[]>([]);
+  const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const fetchQuestions = async () => {
+    const { data } = await supabase.from("questions").select("*").order("created_at", { ascending: false });
+    if (data) setQuestions(data);
+  };
+
+  const fetchAttempts = async () => {
+    const { data } = await supabase.from("quiz_attempts").select("*").order("created_at", { ascending: false });
+    if (data) setAttempts(data);
+  };
+
+  useEffect(() => {
+    fetchQuestions();
+    fetchAttempts();
+  }, []);
+
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      if (editingId) {
+        const { error } = await supabase.from("questions").update(form).eq("id", editingId);
+        if (error) throw error;
+        toast({ title: "Pergunta atualizada!" });
+      } else {
+        const { error } = await supabase.from("questions").insert({ ...form, created_by: user!.id });
+        if (error) throw error;
+        toast({ title: "Pergunta criada!" });
+      }
+      setForm(emptyForm);
+      setEditingId(null);
+      setDialogOpen(false);
+      fetchQuestions();
+    } catch (error: any) {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEdit = (q: Question) => {
+    setForm({
+      question_text: q.question_text,
+      option_a: q.option_a,
+      option_b: q.option_b,
+      option_c: q.option_c,
+      option_d: q.option_d,
+      correct_option: q.correct_option,
+    });
+    setEditingId(q.id);
+    setDialogOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    const { error } = await supabase.from("questions").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Erro ao excluir", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Pergunta excluída!" });
+      fetchQuestions();
+    }
+  };
+
+  const openNew = () => {
+    setForm(emptyForm);
+    setEditingId(null);
+    setDialogOpen(true);
+  };
+
+  return (
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold font-display text-foreground">Painel Admin</h1>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="shadow-card">
+          <CardContent className="pt-6 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center">
+              <HelpCircle className="w-6 h-6 text-primary-foreground" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold font-display">{questions.length}</p>
+              <p className="text-sm text-muted-foreground">Perguntas</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="shadow-card">
+          <CardContent className="pt-6 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl gradient-warm flex items-center justify-center">
+              <BarChart3 className="w-6 h-6 text-accent-foreground" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold font-display">{attempts.length}</p>
+              <p className="text-sm text-muted-foreground">Tentativas</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="shadow-card">
+          <CardContent className="pt-6 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-info flex items-center justify-center">
+              <Users className="w-6 h-6 text-info-foreground" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold font-display">
+                {attempts.filter((a) => a.completed_at).length}
+              </p>
+              <p className="text-sm text-muted-foreground">Finalizadas</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Tabs defaultValue="questions">
+        <TabsList>
+          <TabsTrigger value="questions">Perguntas</TabsTrigger>
+          <TabsTrigger value="results">Resultados</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="questions" className="space-y-4">
+          <div className="flex justify-end">
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button onClick={openNew} className="gradient-primary text-primary-foreground">
+                  <Plus className="w-4 h-4 mr-2" /> Nova Pergunta
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-lg">
+                <DialogHeader>
+                  <DialogTitle className="font-display">
+                    {editingId ? "Editar Pergunta" : "Nova Pergunta"}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label>Pergunta</Label>
+                    <Textarea
+                      value={form.question_text}
+                      onChange={(e) => setForm({ ...form, question_text: e.target.value })}
+                      placeholder="Digite a pergunta..."
+                      rows={3}
+                    />
+                  </div>
+                  {(["A", "B", "C", "D"] as const).map((opt) => (
+                    <div key={opt}>
+                      <Label>Opção {opt}</Label>
+                      <Input
+                        value={form[`option_${opt.toLowerCase()}` as keyof typeof form]}
+                        onChange={(e) =>
+                          setForm({ ...form, [`option_${opt.toLowerCase()}`]: e.target.value })
+                        }
+                        placeholder={`Opção ${opt}`}
+                      />
+                    </div>
+                  ))}
+                  <div>
+                    <Label>Resposta Correta</Label>
+                    <Select
+                      value={form.correct_option}
+                      onValueChange={(v) => setForm({ ...form, correct_option: v })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="A">Opção A</SelectItem>
+                        <SelectItem value="B">Opção B</SelectItem>
+                        <SelectItem value="C">Opção C</SelectItem>
+                        <SelectItem value="D">Opção D</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button onClick={handleSave} disabled={loading} className="w-full gradient-primary text-primary-foreground">
+                    {loading ? "Salvando..." : editingId ? "Atualizar" : "Criar"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          <Card className="shadow-card">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Pergunta</TableHead>
+                  <TableHead className="w-24">Correta</TableHead>
+                  <TableHead className="w-24">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {questions.map((q) => (
+                  <TableRow key={q.id}>
+                    <TableCell className="font-medium max-w-md truncate">
+                      {q.question_text}
+                    </TableCell>
+                    <TableCell>
+                      <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary font-bold text-sm">
+                        {q.correct_option}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => handleEdit(q)}>
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(q.id)}>
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {questions.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
+                      Nenhuma pergunta cadastrada. Clique em "Nova Pergunta" para começar.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="results">
+          <Card className="shadow-card">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Aluno</TableHead>
+                  <TableHead>Pontuação</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Data</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {attempts.map((a) => (
+                  <TableRow key={a.id}>
+                    <TableCell className="text-muted-foreground text-sm">
+                      {a.user_id.slice(0, 8)}...
+                    </TableCell>
+                    <TableCell>
+                      <span className="font-bold font-display">
+                        {a.score}/{a.total_questions}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      {a.completed_at ? (
+                        <span className="text-xs px-2 py-1 rounded-full bg-success/10 text-success font-medium">
+                          Concluído
+                        </span>
+                      ) : (
+                        <span className="text-xs px-2 py-1 rounded-full bg-warning/10 text-warning font-medium">
+                          Em andamento
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {new Date(a.created_at).toLocaleDateString("pt-BR")}
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {attempts.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                      Nenhuma tentativa registrada ainda.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
