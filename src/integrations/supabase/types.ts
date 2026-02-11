@@ -14,6 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
+      exam_questions: {
+        Row: {
+          exam_id: string
+          id: string
+          question_id: string
+          sort_order: number
+        }
+        Insert: {
+          exam_id: string
+          id?: string
+          question_id: string
+          sort_order?: number
+        }
+        Update: {
+          exam_id?: string
+          id?: string
+          question_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exam_questions_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "exams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exam_questions_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exams: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          is_active: boolean
+          password: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          is_active?: boolean
+          password: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_active?: boolean
+          password?: string
+          title?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -120,6 +183,7 @@ export type Database = {
         Row: {
           completed_at: string | null
           created_at: string
+          exam_id: string | null
           id: string
           score: number | null
           total_questions: number | null
@@ -128,6 +192,7 @@ export type Database = {
         Insert: {
           completed_at?: string | null
           created_at?: string
+          exam_id?: string | null
           id?: string
           score?: number | null
           total_questions?: number | null
@@ -136,12 +201,21 @@ export type Database = {
         Update: {
           completed_at?: string | null
           created_at?: string
+          exam_id?: string | null
           id?: string
           score?: number | null
           total_questions?: number | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "quiz_attempts_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "exams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

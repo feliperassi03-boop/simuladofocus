@@ -11,7 +11,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, Users, HelpCircle, BarChart3, ImagePlus, X } from "lucide-react";
+import { Plus, Pencil, Trash2, Users, HelpCircle, BarChart3, ImagePlus, X, FileText } from "lucide-react";
+import ExamsTab from "@/components/admin/ExamsTab";
 
 interface Question {
   id: string;
@@ -197,6 +198,7 @@ export default function AdminPage() {
       <Tabs defaultValue="questions">
         <TabsList>
           <TabsTrigger value="questions">Perguntas</TabsTrigger>
+          <TabsTrigger value="exams">Provas</TabsTrigger>
           <TabsTrigger value="results">Resultados</TabsTrigger>
         </TabsList>
 
@@ -334,6 +336,11 @@ export default function AdminPage() {
               </TableBody>
             </Table>
           </Card>
+        </TabsContent>
+
+
+        <TabsContent value="exams">
+          <ExamsTab />
         </TabsContent>
 
         <TabsContent value="results">
