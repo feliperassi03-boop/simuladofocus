@@ -99,7 +99,7 @@ export default function ExamPage() {
     const { data: attempt, error } = await supabase
       .from("quiz_attempts")
       .insert({
-        user_id: user!.id,
+        ...(user ? { user_id: user.id } : {}),
         total_questions: sorted.length,
         exam_id: exam.id,
       })
