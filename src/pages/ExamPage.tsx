@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -7,7 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send } from "lucide-react";
+import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock } from "lucide-react";
+
+const EXAM_DURATION_SECONDS = 3750; // 62min30s
 
 interface Question {
   id: string;
@@ -43,6 +45,9 @@ export default function ExamPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [score, setScore] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(EXAM_DURATION_SECONDS);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const autoSubmitRef = useRef(false);
 
   useEffect(() => {
     const fetchExam = async () => {
@@ -109,7 +114,71 @@ export default function ExamPage() {
     }
 
     setAttemptId(attempt.id);
+    setTimeLeft(EXAM_DURATION_SECONDS);
     setState("playing");
+  };
+
+  // Timer effect
+  useEffect(() => {
+    if (state === "playing") {
+      timerRef.current = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(timerRef.current!);
+            autoSubmitRef.current = true;
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [state]);
+
+  // Auto-submit when time runs out
+  useEffect(() => {
+    if (autoSubmitRef.current && timeLeft === 0 && state === "playing") {
+      autoSubmitRef.current = false;
+      handleForceSubmit();
+    }
+  }, [timeLeft, state]);
+
+  const handleForceSubmit = async () => {
+    setSubmitting(true);
+    let totalScore = 0;
+    const answerRows = questions.map((q) => {
+      const selected = answers[q.id] || null;
+      const isCorrect = selected === q.correct_option;
+      if (isCorrect) totalScore++;
+      return {
+        attempt_id: attemptId!,
+        question_id: q.id,
+        selected_option: selected,
+        is_correct: selected ? isCorrect : false,
+      };
+    });
+
+    await supabase.from("quiz_answers").insert(answerRows);
+    await supabase
+      .from("quiz_attempts")
+      .update({ score: totalScore, completed_at: new Date().toISOString() })
+      .eq("id", attemptId);
+
+    setScore(totalScore);
+    setState("reviewing");
+    setCurrentIndex(0);
+    setSubmitting(false);
+    toast({ title: "Tempo esgotado! Prova enviada automaticamente." });
+  };
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
   const handleSelect = (option: string) => {
@@ -343,7 +412,15 @@ export default function ExamPage() {
     <div className="min-h-screen p-4 md:p-8">
       <div className="max-w-2xl mx-auto animate-fade-in">
         <div className="mb-4">
-          <h2 className="text-lg font-display font-bold text-foreground mb-2">{exam?.title}</h2>
+          <div className="flex justify-between items-center mb-2">
+            <h2 className="text-lg font-display font-bold text-foreground">{exam?.title}</h2>
+            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-mono text-sm font-bold ${
+              timeLeft <= 300 ? "bg-destructive/10 text-destructive animate-pulse" : "bg-secondary text-secondary-foreground"
+            }`}>
+              <Clock className="w-4 h-4" />
+              {formatTime(timeLeft)}
+            </div>
+          </div>
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm font-medium text-muted-foreground">
               Pergunta {currentIndex + 1} de {questions.length}
