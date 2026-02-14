@@ -263,7 +263,7 @@ export default function ExamPage() {
             {options.map((opt) => {
               const isSelected = selectedOption === opt.key;
               const isCorrect = opt.key === currentQuestion?.correct_option;
-              let extraClass = "w-full justify-start text-left h-auto py-3 px-4 text-base transition-all ";
+              let extraClass = "w-full justify-start text-left h-auto py-3 px-4 text-base transition-all break-words whitespace-normal max-w-full overflow-hidden ";
 
               if (answered) {
                 if (isCorrect) {
@@ -286,7 +286,7 @@ export default function ExamPage() {
                   <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-secondary text-secondary-foreground font-bold mr-3 shrink-0">
                     {opt.key}
                   </span>
-                  <span className="flex-1">{opt.text}</span>
+                  <span className="flex-1 break-words whitespace-normal overflow-hidden max-w-full">{opt.text}</span>
                   {answered && isCorrect && <CheckCircle className="w-5 h-5 text-success ml-2 shrink-0" />}
                   {answered && isSelected && !isCorrect && <XCircle className="w-5 h-5 text-destructive ml-2 shrink-0" />}
                 </Button>
