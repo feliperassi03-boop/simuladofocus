@@ -28,7 +28,7 @@ interface Question {
 
 interface Attempt {
   id: string;
-  user_id: string;
+  user_id: string | null;
   score: number;
   total_questions: number;
   completed_at: string | null;
@@ -358,7 +358,7 @@ export default function AdminPage() {
                 {attempts.map((a) => (
                   <TableRow key={a.id}>
                     <TableCell className="text-muted-foreground text-sm">
-                      {a.user_id.slice(0, 8)}...
+                      {a.user_id ? `${a.user_id.slice(0, 8)}...` : "Anônimo"}
                     </TableCell>
                     <TableCell>
                       <span className="font-bold font-display">
