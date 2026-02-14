@@ -118,7 +118,7 @@ export default function ExamsTab() {
   };
 
   const copyLink = (examId: string) => {
-    const url = `${window.location.origin}/prova/${examId}`;
+    const url = `${window.location.origin}/#/prova/${examId}`;
     navigator.clipboard.writeText(url);
     toast({ title: "Link copiado!" });
   };
