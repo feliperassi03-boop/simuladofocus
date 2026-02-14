@@ -33,6 +33,9 @@ interface Attempt {
   total_questions: number;
   completed_at: string | null;
   created_at: string;
+  guest_name: string | null;
+  guest_email: string | null;
+  exam_id: string | null;
 }
 
 const emptyForm = {
@@ -357,8 +360,11 @@ export default function AdminPage() {
               <TableBody>
                 {attempts.map((a) => (
                   <TableRow key={a.id}>
-                    <TableCell className="text-muted-foreground text-sm">
-                      {a.user_id ? `${a.user_id.slice(0, 8)}...` : "Anônimo"}
+                    <TableCell className="text-sm">
+                      {a.guest_name || (a.user_id ? `${a.user_id.slice(0, 8)}...` : "Anônimo")}
+                      {a.guest_email && (
+                        <span className="block text-xs text-muted-foreground">{a.guest_email}</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <span className="font-bold font-display">
