@@ -187,7 +187,7 @@ export type Database = {
           id: string
           score: number | null
           total_questions: number | null
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           completed_at?: string | null
@@ -196,7 +196,7 @@ export type Database = {
           id?: string
           score?: number | null
           total_questions?: number | null
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           completed_at?: string | null
@@ -205,7 +205,7 @@ export type Database = {
           id?: string
           score?: number | null
           total_questions?: number | null
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
