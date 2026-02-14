@@ -2,12 +2,13 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock } from "lucide-react";
+import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock, User } from "lucide-react";
 
 const EXAM_DURATION_SECONDS = 3750; // 62min30s
 
@@ -29,7 +30,7 @@ interface Exam {
   is_active: boolean;
 }
 
-type ExamState = "password" | "playing" | "reviewing" | "error";
+type ExamState = "password" | "identify" | "playing" | "reviewing" | "error";
 
 export default function ExamPage() {
   const { id: examId } = useParams<{ id: string }>();
@@ -48,6 +49,8 @@ export default function ExamPage() {
   const [timeLeft, setTimeLeft] = useState(EXAM_DURATION_SECONDS);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const autoSubmitRef = useRef(false);
+  const [guestName, setGuestName] = useState("");
+  const [guestEmail, setGuestEmail] = useState("");
 
   useEffect(() => {
     const fetchExam = async () => {
@@ -74,11 +77,19 @@ export default function ExamPage() {
       toast({ title: "Senha incorreta", variant: "destructive" });
       return;
     }
+    setState("identify");
+  };
+
+  const handleIdentifySubmit = async () => {
+    if (!guestName.trim()) {
+      toast({ title: "Digite seu nome para continuar.", variant: "destructive" });
+      return;
+    }
 
     const { data: eqData } = await supabase
       .from("exam_questions")
       .select("question_id, sort_order")
-      .eq("exam_id", exam.id)
+      .eq("exam_id", exam!.id)
       .order("sort_order");
 
     if (!eqData || eqData.length === 0) {
@@ -103,7 +114,9 @@ export default function ExamPage() {
       .insert({
         ...(user ? { user_id: user.id } : {}),
         total_questions: sorted.length,
-        exam_id: exam.id,
+        exam_id: exam!.id,
+        guest_name: guestName.trim(),
+        guest_email: guestEmail.trim() || null,
       })
       .select()
       .single();
@@ -273,6 +286,48 @@ export default function ExamPage() {
               onKeyDown={(e) => e.key === "Enter" && handlePasswordSubmit()}
             />
             <Button onClick={handlePasswordSubmit} className="w-full gradient-primary text-primary-foreground">
+              Iniciar Prova
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (state === "identify") {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-elevated animate-fade-in">
+          <CardHeader className="text-center">
+            <div className="mx-auto w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mb-4 shadow-glow">
+              <User className="w-8 h-8 text-primary-foreground" />
+            </div>
+            <CardTitle className="font-display text-2xl">{exam?.title}</CardTitle>
+            <p className="text-muted-foreground mt-2">Identifique-se para iniciar a prova</p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="guestName">Nome completo *</Label>
+              <Input
+                id="guestName"
+                value={guestName}
+                onChange={(e) => setGuestName(e.target.value)}
+                placeholder="Seu nome completo"
+                onKeyDown={(e) => e.key === "Enter" && handleIdentifySubmit()}
+              />
+            </div>
+            <div>
+              <Label htmlFor="guestEmail">E-mail (opcional)</Label>
+              <Input
+                id="guestEmail"
+                type="email"
+                value={guestEmail}
+                onChange={(e) => setGuestEmail(e.target.value)}
+                placeholder="seu@email.com"
+                onKeyDown={(e) => e.key === "Enter" && handleIdentifySubmit()}
+              />
+            </div>
+            <Button onClick={handleIdentifySubmit} className="w-full gradient-primary text-primary-foreground">
               Iniciar Prova
             </Button>
           </CardContent>

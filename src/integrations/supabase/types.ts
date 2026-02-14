@@ -184,6 +184,8 @@ export type Database = {
           completed_at: string | null
           created_at: string
           exam_id: string | null
+          guest_email: string | null
+          guest_name: string | null
           id: string
           score: number | null
           total_questions: number | null
@@ -193,6 +195,8 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           exam_id?: string | null
+          guest_email?: string | null
+          guest_name?: string | null
           id?: string
           score?: number | null
           total_questions?: number | null
@@ -202,6 +206,8 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           exam_id?: string | null
+          guest_email?: string | null
+          guest_name?: string | null
           id?: string
           score?: number | null
           total_questions?: number | null
