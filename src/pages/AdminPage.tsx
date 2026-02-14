@@ -306,7 +306,7 @@ export default function AdminPage() {
               <TableBody>
                 {questions.map((q) => (
                   <TableRow key={q.id}>
-                    <TableCell className="font-medium max-w-md truncate">
+                    <TableCell className="font-medium max-w-md break-words whitespace-normal">
                       {q.question_text}
                     </TableCell>
                     <TableCell>
