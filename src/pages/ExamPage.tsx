@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, ArrowRight, Trophy, Lock, BookOpen } from "lucide-react";
+import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send } from "lucide-react";
 
 interface Question {
   id: string;
@@ -27,7 +27,7 @@ interface Exam {
   is_active: boolean;
 }
 
-type ExamState = "password" | "playing" | "finished" | "error";
+type ExamState = "password" | "playing" | "reviewing" | "error";
 
 export default function ExamPage() {
   const { id: examId } = useParams<{ id: string }>();
@@ -38,11 +38,11 @@ export default function ExamPage() {
   const [state, setState] = useState<ExamState>("password");
   const [passwordInput, setPasswordInput] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const [answered, setAnswered] = useState(false);
-  const [score, setScore] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
   const [attemptId, setAttemptId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [score, setScore] = useState(0);
 
   useEffect(() => {
     const fetchExam = async () => {
@@ -70,7 +70,6 @@ export default function ExamPage() {
       return;
     }
 
-    // Fetch exam questions
     const { data: eqData } = await supabase
       .from("exam_questions")
       .select("question_id, sort_order")
@@ -90,12 +89,10 @@ export default function ExamPage() {
 
     if (!qData) return;
 
-    // Sort by exam order
     const orderMap = new Map(eqData.map((eq) => [eq.question_id, eq.sort_order]));
     const sorted = qData.sort((a, b) => (orderMap.get(a.id) || 0) - (orderMap.get(b.id) || 0));
     setQuestions(sorted);
 
-    // Create attempt
     const { data: attempt, error } = await supabase
       .from("quiz_attempts")
       .insert({
@@ -115,35 +112,53 @@ export default function ExamPage() {
     setState("playing");
   };
 
-  const handleAnswer = async (option: string) => {
-    if (answered) return;
-    setSelectedOption(option);
-    setAnswered(true);
-
-    const question = questions[currentIndex];
-    const isCorrect = option === question.correct_option;
-    if (isCorrect) setScore((s) => s + 1);
-
-    await supabase.from("quiz_answers").insert({
-      attempt_id: attemptId,
-      question_id: question.id,
-      selected_option: option,
-      is_correct: isCorrect,
-    });
+  const handleSelect = (option: string) => {
+    const questionId = questions[currentIndex].id;
+    setAnswers((prev) => ({ ...prev, [questionId]: option }));
   };
 
-  const nextQuestion = async () => {
-    if (currentIndex + 1 >= questions.length) {
-      await supabase
-        .from("quiz_attempts")
-        .update({ score, completed_at: new Date().toISOString() })
-        .eq("id", attemptId);
-      setState("finished");
-    } else {
-      setCurrentIndex((i) => i + 1);
-      setSelectedOption(null);
-      setAnswered(false);
+  const goToQuestion = (index: number) => {
+    if (index >= 0 && index < questions.length) {
+      setCurrentIndex(index);
     }
+  };
+
+  const handleSubmit = async () => {
+    const unanswered = questions.filter((q) => !answers[q.id]);
+    if (unanswered.length > 0) {
+      toast({
+        title: `Faltam ${unanswered.length} questão(ões)`,
+        description: "Responda todas as questões antes de enviar.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSubmitting(true);
+
+    let totalScore = 0;
+    const answerRows = questions.map((q) => {
+      const selected = answers[q.id];
+      const isCorrect = selected === q.correct_option;
+      if (isCorrect) totalScore++;
+      return {
+        attempt_id: attemptId!,
+        question_id: q.id,
+        selected_option: selected,
+        is_correct: isCorrect,
+      };
+    });
+
+    await supabase.from("quiz_answers").insert(answerRows);
+    await supabase
+      .from("quiz_attempts")
+      .update({ score: totalScore, completed_at: new Date().toISOString() })
+      .eq("id", attemptId);
+
+    setScore(totalScore);
+    setState("reviewing");
+    setCurrentIndex(0);
+    setSubmitting(false);
   };
 
   if (loading) {
@@ -197,34 +212,126 @@ export default function ExamPage() {
     );
   }
 
-  if (state === "finished") {
+  // Reviewing state — show results with correct/wrong feedback
+  if (state === "reviewing") {
     const percentage = Math.round((score / questions.length) * 100);
+    const currentQuestion = questions[currentIndex];
+    const selectedOption = answers[currentQuestion.id];
+    const options = [
+      { key: "A", text: currentQuestion.option_a },
+      { key: "B", text: currentQuestion.option_b },
+      { key: "C", text: currentQuestion.option_c },
+      { key: "D", text: currentQuestion.option_d },
+    ];
+
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-lg shadow-elevated animate-scale-in text-center">
-          <CardHeader>
-            <div className="mx-auto w-20 h-20 rounded-full gradient-primary flex items-center justify-center mb-4 shadow-glow">
-              <Trophy className="w-10 h-10 text-primary-foreground" />
-            </div>
-            <CardTitle className="font-display text-3xl">Prova Finalizada!</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div>
-              <p className="text-5xl font-bold font-display text-primary">{percentage}%</p>
-              <p className="text-muted-foreground mt-2">
+      <div className="min-h-screen p-4 md:p-8">
+        <div className="max-w-2xl mx-auto animate-fade-in">
+          {/* Score summary */}
+          <Card className="shadow-elevated mb-6 text-center">
+            <CardContent className="pt-6 pb-4">
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <Trophy className="w-8 h-8 text-primary" />
+                <span className="text-4xl font-bold font-display text-primary">{percentage}%</span>
+              </div>
+              <p className="text-muted-foreground">
                 Você acertou {score} de {questions.length} perguntas
               </p>
-            </div>
-            <Progress value={percentage} className="h-3" />
-          </CardContent>
-        </Card>
+              <Progress value={percentage} className="h-3 mt-3" />
+            </CardContent>
+          </Card>
+
+          {/* Question navigation */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            {questions.map((q, i) => {
+              const ans = answers[q.id];
+              const isCorrect = ans === q.correct_option;
+              return (
+                <button
+                  key={q.id}
+                  onClick={() => setCurrentIndex(i)}
+                  className={`w-9 h-9 rounded-lg text-sm font-bold transition-all ${
+                    i === currentIndex
+                      ? "ring-2 ring-primary"
+                      : ""
+                  } ${
+                    isCorrect
+                      ? "bg-success/20 text-success"
+                      : "bg-destructive/20 text-destructive"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Question review */}
+          <Card className="shadow-elevated mb-6">
+            <CardHeader>
+              <CardTitle className="font-display text-xl leading-relaxed">
+                {currentQuestion.question_text}
+              </CardTitle>
+              {currentQuestion.image_url && (
+                <img
+                  src={currentQuestion.image_url}
+                  alt="Imagem da questão"
+                  className="mt-3 rounded-lg w-full max-h-64 object-contain bg-muted"
+                />
+              )}
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {options.map((opt) => {
+                const isSelected = selectedOption === opt.key;
+                const isCorrect = opt.key === currentQuestion.correct_option;
+                let classes = "w-full justify-start text-left h-auto py-3 px-4 text-base break-words whitespace-normal max-w-full overflow-hidden ";
+
+                if (isCorrect) {
+                  classes += "border-success bg-success/10 text-success";
+                } else if (isSelected && !isCorrect) {
+                  classes += "border-destructive bg-destructive/10 text-destructive";
+                }
+
+                return (
+                  <Button key={opt.key} variant="outline" className={classes} disabled>
+                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-secondary text-secondary-foreground font-bold mr-3 shrink-0">
+                      {opt.key}
+                    </span>
+                    <span className="flex-1 break-words whitespace-normal overflow-hidden max-w-full">{opt.text}</span>
+                    {isCorrect && <CheckCircle className="w-5 h-5 text-success ml-2 shrink-0" />}
+                    {isSelected && !isCorrect && <XCircle className="w-5 h-5 text-destructive ml-2 shrink-0" />}
+                  </Button>
+                );
+              })}
+            </CardContent>
+          </Card>
+
+          <div className="flex justify-between">
+            <Button
+              variant="outline"
+              onClick={() => goToQuestion(currentIndex - 1)}
+              disabled={currentIndex === 0}
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" /> Anterior
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => goToQuestion(currentIndex + 1)}
+              disabled={currentIndex >= questions.length - 1}
+            >
+              Próxima <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
+        </div>
       </div>
     );
   }
 
-  // Playing state
+  // Playing state — no feedback, just selection
   const currentQuestion = questions[currentIndex];
-  const progress = ((currentIndex + (answered ? 1 : 0)) / questions.length) * 100;
+  const selectedOption = answers[currentQuestion?.id];
+  const progress = ((currentIndex + 1) / questions.length) * 100;
+  const allAnswered = questions.every((q) => answers[q.id]);
   const options = [
     { key: "A", text: currentQuestion?.option_a },
     { key: "B", text: currentQuestion?.option_b },
@@ -241,9 +348,33 @@ export default function ExamPage() {
             <span className="text-sm font-medium text-muted-foreground">
               Pergunta {currentIndex + 1} de {questions.length}
             </span>
-            <span className="text-sm font-medium text-primary">Acertos: {score}</span>
+            <span className="text-sm font-medium text-muted-foreground">
+              {Object.keys(answers).length}/{questions.length} respondidas
+            </span>
           </div>
           <Progress value={progress} className="h-2" />
+        </div>
+
+        {/* Question number pills */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          {questions.map((q, i) => {
+            const hasAnswer = !!answers[q.id];
+            return (
+              <button
+                key={q.id}
+                onClick={() => setCurrentIndex(i)}
+                className={`w-9 h-9 rounded-lg text-sm font-bold transition-all ${
+                  i === currentIndex
+                    ? "gradient-primary text-primary-foreground shadow-glow"
+                    : hasAnswer
+                    ? "bg-primary/20 text-primary"
+                    : "bg-secondary text-secondary-foreground"
+                }`}
+              >
+                {i + 1}
+              </button>
+            );
+          })}
         </div>
 
         <Card className="shadow-elevated mb-6">
@@ -262,15 +393,10 @@ export default function ExamPage() {
           <CardContent className="space-y-3">
             {options.map((opt) => {
               const isSelected = selectedOption === opt.key;
-              const isCorrect = opt.key === currentQuestion?.correct_option;
               let extraClass = "w-full justify-start text-left h-auto py-3 px-4 text-base transition-all break-words whitespace-normal max-w-full overflow-hidden ";
 
-              if (answered) {
-                if (isCorrect) {
-                  extraClass += "border-success bg-success/10 text-success";
-                } else if (isSelected && !isCorrect) {
-                  extraClass += "border-destructive bg-destructive/10 text-destructive";
-                }
+              if (isSelected) {
+                extraClass += "border-primary bg-primary/10 text-primary ring-2 ring-primary/30";
               } else {
                 extraClass += "hover:border-primary hover:bg-primary/5";
               }
@@ -280,29 +406,46 @@ export default function ExamPage() {
                   key={opt.key}
                   variant="outline"
                   className={extraClass}
-                  onClick={() => handleAnswer(opt.key)}
-                  disabled={answered}
+                  onClick={() => handleSelect(opt.key)}
                 >
                   <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-secondary text-secondary-foreground font-bold mr-3 shrink-0">
                     {opt.key}
                   </span>
                   <span className="flex-1 break-words whitespace-normal overflow-hidden max-w-full">{opt.text}</span>
-                  {answered && isCorrect && <CheckCircle className="w-5 h-5 text-success ml-2 shrink-0" />}
-                  {answered && isSelected && !isCorrect && <XCircle className="w-5 h-5 text-destructive ml-2 shrink-0" />}
                 </Button>
               );
             })}
           </CardContent>
         </Card>
 
-        {answered && (
-          <div className="flex justify-end animate-fade-in">
-            <Button onClick={nextQuestion} className="gradient-primary text-primary-foreground">
-              {currentIndex + 1 >= questions.length ? "Ver Resultado" : "Próxima"}
-              <ArrowRight className="w-4 h-4 ml-2" />
+        <div className="flex justify-between">
+          <Button
+            variant="outline"
+            onClick={() => goToQuestion(currentIndex - 1)}
+            disabled={currentIndex === 0}
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" /> Anterior
+          </Button>
+
+          {currentIndex + 1 < questions.length ? (
+            <Button
+              onClick={() => goToQuestion(currentIndex + 1)}
+              disabled={!selectedOption}
+              className="gradient-primary text-primary-foreground"
+            >
+              Próxima <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
-          </div>
-        )}
+          ) : (
+            <Button
+              onClick={handleSubmit}
+              disabled={!allAnswered || submitting}
+              className="gradient-primary text-primary-foreground"
+            >
+              {submitting ? "Enviando..." : "Finalizar Prova"}
+              <Send className="w-4 h-4 ml-2" />
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );
