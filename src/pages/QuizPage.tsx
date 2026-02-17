@@ -38,7 +38,7 @@ export default function QuizPage() {
     const { data, error } = await supabase
       .from("questions")
       .select("*")
-      .limit(25);
+      .limit(50);
 
     if (error || !data || data.length === 0) {
       toast({ title: "Erro", description: "Nenhuma pergunta disponível.", variant: "destructive" });
@@ -47,7 +47,7 @@ export default function QuizPage() {
     }
 
     // Shuffle
-    const shuffled = data.sort(() => Math.random() - 0.5).slice(0, 25);
+    const shuffled = data.sort(() => Math.random() - 0.5).slice(0, 50);
     setQuestions(shuffled);
 
     // Create attempt
@@ -119,7 +119,7 @@ export default function QuizPage() {
             </div>
             <CardTitle className="font-display text-2xl">Pronto para o Quiz?</CardTitle>
             <p className="text-muted-foreground mt-2">
-              Responda 25 perguntas e teste seus conhecimentos!
+              Responda 50 perguntas e teste seus conhecimentos!
             </p>
           </CardHeader>
           <CardContent>
