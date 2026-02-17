@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, ArrowRight, RotateCcw, Trophy, BookOpen } from "lucide-react";
+import { CheckCircle, XCircle, ArrowRight, RotateCcw, Trophy, BookOpen, ClipboardList, Clock, Target } from "lucide-react";
+import quizBanner from "@/assets/quiz-banner.jpg";
 
 interface Question {
   id: string;
@@ -111,20 +112,48 @@ export default function QuizPage() {
 
   if (state === "idle") {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <Card className="w-full max-w-lg shadow-elevated animate-fade-in text-center">
-          <CardHeader>
-            <div className="mx-auto w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mb-4 shadow-glow">
-              <BookOpen className="w-8 h-8 text-primary-foreground" />
-            </div>
-            <CardTitle className="font-display text-2xl">Pronto para o Quiz?</CardTitle>
-            <p className="text-muted-foreground mt-2">
-              Responda 50 perguntas e teste seus conhecimentos!
+      <div className="min-h-[70vh] flex items-center justify-center px-4">
+        <Card className="w-full max-w-2xl shadow-elevated animate-fade-in overflow-hidden">
+          <div className="w-full">
+            <img
+              src={quizBanner}
+              alt="Banner do Simulado"
+              className="w-full h-48 sm:h-56 md:h-64 object-cover"
+            />
+          </div>
+          <CardHeader className="text-center pt-6 pb-2">
+            <CardTitle className="font-display text-2xl sm:text-3xl">
+              Simulado Focus
+            </CardTitle>
+            <p className="text-muted-foreground mt-2 text-sm sm:text-base">
+              Teste seus conhecimentos com questões selecionadas para reforçar seu aprendizado.
             </p>
           </CardHeader>
-          <CardContent>
-            <Button onClick={startQuiz} disabled={loading} className="gradient-primary text-primary-foreground px-8 py-3 text-lg">
-              {loading ? "Carregando..." : "Iniciar Quiz"}
+          <CardContent className="space-y-6 pb-8">
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-secondary">
+                <ClipboardList className="w-5 h-5 text-primary" />
+                <span className="text-xs text-muted-foreground">Questões</span>
+                <span className="font-display font-bold text-foreground">50</span>
+              </div>
+              <div className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-secondary">
+                <Target className="w-5 h-5 text-primary" />
+                <span className="text-xs text-muted-foreground">Tipo</span>
+                <span className="font-display font-bold text-foreground">Múltipla</span>
+              </div>
+              <div className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-secondary">
+                <Clock className="w-5 h-5 text-primary" />
+                <span className="text-xs text-muted-foreground">Feedback</span>
+                <span className="font-display font-bold text-foreground">Imediato</span>
+              </div>
+            </div>
+            <Button
+              onClick={startQuiz}
+              disabled={loading}
+              className="w-full gradient-primary text-primary-foreground py-6 text-lg font-display font-semibold shadow-glow"
+            >
+              {loading ? "Carregando..." : "Iniciar Simulado"}
+              {!loading && <ArrowRight className="w-5 h-5 ml-2" />}
             </Button>
           </CardContent>
         </Card>
