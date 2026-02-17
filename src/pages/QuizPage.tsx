@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, XCircle, ArrowRight, RotateCcw, Trophy, BookOpen, ClipboardList, Clock, Target } from "lucide-react";
-import quizBanner from "@/assets/quiz-banner.jpg";
+import quizBanner from "@/assets/quiz-banner.png";
 
 interface Question {
   id: string;
