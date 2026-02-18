@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, ArrowRight, RotateCcw, Trophy, BookOpen, ClipboardList, Clock, Target } from "lucide-react";
+import { CheckCircle, XCircle, ArrowRight, RotateCcw, Trophy, BookOpen, ClipboardList, Clock, Target, Timer } from "lucide-react";
 import quizBanner from "@/assets/quiz-banner.png";
 
 interface Question {
@@ -21,6 +21,15 @@ interface Question {
 
 type QuizState = "idle" | "playing" | "finished";
 
+const QUIZ_DURATION = 7200; // 2 horas em segundos
+
+const formatTime = (seconds: number) => {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+};
+
 export default function QuizPage() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -32,6 +41,30 @@ export default function QuizPage() {
   const [state, setState] = useState<QuizState>("idle");
   const [attemptId, setAttemptId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(QUIZ_DURATION);
+
+  // Timer countdown
+  useEffect(() => {
+    if (state !== "playing") return;
+    if (timeLeft <= 0) {
+      // Auto-finish quiz
+      const autoFinish = async () => {
+        const finalScore = score;
+        await supabase
+          .from("quiz_attempts")
+          .update({ score: finalScore, completed_at: new Date().toISOString() })
+          .eq("id", attemptId);
+        setState("finished");
+        toast({ title: "Tempo esgotado!", description: "O simulado foi finalizado automaticamente." });
+      };
+      autoFinish();
+      return;
+    }
+    const interval = setInterval(() => setTimeLeft((t) => t - 1), 1000);
+    return () => clearInterval(interval);
+  }, [state, timeLeft]);
+
+  const isLowTime = timeLeft <= 300; // últimos 5 minutos
 
   const startQuiz = async () => {
     setLoading(true);
@@ -67,6 +100,7 @@ export default function QuizPage() {
     setAttemptId(attempt.id);
     setCurrentIndex(0);
     setScore(0);
+    setTimeLeft(QUIZ_DURATION);
     setSelectedOption(null);
     setAnswered(false);
     setState("playing");
@@ -143,8 +177,8 @@ export default function QuizPage() {
               </div>
               <div className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-secondary">
                 <Clock className="w-5 h-5 text-primary" />
-                <span className="text-xs text-muted-foreground">Feedback</span>
-                <span className="font-display font-bold text-foreground">Imediato</span>
+                <span className="text-xs text-muted-foreground">Tempo</span>
+                <span className="font-display font-bold text-foreground">2 horas</span>
               </div>
             </div>
             <Button
@@ -203,9 +237,15 @@ export default function QuizPage() {
           <span className="text-sm font-medium text-muted-foreground">
             Pergunta {currentIndex + 1} de {questions.length}
           </span>
-          <span className="text-sm font-medium text-primary">
-            Acertos: {score}
-          </span>
+          <div className="flex items-center gap-4">
+            <span className="text-sm font-medium text-primary">
+              Acertos: {score}
+            </span>
+            <span className={`flex items-center gap-1 text-sm font-bold px-3 py-1 rounded-full ${isLowTime ? "bg-destructive/10 text-destructive animate-pulse" : "bg-secondary text-foreground"}`}>
+              <Timer className="w-4 h-4" />
+              {formatTime(timeLeft)}
+            </span>
+          </div>
         </div>
         <Progress value={progress} className="h-2" />
       </div>
