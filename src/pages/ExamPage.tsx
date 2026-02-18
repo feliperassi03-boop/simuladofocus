@@ -10,7 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock, User } from "lucide-react";
 
-const EXAM_DURATION_SECONDS = 3750; // 62min30s
+const EXAM_DURATION_SECONDS = 7200; // 120 minutos (2 horas)
 
 interface Question {
   id: string;
