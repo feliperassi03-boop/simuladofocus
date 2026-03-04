@@ -21,7 +21,7 @@ interface Question {
 
 type QuizState = "idle" | "playing" | "finished";
 
-const QUIZ_DURATION = 7200; // 2 horas em segundos
+const QUIZ_DURATION = 3900; // 65 minutos em segundos
 
 const formatTime = (seconds: number) => {
   const h = Math.floor(seconds / 3600);
