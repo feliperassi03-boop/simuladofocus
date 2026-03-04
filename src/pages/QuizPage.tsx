@@ -178,7 +178,7 @@ export default function QuizPage() {
               <div className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-secondary">
                 <Clock className="w-5 h-5 text-primary" />
                 <span className="text-xs text-muted-foreground">Tempo</span>
-                <span className="font-display font-bold text-foreground">2 horas</span>
+                <span className="font-display font-bold text-foreground">65 min</span>
               </div>
             </div>
             <Button
