@@ -72,7 +72,7 @@ export default function QuizPage() {
     const { data, error } = await supabase
       .from("questions")
       .select("*")
-      .limit(50);
+      .limit(25);
 
     if (error || !data || data.length === 0) {
       toast({ title: "Erro", description: "Nenhuma pergunta disponível.", variant: "destructive" });
@@ -81,7 +81,7 @@ export default function QuizPage() {
     }
 
     // Shuffle
-    const shuffled = data.sort(() => Math.random() - 0.5).slice(0, 50);
+    const shuffled = data.sort(() => Math.random() - 0.5).slice(0, 25);
     setQuestions(shuffled);
 
     // Create attempt
@@ -168,7 +168,7 @@ export default function QuizPage() {
               <div className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-secondary">
                 <ClipboardList className="w-5 h-5 text-primary" />
                 <span className="text-xs text-muted-foreground">Questões</span>
-                <span className="font-display font-bold text-foreground">50</span>
+                <span className="font-display font-bold text-foreground">25</span>
               </div>
               <div className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-secondary">
                 <Target className="w-5 h-5 text-primary" />
