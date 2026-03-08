@@ -47,7 +47,7 @@ export default function ExamPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(EXAM_DURATION_SECONDS);
+  const [timeLeft, setTimeLeft] = useState(7200);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const autoSubmitRef = useRef(false);
   const [guestName, setGuestName] = useState("");
