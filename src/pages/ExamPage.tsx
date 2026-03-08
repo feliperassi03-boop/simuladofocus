@@ -10,7 +10,8 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock, User } from "lucide-react";
 
-const EXAM_DURATION_SECONDS = 7200; // 120 minutos (2 horas)
+const getDurationByQuestionCount = (count: number) =>
+  count <= 25 ? 3900 : 7200; // 65 min para ≤25 questões, 120 min para mais
 
 interface Question {
   id: string;
@@ -46,7 +47,7 @@ export default function ExamPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(EXAM_DURATION_SECONDS);
+  const [timeLeft, setTimeLeft] = useState(7200);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const autoSubmitRef = useRef(false);
   const [guestName, setGuestName] = useState("");
@@ -127,7 +128,7 @@ export default function ExamPage() {
     }
 
     setAttemptId(attempt.id);
-    setTimeLeft(EXAM_DURATION_SECONDS);
+    setTimeLeft(getDurationByQuestionCount(sorted.length));
     setState("playing");
   };
 
