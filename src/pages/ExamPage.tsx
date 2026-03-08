@@ -128,7 +128,7 @@ export default function ExamPage() {
     }
 
     setAttemptId(attempt.id);
-    setTimeLeft(EXAM_DURATION_SECONDS);
+    setTimeLeft(getDurationByQuestionCount(sorted.length));
     setState("playing");
   };
 
