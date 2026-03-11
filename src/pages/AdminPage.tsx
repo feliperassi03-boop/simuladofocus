@@ -127,6 +127,7 @@ export default function AdminPage() {
       const payload = {
         ...form,
         image_url: form.image_url || null,
+        video_url: form.video_url || null,
       };
       if (editingId) {
         const { error } = await supabase.from("questions").update(payload).eq("id", editingId);
