@@ -17,6 +17,7 @@ interface Question {
   option_d: string;
   correct_option: string;
   image_url: string | null;
+  video_url: string | null;
 }
 
 type QuizState = "idle" | "playing" | "finished";
