@@ -405,6 +405,13 @@ export default function ExamPage() {
                   className="mt-3 rounded-lg w-full max-h-64 object-contain bg-muted"
                 />
               )}
+              {currentQuestion.video_url && (
+                <video
+                  src={currentQuestion.video_url}
+                  controls
+                  className="mt-3 rounded-lg w-full max-h-64 bg-muted"
+                />
+              )}
             </CardHeader>
             <CardContent className="space-y-3">
               {options.map((opt) => {
