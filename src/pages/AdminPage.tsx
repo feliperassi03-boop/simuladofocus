@@ -46,6 +46,7 @@ const emptyForm = {
   option_d: "",
   correct_option: "A",
   image_url: "" as string,
+  video_url: "" as string,
 };
 
 export default function AdminPage() {
