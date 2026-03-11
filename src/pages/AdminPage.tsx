@@ -60,6 +60,29 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
+  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const filePath = `${crypto.randomUUID()}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from("question-videos")
+        .upload(filePath, file);
+      if (uploadError) throw uploadError;
+      const { data: { publicUrl } } = supabase.storage
+        .from("question-videos")
+        .getPublicUrl(filePath);
+      setForm((f) => ({ ...f, video_url: publicUrl }));
+      toast({ title: "Vídeo enviado!" });
+    } catch (error: any) {
+      toast({ title: "Erro no upload", description: error.message, variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
