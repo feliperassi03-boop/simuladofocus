@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, Users, HelpCircle, BarChart3, ImagePlus, X, FileText } from "lucide-react";
+import { Plus, Pencil, Trash2, Users, HelpCircle, BarChart3, ImagePlus, X, FileText, Video } from "lucide-react";
 import ExamsTab from "@/components/admin/ExamsTab";
 
 interface Question {
@@ -46,6 +46,7 @@ const emptyForm = {
   option_d: "",
   correct_option: "A",
   image_url: "" as string,
+  video_url: "" as string,
 };
 
 export default function AdminPage() {
@@ -58,6 +59,29 @@ export default function AdminPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+
+  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const filePath = `${crypto.randomUUID()}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from("question-videos")
+        .upload(filePath, file);
+      if (uploadError) throw uploadError;
+      const { data: { publicUrl } } = supabase.storage
+        .from("question-videos")
+        .getPublicUrl(filePath);
+      setForm((f) => ({ ...f, video_url: publicUrl }));
+      toast({ title: "Vídeo enviado!" });
+    } catch (error: any) {
+      toast({ title: "Erro no upload", description: error.message, variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -103,6 +127,7 @@ export default function AdminPage() {
       const payload = {
         ...form,
         image_url: form.image_url || null,
+        video_url: form.video_url || null,
       };
       if (editingId) {
         const { error } = await supabase.from("questions").update(payload).eq("id", editingId);
@@ -133,6 +158,7 @@ export default function AdminPage() {
       option_d: q.option_d,
       correct_option: q.correct_option,
       image_url: q.image_url || "",
+      video_url: (q as any).video_url || "",
     });
     setEditingId(q.id);
     setDialogOpen(true);
@@ -255,6 +281,37 @@ export default function AdminPage() {
                           accept="image/*"
                           className="hidden"
                           onChange={handleImageUpload}
+                          disabled={uploading}
+                        />
+                      </label>
+                    )}
+                  </div>
+                  <div>
+                    <Label>Vídeo (opcional)</Label>
+                    {form.video_url ? (
+                      <div className="relative mt-2 rounded-lg overflow-hidden border">
+                        <video src={form.video_url} controls className="w-full max-h-48 bg-muted" />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-2 right-2 h-7 w-7"
+                          onClick={() => setForm((f) => ({ ...f, video_url: "" }))}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <label className="mt-2 flex items-center gap-2 cursor-pointer border border-dashed rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                        <Video className="w-5 h-5 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">
+                          {uploading ? "Enviando..." : "Clique para adicionar vídeo"}
+                        </span>
+                        <input
+                          type="file"
+                          accept="video/*"
+                          className="hidden"
+                          onChange={handleVideoUpload}
                           disabled={uploading}
                         />
                       </label>

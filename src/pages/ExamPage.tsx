@@ -22,6 +22,7 @@ interface Question {
   option_d: string;
   correct_option: string;
   image_url: string | null;
+  video_url: string | null;
 }
 
 interface Exam {
@@ -404,6 +405,13 @@ export default function ExamPage() {
                   className="mt-3 rounded-lg w-full max-h-64 object-contain bg-muted"
                 />
               )}
+              {currentQuestion.video_url && (
+                <video
+                  src={currentQuestion.video_url}
+                  controls
+                  className="mt-3 rounded-lg w-full max-h-64 bg-muted"
+                />
+              )}
             </CardHeader>
             <CardContent className="space-y-3">
               {options.map((opt) => {
@@ -520,6 +528,13 @@ export default function ExamPage() {
                 src={currentQuestion.image_url}
                 alt="Imagem da questão"
                 className="mt-3 rounded-lg w-full max-h-64 object-contain bg-muted"
+              />
+            )}
+            {currentQuestion?.video_url && (
+              <video
+                src={currentQuestion.video_url}
+                controls
+                className="mt-3 rounded-lg w-full max-h-64 bg-muted"
               />
             )}
           </CardHeader>

@@ -110,6 +110,7 @@ export type Database = {
           option_c: string
           option_d: string
           question_text: string
+          video_url: string | null
         }
         Insert: {
           correct_option: string
@@ -122,6 +123,7 @@ export type Database = {
           option_c: string
           option_d: string
           question_text: string
+          video_url?: string | null
         }
         Update: {
           correct_option?: string
@@ -134,6 +136,7 @@ export type Database = {
           option_c?: string
           option_d?: string
           question_text?: string
+          video_url?: string | null
         }
         Relationships: []
       }
