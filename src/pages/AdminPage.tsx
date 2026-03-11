@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, Users, HelpCircle, BarChart3, ImagePlus, X, FileText } from "lucide-react";
+import { Plus, Pencil, Trash2, Users, HelpCircle, BarChart3, ImagePlus, X, FileText, Video } from "lucide-react";
 import ExamsTab from "@/components/admin/ExamsTab";
 
 interface Question {
