@@ -158,6 +158,7 @@ export default function AdminPage() {
       option_d: q.option_d,
       correct_option: q.correct_option,
       image_url: q.image_url || "",
+      video_url: (q as any).video_url || "",
     });
     setEditingId(q.id);
     setDialogOpen(true);
