@@ -286,6 +286,37 @@ export default function AdminPage() {
                       </label>
                     )}
                   </div>
+                  <div>
+                    <Label>Vídeo (opcional)</Label>
+                    {form.video_url ? (
+                      <div className="relative mt-2 rounded-lg overflow-hidden border">
+                        <video src={form.video_url} controls className="w-full max-h-48 bg-muted" />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-2 right-2 h-7 w-7"
+                          onClick={() => setForm((f) => ({ ...f, video_url: "" }))}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <label className="mt-2 flex items-center gap-2 cursor-pointer border border-dashed rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                        <Video className="w-5 h-5 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">
+                          {uploading ? "Enviando..." : "Clique para adicionar vídeo"}
+                        </span>
+                        <input
+                          type="file"
+                          accept="video/*"
+                          className="hidden"
+                          onChange={handleVideoUpload}
+                          disabled={uploading}
+                        />
+                      </label>
+                    )}
+                  </div>
                   {(["A", "B", "C", "D"] as const).map((opt) => (
                     <div key={opt}>
                       <Label>Opção {opt}</Label>
