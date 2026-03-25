@@ -75,10 +75,10 @@ export default function AuthPage() {
         <Card className="shadow-elevated border-border/50">
           <CardHeader className="text-center">
             <CardTitle className="font-display text-xl">
-              {isLogin ? "Entrar" : "Criar Conta"}
+              {forgotPassword ? "Redefinir Senha" : isLogin ? "Entrar" : "Criar Conta"}
             </CardTitle>
             <CardDescription>
-              {isLogin ? "Acesse sua conta para começar" : "Registre-se para participar dos quizzes"}
+              {forgotPassword ? "Digite seu e-mail para receber o link de redefinição" : isLogin ? "Acesse sua conta para começar" : "Registre-se para participar dos quizzes"}
             </CardDescription>
           </CardHeader>
           <CardContent>
