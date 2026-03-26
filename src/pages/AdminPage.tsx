@@ -312,7 +312,7 @@ export default function AdminPage() {
                       <label className="mt-2 flex items-center gap-2 cursor-pointer border border-dashed rounded-lg p-4 hover:bg-muted/50 transition-colors">
                         <Video className="w-5 h-5 text-muted-foreground" />
                         <span className="text-sm text-muted-foreground">
-                          {uploading ? "Enviando..." : "Clique para adicionar vídeo"}
+                          {converting ? `Convertendo... ${convertProgress}%` : uploading ? "Enviando..." : "Clique para adicionar vídeo (MP4, MOV, WebM)"}
                         </span>
                         <input
                           type="file"
