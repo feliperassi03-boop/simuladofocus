@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, XCircle, ArrowRight, RotateCcw, Trophy, BookOpen, ClipboardList, Clock, Target, Timer } from "lucide-react";
 import quizBanner from "@/assets/quiz-banner.png";
+import QuestionVideo from "@/components/QuestionVideo";
 
 interface Question {
   id: string;
