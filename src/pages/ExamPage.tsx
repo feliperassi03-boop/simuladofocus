@@ -407,7 +407,7 @@ export default function ExamPage() {
                 />
               )}
               {currentQuestion.video_url && (
-                <QuestionVideo src={currentQuestion.video_url} />
+                <QuestionVideo key={currentQuestion.id} src={currentQuestion.video_url} />
               )}
             </CardHeader>
             <CardContent className="space-y-3">
@@ -528,7 +528,7 @@ export default function ExamPage() {
               />
             )}
             {currentQuestion?.video_url && (
-              <QuestionVideo src={currentQuestion.video_url} />
+              <QuestionVideo key={currentQuestion.id} src={currentQuestion.video_url} />
             )}
           </CardHeader>
           <CardContent className="space-y-3">
