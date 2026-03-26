@@ -53,7 +53,7 @@ export function useVideoConverter() {
 
       const data = await ffmpeg.readFile(outputName);
       const uint8 = data as Uint8Array;
-      const blob = new Blob([uint8.buffer], { type: "video/mp4" });
+      const blob = new Blob([new Uint8Array(uint8)], { type: "video/mp4" });
       const baseName = file.name.replace(/\.[^.]+$/, "");
       return new File([blob], `${baseName}.mp4`, { type: "video/mp4" });
     } finally {
