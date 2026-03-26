@@ -60,17 +60,23 @@ export default function AdminPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const { convertToMp4, needsConversion, converting, progress: convertProgress } = useVideoConverter();
 
   const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
     try {
-      const ext = file.name.split(".").pop();
+      let finalFile = file;
+      if (needsConversion(file.name)) {
+        toast({ title: "Convertendo vídeo para MP4...", description: "Isso pode levar alguns segundos." });
+        finalFile = await convertToMp4(file);
+      }
+      const ext = finalFile.name.split(".").pop();
       const filePath = `${crypto.randomUUID()}.${ext}`;
       const { error: uploadError } = await supabase.storage
         .from("question-videos")
-        .upload(filePath, file);
+        .upload(filePath, finalFile);
       if (uploadError) throw uploadError;
       const { data: { publicUrl } } = supabase.storage
         .from("question-videos")
