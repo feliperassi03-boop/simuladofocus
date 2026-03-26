@@ -38,15 +38,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let mounted = true;
 
+    // Set up auth state listener FIRST (before getSession)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
         if (!mounted) return;
-        setSession(session);
-        setUser(session?.user ?? null);
+        
+        // Only update state if the user actually changed
+        setSession((prev) => {
+          if (prev?.user?.id === session?.user?.id) return prev;
+          return session;
+        });
+        setUser((prev) => {
+          const newUser = session?.user ?? null;
+          if (prev?.id === newUser?.id) return prev;
+          return newUser;
+        });
+
         if (session?.user) {
-          // Use setTimeout to avoid blocking the auth state change callback
+          // Fire-and-forget: never block onAuthStateChange
           setTimeout(() => {
-            checkAdmin(session.user.id);
+            if (mounted) checkAdmin(session.user.id);
           }, 0);
         } else {
           setIsAdmin(false);
@@ -55,6 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     );
 
+    // Then restore session from storage
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!mounted) return;
       setSession(session);
