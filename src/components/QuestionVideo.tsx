@@ -15,6 +15,10 @@ export default function QuestionVideo({ src, className = "" }: QuestionVideoProp
   useEffect(() => {
     setError(false);
     setLoading(true);
+
+    // Fallback: hide spinner after 3 seconds regardless
+    const timeout = setTimeout(() => setLoading(false), 3000);
+    return () => clearTimeout(timeout);
   }, [src]);
 
   // Determine MIME type from URL extension
@@ -24,7 +28,7 @@ export default function QuestionVideo({ src, className = "" }: QuestionVideoProp
       case "mp4": return "video/mp4";
       case "webm": return "video/webm";
       case "ogg": return "video/ogg";
-      case "mov": return "video/mp4"; // Try as mp4 first since many .mov are h264 compatible
+      case "mov": return "video/mp4";
       default: return undefined;
     }
   };
@@ -69,16 +73,13 @@ export default function QuestionVideo({ src, className = "" }: QuestionVideoProp
         ref={videoRef}
         controls
         playsInline
-        crossOrigin="anonymous"
-        preload="metadata"
+        preload="auto"
         className="rounded-lg w-full max-h-96 bg-muted"
         onLoadedMetadata={() => setLoading(false)}
         onLoadedData={() => setLoading(false)}
         onCanPlay={() => setLoading(false)}
         onError={() => {
-          // If it's a .mov file, try without type hint first
           if (isMovFile && videoRef.current) {
-            // Try direct src without source element
             const video = videoRef.current;
             video.onerror = () => setError(true);
             video.src = src;
