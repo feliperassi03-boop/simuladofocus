@@ -52,7 +52,8 @@ export function useVideoConverter() {
       await ffmpeg.exec(["-i", inputName, "-c:v", "libx264", "-preset", "fast", "-crf", "28", "-c:a", "aac", "-movflags", "+faststart", outputName]);
 
       const data = await ffmpeg.readFile(outputName);
-      const blob = new Blob([data], { type: "video/mp4" });
+      const uint8 = data as Uint8Array;
+      const blob = new Blob([uint8.buffer], { type: "video/mp4" });
       const baseName = file.name.replace(/\.[^.]+$/, "");
       return new File([blob], `${baseName}.mp4`, { type: "video/mp4" });
     } finally {
