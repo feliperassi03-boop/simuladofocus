@@ -407,11 +407,7 @@ export default function ExamPage() {
                 />
               )}
               {currentQuestion.video_url && (
-                <video
-                  src={currentQuestion.video_url}
-                  controls
-                  className="mt-3 rounded-lg w-full max-h-64 bg-muted"
-                />
+                <QuestionVideo src={currentQuestion.video_url} />
               )}
             </CardHeader>
             <CardContent className="space-y-3">
@@ -532,11 +528,7 @@ export default function ExamPage() {
               />
             )}
             {currentQuestion?.video_url && (
-              <video
-                src={currentQuestion.video_url}
-                controls
-                className="mt-3 rounded-lg w-full max-h-64 bg-muted"
-              />
+              <QuestionVideo src={currentQuestion.video_url} />
             )}
           </CardHeader>
           <CardContent className="space-y-3">
