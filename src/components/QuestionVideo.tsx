@@ -58,7 +58,7 @@ export default function QuestionVideo({ src, className = "" }: QuestionVideoProp
   return (
     <div className={`mt-3 relative ${className}`}>
       {loading && (
-        <div className="absolute inset-0 rounded-lg bg-muted flex items-center justify-center z-10">
+        <div className="absolute inset-0 rounded-lg bg-muted flex items-center justify-center z-10 pointer-events-none">
           <div className="flex flex-col items-center gap-2">
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             <span className="text-xs text-muted-foreground">Carregando vídeo...</span>
@@ -71,7 +71,8 @@ export default function QuestionVideo({ src, className = "" }: QuestionVideoProp
         playsInline
         crossOrigin="anonymous"
         preload="metadata"
-        className={`rounded-lg w-full max-h-96 bg-muted ${loading ? "invisible" : ""}`}
+        className="rounded-lg w-full max-h-96 bg-muted"
+        onLoadedMetadata={() => setLoading(false)}
         onLoadedData={() => setLoading(false)}
         onCanPlay={() => setLoading(false)}
         onError={() => {
