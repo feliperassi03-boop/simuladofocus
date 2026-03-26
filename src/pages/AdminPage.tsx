@@ -411,6 +411,31 @@ export default function AdminPage() {
         </TabsContent>
 
         <TabsContent value="results">
+          <div className="flex justify-end mb-4">
+            {attempts.length > 0 && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={async () => {
+                  if (!confirm("Tem certeza que deseja apagar TODOS os resultados?")) return;
+                  const { error } = await supabase.from("quiz_answers").delete().in("attempt_id", attempts.map(a => a.id));
+                  if (!error) {
+                    const { error: err2 } = await supabase.from("quiz_attempts").delete().in("id", attempts.map(a => a.id));
+                    if (!err2) {
+                      toast({ title: "Todos os resultados foram apagados!" });
+                      fetchAttempts();
+                    } else {
+                      toast({ title: "Erro", description: err2.message, variant: "destructive" });
+                    }
+                  } else {
+                    toast({ title: "Erro", description: error.message, variant: "destructive" });
+                  }
+                }}
+              >
+                <Trash2 className="w-4 h-4 mr-2" /> Apagar Todos
+              </Button>
+            )}
+          </div>
           <Card className="shadow-card">
             <Table>
               <TableHeader>
@@ -419,6 +444,7 @@ export default function AdminPage() {
                   <TableHead>Pontuação</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Data</TableHead>
+                  <TableHead className="w-16">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -449,11 +475,25 @@ export default function AdminPage() {
                     <TableCell className="text-sm text-muted-foreground">
                       {new Date(a.created_at).toLocaleDateString("pt-BR")}
                     </TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="icon" onClick={async () => {
+                        await supabase.from("quiz_answers").delete().eq("attempt_id", a.id);
+                        const { error } = await supabase.from("quiz_attempts").delete().eq("id", a.id);
+                        if (error) {
+                          toast({ title: "Erro", description: error.message, variant: "destructive" });
+                        } else {
+                          toast({ title: "Resultado apagado!" });
+                          fetchAttempts();
+                        }
+                      }}>
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
                 {attempts.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
                       Nenhuma tentativa registrada ainda.
                     </TableCell>
                   </TableRow>
