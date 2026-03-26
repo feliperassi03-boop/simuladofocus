@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2, Users, HelpCircle, BarChart3, ImagePlus, X, FileText, Video } from "lucide-react";
 import ExamsTab from "@/components/admin/ExamsTab";
+import { useVideoConverter } from "@/hooks/useVideoConverter";
 
 interface Question {
   id: string;
