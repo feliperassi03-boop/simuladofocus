@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2, Users, HelpCircle, BarChart3, ImagePlus, X, FileText, Video } from "lucide-react";
 import ExamsTab from "@/components/admin/ExamsTab";
+import { useVideoConverter } from "@/hooks/useVideoConverter";
 
 interface Question {
   id: string;
@@ -59,17 +60,23 @@ export default function AdminPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const { convertToMp4, needsConversion, converting, progress: convertProgress } = useVideoConverter();
 
   const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
     try {
-      const ext = file.name.split(".").pop();
+      let finalFile = file;
+      if (needsConversion(file.name)) {
+        toast({ title: "Convertendo vídeo para MP4...", description: "Isso pode levar alguns segundos." });
+        finalFile = await convertToMp4(file);
+      }
+      const ext = finalFile.name.split(".").pop();
       const filePath = `${crypto.randomUUID()}.${ext}`;
       const { error: uploadError } = await supabase.storage
         .from("question-videos")
-        .upload(filePath, file);
+        .upload(filePath, finalFile);
       if (uploadError) throw uploadError;
       const { data: { publicUrl } } = supabase.storage
         .from("question-videos")
@@ -305,7 +312,7 @@ export default function AdminPage() {
                       <label className="mt-2 flex items-center gap-2 cursor-pointer border border-dashed rounded-lg p-4 hover:bg-muted/50 transition-colors">
                         <Video className="w-5 h-5 text-muted-foreground" />
                         <span className="text-sm text-muted-foreground">
-                          {uploading ? "Enviando..." : "Clique para adicionar vídeo"}
+                          {converting ? `Convertendo... ${convertProgress}%` : uploading ? "Enviando..." : "Clique para adicionar vídeo (MP4, MOV, WebM)"}
                         </span>
                         <input
                           type="file"
