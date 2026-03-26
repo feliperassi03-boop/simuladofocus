@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, XCircle, ArrowRight, RotateCcw, Trophy, BookOpen, ClipboardList, Clock, Target, Timer } from "lucide-react";
 import quizBanner from "@/assets/quiz-banner.png";
+import QuestionVideo from "@/components/QuestionVideo";
 
 interface Question {
   id: string;
@@ -264,11 +265,7 @@ export default function QuizPage() {
             />
           )}
           {currentQuestion?.video_url && (
-            <video
-              src={currentQuestion.video_url}
-              controls
-              className="mt-3 rounded-lg w-full max-h-64 bg-muted"
-            />
+            <QuestionVideo src={currentQuestion.video_url} />
           )}
         </CardHeader>
         <CardContent className="space-y-3">

@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock, User } from "lucide-react";
+import QuestionVideo from "@/components/QuestionVideo";
 
 const getDurationByQuestionCount = (count: number) =>
   count <= 25 ? 3900 : 7200; // 65 min para ≤25 questões, 120 min para mais
@@ -406,11 +407,7 @@ export default function ExamPage() {
                 />
               )}
               {currentQuestion.video_url && (
-                <video
-                  src={currentQuestion.video_url}
-                  controls
-                  className="mt-3 rounded-lg w-full max-h-64 bg-muted"
-                />
+                <QuestionVideo src={currentQuestion.video_url} />
               )}
             </CardHeader>
             <CardContent className="space-y-3">
@@ -531,11 +528,7 @@ export default function ExamPage() {
               />
             )}
             {currentQuestion?.video_url && (
-              <video
-                src={currentQuestion.video_url}
-                controls
-                className="mt-3 rounded-lg w-full max-h-64 bg-muted"
-              />
+              <QuestionVideo src={currentQuestion.video_url} />
             )}
           </CardHeader>
           <CardContent className="space-y-3">
