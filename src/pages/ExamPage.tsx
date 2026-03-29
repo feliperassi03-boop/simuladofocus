@@ -11,8 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock, User } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
 
-const getDurationByQuestionCount = (count: number) =>
-  count <= 25 ? 3900 : 7200; // 65 min para ≤25 questões, 120 min para mais
+const getDurationByQuestionCount = (_count: number) => 7200; // 120 min para todas as provas
 
 interface Question {
   id: string;
