@@ -1,0 +1,1 @@
+ALTER TABLE public.questions ADD COLUMN comment TEXT DEFAULT NULL;

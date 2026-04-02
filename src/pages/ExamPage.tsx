@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock, User } from "lucide-react";
+import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock, User, MessageSquareText } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
 
 const getDurationByQuestionCount = (_count: number) => 7200; // 120 min para todas as provas
@@ -23,6 +23,7 @@ interface Question {
   correct_option: string;
   image_url: string | null;
   video_url: string | null;
+  comment: string | null;
 }
 
 interface Exam {
@@ -432,6 +433,19 @@ export default function ExamPage() {
                   </Button>
                 );
               })}
+
+              {/* Comentário / Gabarito Comentado */}
+              {currentQuestion.comment && (
+                <div className="mt-4 p-4 rounded-lg bg-muted/50 border border-border">
+                  <div className="flex items-center gap-2 mb-2">
+                    <MessageSquareText className="w-5 h-5 text-primary" />
+                    <span className="font-display font-semibold text-foreground">Comentário</span>
+                  </div>
+                  <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                    {currentQuestion.comment}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 

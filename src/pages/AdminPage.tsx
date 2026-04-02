@@ -48,6 +48,7 @@ const emptyForm = {
   correct_option: "A",
   image_url: "" as string,
   video_url: "" as string,
+  comment: "" as string,
 };
 
 export default function AdminPage() {
@@ -135,6 +136,7 @@ export default function AdminPage() {
         ...form,
         image_url: form.image_url || null,
         video_url: form.video_url || null,
+        comment: form.comment || null,
       };
       if (editingId) {
         const { error } = await supabase.from("questions").update(payload).eq("id", editingId);
@@ -166,6 +168,7 @@ export default function AdminPage() {
       correct_option: q.correct_option,
       image_url: q.image_url || "",
       video_url: (q as any).video_url || "",
+      comment: (q as any).comment || "",
     });
     setEditingId(q.id);
     setDialogOpen(true);
@@ -336,6 +339,16 @@ export default function AdminPage() {
                       />
                     </div>
                   ))}
+                  <div>
+                    <Label>Comentário / Gabarito Comentado (opcional)</Label>
+                    <Textarea
+                      value={form.comment}
+                      onChange={(e) => setForm({ ...form, comment: e.target.value })}
+                      placeholder="Digite o comentário explicativo da questão (gabarito comentado)..."
+                      rows={6}
+                      className="min-h-[120px]"
+                    />
+                  </div>
                   <div>
                     <Label>Resposta Correta</Label>
                     <Select
