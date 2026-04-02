@@ -433,6 +433,19 @@ export default function ExamPage() {
                   </Button>
                 );
               })}
+
+              {/* Comentário / Gabarito Comentado */}
+              {currentQuestion.comment && (
+                <div className="mt-4 p-4 rounded-lg bg-muted/50 border border-border">
+                  <div className="flex items-center gap-2 mb-2">
+                    <MessageSquareText className="w-5 h-5 text-primary" />
+                    <span className="font-display font-semibold text-foreground">Comentário</span>
+                  </div>
+                  <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                    {currentQuestion.comment}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
