@@ -340,6 +340,16 @@ export default function AdminPage() {
                     </div>
                   ))}
                   <div>
+                    <Label>Comentário / Gabarito Comentado (opcional)</Label>
+                    <Textarea
+                      value={form.comment}
+                      onChange={(e) => setForm({ ...form, comment: e.target.value })}
+                      placeholder="Digite o comentário explicativo da questão (gabarito comentado)..."
+                      rows={6}
+                      className="min-h-[120px]"
+                    />
+                  </div>
+                  <div>
                     <Label>Resposta Correta</Label>
                     <Select
                       value={form.correct_option}
