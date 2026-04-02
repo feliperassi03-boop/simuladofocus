@@ -100,6 +100,7 @@ export type Database = {
       }
       questions: {
         Row: {
+          comment: string | null
           correct_option: string
           created_at: string
           created_by: string | null
@@ -113,6 +114,7 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          comment?: string | null
           correct_option: string
           created_at?: string
           created_by?: string | null
@@ -126,6 +128,7 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          comment?: string | null
           correct_option?: string
           created_at?: string
           created_by?: string | null
