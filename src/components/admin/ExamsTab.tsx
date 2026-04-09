@@ -29,6 +29,7 @@ interface Exam {
 export default function ExamsTab() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [exams, setExams] = useState<Exam[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
