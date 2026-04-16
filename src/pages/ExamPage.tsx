@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Label } from "@/components/ui/label";
@@ -8,8 +8,19 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock, User, MessageSquareText } from "lucide-react";
+import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock, User, MessageSquareText, Home } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const getDurationByQuestionCount = (_count: number) => 7200; // 120 min para todas as provas
 
@@ -37,8 +48,12 @@ type ExamState = "password" | "identify" | "playing" | "reviewing" | "error";
 
 export default function ExamPage() {
   const { id: examId } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
+  const handleExit = () => {
+    navigate(user ? "/" : "/auth");
+  };
   const [exam, setExam] = useState<Exam | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [state, setState] = useState<ExamState>("password");
@@ -486,9 +501,33 @@ export default function ExamPage() {
     <div className="min-h-screen p-4 md:p-8">
       <div className="max-w-2xl mx-auto animate-fade-in">
         <div className="mb-4">
-          <div className="flex justify-between items-center mb-2">
-            <h2 className="text-lg font-display font-bold text-foreground">{exam?.title}</h2>
-            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-mono text-sm font-bold ${
+          <div className="flex justify-between items-center mb-2 gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="shrink-0">
+                    <Home className="w-4 h-4 sm:mr-1.5" />
+                    <span className="hidden sm:inline">Sair</span>
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Sair da prova?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Se você sair agora, suas respostas não serão enviadas e o progresso desta tentativa será perdido.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Continuar prova</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleExit} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                      Sair mesmo assim
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              <h2 className="text-lg font-display font-bold text-foreground truncate">{exam?.title}</h2>
+            </div>
+            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-mono text-sm font-bold shrink-0 ${
               timeLeft <= 300 ? "bg-destructive/10 text-destructive animate-pulse" : "bg-secondary text-secondary-foreground"
             }`}>
               <Clock className="w-4 h-4" />
