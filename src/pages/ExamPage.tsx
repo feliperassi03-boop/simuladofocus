@@ -48,8 +48,12 @@ type ExamState = "password" | "identify" | "playing" | "reviewing" | "error";
 
 export default function ExamPage() {
   const { id: examId } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
+  const handleExit = () => {
+    navigate(user ? "/" : "/auth");
+  };
   const [exam, setExam] = useState<Exam | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [state, setState] = useState<ExamState>("password");
