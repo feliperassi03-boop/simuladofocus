@@ -501,9 +501,33 @@ export default function ExamPage() {
     <div className="min-h-screen p-4 md:p-8">
       <div className="max-w-2xl mx-auto animate-fade-in">
         <div className="mb-4">
-          <div className="flex justify-between items-center mb-2">
-            <h2 className="text-lg font-display font-bold text-foreground">{exam?.title}</h2>
-            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-mono text-sm font-bold ${
+          <div className="flex justify-between items-center mb-2 gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="shrink-0">
+                    <Home className="w-4 h-4 sm:mr-1.5" />
+                    <span className="hidden sm:inline">Sair</span>
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Sair da prova?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Se você sair agora, suas respostas não serão enviadas e o progresso desta tentativa será perdido.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Continuar prova</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleExit} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                      Sair mesmo assim
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              <h2 className="text-lg font-display font-bold text-foreground truncate">{exam?.title}</h2>
+            </div>
+            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-mono text-sm font-bold shrink-0 ${
               timeLeft <= 300 ? "bg-destructive/10 text-destructive animate-pulse" : "bg-secondary text-secondary-foreground"
             }`}>
               <Clock className="w-4 h-4" />
