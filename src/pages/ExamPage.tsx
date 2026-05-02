@@ -56,7 +56,7 @@ export default function ExamPage() {
   };
   const [exam, setExam] = useState<Exam | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [state, setState] = useState<ExamState>("password");
+  const [state, setState] = useState<ExamState>("identify");
   const [passwordInput, setPasswordInput] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -279,34 +279,6 @@ export default function ExamPage() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">Esta prova não existe ou não está mais disponível.</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (state === "password") {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-md shadow-elevated animate-fade-in">
-          <CardHeader className="text-center">
-            <div className="mx-auto w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mb-4 shadow-glow">
-              <Lock className="w-8 h-8 text-primary-foreground" />
-            </div>
-            <CardTitle className="font-display text-2xl">{exam?.title}</CardTitle>
-            <p className="text-muted-foreground mt-2">Digite a senha para iniciar a prova</p>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Input
-              type="password"
-              value={passwordInput}
-              onChange={(e) => setPasswordInput(e.target.value)}
-              placeholder="Senha da prova"
-              onKeyDown={(e) => e.key === "Enter" && handlePasswordSubmit()}
-            />
-            <Button onClick={handlePasswordSubmit} className="w-full gradient-primary text-primary-foreground">
-              Iniciar Prova
-            </Button>
           </CardContent>
         </Card>
       </div>
