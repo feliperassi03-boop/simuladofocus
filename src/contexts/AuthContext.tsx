@@ -56,6 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
 
         if (session?.user) {
+          setAdminChecked(false);
           setTimeout(() => {
             if (mounted) checkAdmin(session.user.id);
           }, 0);
@@ -72,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
+        setAdminChecked(false);
         checkAdmin(session.user.id);
       } else {
         setAdminChecked(true);
