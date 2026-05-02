@@ -647,6 +647,7 @@ export default function ExamPage() {
               <Clock className="w-4 h-4" />
               {formatTime(timeLeft)}
             </div>
+            </div>
           </div>
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm font-medium text-muted-foreground">
