@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock, User, MessageSquareText, Home } from "lucide-react";
+import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock, User, MessageSquareText, Home, BookOpen } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
 import {
   AlertDialog,
@@ -44,7 +44,7 @@ interface Exam {
   is_active: boolean;
 }
 
-type ExamState = "password" | "identify" | "playing" | "reviewing" | "error";
+type ExamState = "password" | "identify" | "playing" | "reviewing" | "gabarito" | "error";
 
 export default function ExamPage() {
   const { id: examId } = useParams<{ id: string }>();
@@ -69,6 +69,7 @@ export default function ExamPage() {
   const autoSubmitRef = useRef(false);
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
+  const [gabaritoReturnIndex, setGabaritoReturnIndex] = useState(0);
 
   useEffect(() => {
     const fetchExam = async () => {
@@ -485,6 +486,106 @@ export default function ExamPage() {
     );
   }
 
+  // Gabarito comentado view — accessible during exam
+  if (state === "gabarito") {
+    return (
+      <div className="min-h-screen p-4 md:p-8">
+        <div className="max-w-2xl mx-auto animate-fade-in">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-display font-bold text-foreground flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-primary" />
+              Gabarito Comentado
+            </h2>
+            <Button
+              onClick={() => {
+                setCurrentIndex(gabaritoReturnIndex);
+                setState("playing");
+              }}
+              className="gradient-primary text-primary-foreground"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" /> Voltar à Prova
+            </Button>
+          </div>
+
+          <div className="space-y-6">
+            {questions.map((q, i) => {
+              const studentAnswer = answers[q.id];
+              const opts = [
+                { key: "A", text: q.option_a },
+                { key: "B", text: q.option_b },
+                { key: "C", text: q.option_c },
+                { key: "D", text: q.option_d },
+              ];
+
+              return (
+                <Card key={q.id} className="shadow-elevated">
+                  <CardHeader>
+                    <CardTitle className="font-display text-lg leading-relaxed">
+                      <span className="text-primary font-bold mr-2">{i + 1}.</span>
+                      {q.question_text}
+                    </CardTitle>
+                    {q.image_url && (
+                      <img src={q.image_url} alt="Imagem da questão" className="mt-3 rounded-lg w-full max-h-64 object-contain bg-muted" />
+                    )}
+                    {q.video_url && <QuestionVideo key={q.id} src={q.video_url} />}
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {opts.map((opt) => {
+                      const isCorrect = opt.key === q.correct_option;
+                      const isStudentPick = studentAnswer === opt.key;
+                      let classes = "w-full justify-start text-left h-auto py-3 px-4 text-base break-words whitespace-normal max-w-full overflow-hidden ";
+
+                      if (isCorrect) {
+                        classes += "border-success bg-success/10 text-success";
+                      } else if (isStudentPick && !isCorrect) {
+                        classes += "border-destructive bg-destructive/10 text-destructive";
+                      }
+
+                      return (
+                        <Button key={opt.key} variant="outline" className={classes} disabled>
+                          <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-secondary text-secondary-foreground font-bold mr-3 shrink-0">
+                            {opt.key}
+                          </span>
+                          <span className="flex-1 break-words whitespace-normal overflow-hidden max-w-full">{opt.text}</span>
+                          {isCorrect && <CheckCircle className="w-5 h-5 text-success ml-2 shrink-0" />}
+                          {isStudentPick && !isCorrect && <XCircle className="w-5 h-5 text-destructive ml-2 shrink-0" />}
+                        </Button>
+                      );
+                    })}
+
+                    {q.comment && (
+                      <div className="mt-4 p-4 rounded-lg bg-muted/50 border border-border">
+                        <div className="flex items-center gap-2 mb-2">
+                          <MessageSquareText className="w-5 h-5 text-primary" />
+                          <span className="font-display font-semibold text-foreground">Comentário</span>
+                        </div>
+                        <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                          {q.comment}
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+
+          <div className="mt-6 text-center">
+            <Button
+              onClick={() => {
+                setCurrentIndex(gabaritoReturnIndex);
+                setState("playing");
+              }}
+              className="gradient-primary text-primary-foreground"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" /> Voltar à Prova
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Playing state — no feedback, just selection
   const currentQuestion = questions[currentIndex];
   const selectedOption = answers[currentQuestion?.id];
@@ -527,11 +628,25 @@ export default function ExamPage() {
               </AlertDialog>
               <h2 className="text-lg font-display font-bold text-foreground truncate">{exam?.title}</h2>
             </div>
-            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-mono text-sm font-bold shrink-0 ${
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="shrink-0"
+                onClick={() => {
+                  setGabaritoReturnIndex(currentIndex);
+                  setState("gabarito");
+                }}
+              >
+                <BookOpen className="w-4 h-4 sm:mr-1.5" />
+                <span className="hidden sm:inline">Ver gabarito comentado</span>
+              </Button>
+              <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-mono text-sm font-bold shrink-0 ${
               timeLeft <= 300 ? "bg-destructive/10 text-destructive animate-pulse" : "bg-secondary text-secondary-foreground"
             }`}>
               <Clock className="w-4 h-4" />
               {formatTime(timeLeft)}
+            </div>
             </div>
           </div>
           <div className="flex justify-between items-center mb-2">
