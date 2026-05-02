@@ -120,6 +120,33 @@ export default function ProvasPage() {
     );
   }
 
+  if (!unlocked && !isAdmin) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+        <Lock className="w-16 h-16 text-primary opacity-60" />
+        <h2 className="text-xl font-display font-bold text-foreground">Acesso Protegido</h2>
+        <p className="text-muted-foreground max-w-md">
+          Digite a senha de acesso para visualizar as provas disponíveis.
+        </p>
+        <div className="flex gap-2 w-full max-w-xs">
+          <Input
+            type="password"
+            placeholder="Senha de acesso"
+            value={passwordInput}
+            onChange={(e) => { setPasswordInput(e.target.value); setPasswordError(false); }}
+            onKeyDown={(e) => e.key === "Enter" && handlePasswordSubmit()}
+          />
+          <Button onClick={handlePasswordSubmit} className="gradient-primary text-primary-foreground">
+            Entrar
+          </Button>
+        </div>
+        {passwordError && (
+          <p className="text-sm text-destructive">Senha incorreta. Tente novamente.</p>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
