@@ -122,8 +122,18 @@ export default function AdminPage() {
   };
 
   const fetchAttempts = async () => {
-    const { data } = await supabase.from("quiz_attempts").select("*").order("created_at", { ascending: false });
-    if (data) setAttempts(data);
+    const { data } = await supabase
+      .from("quiz_attempts")
+      .select("*, exams(title)")
+      .order("created_at", { ascending: false });
+    if (data) {
+      setAttempts(
+        data.map((a: any) => ({
+          ...a,
+          exam_title: a.exams?.title || "—",
+        }))
+      );
+    }
   };
 
   useEffect(() => {
