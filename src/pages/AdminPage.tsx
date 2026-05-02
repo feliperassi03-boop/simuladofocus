@@ -38,6 +38,7 @@ interface Attempt {
   guest_name: string | null;
   guest_email: string | null;
   exam_id: string | null;
+  exam_title?: string;
 }
 
 const emptyForm = {
