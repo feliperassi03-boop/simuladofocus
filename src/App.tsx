@@ -20,14 +20,14 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   if (loading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Carregando...</div>;
   if (!user) return <Navigate to="/auth" replace />;
-  return <AppLayout>{children}</AppLayout>;
+  return <>{children}</>;
 }
 
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const { isAdmin, loading } = useAuth();
   if (loading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Carregando...</div>;
   if (!isAdmin) return <Navigate to="/provas" replace />;
-  return <>{children}</>;
+  return <AppLayout>{children}</AppLayout>;
 }
 
 function AuthRoute() {
@@ -43,6 +43,13 @@ function HomeRedirect() {
   return isAdmin ? <Navigate to="/admin" replace /> : <Navigate to="/provas" replace />;
 }
 
+function StudentRoute({ children }: { children: React.ReactNode }) {
+  const { isAdmin, loading } = useAuth();
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Carregando...</div>;
+  if (isAdmin) return <Navigate to="/admin" replace />;
+  return <>{children}</>;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -54,8 +61,8 @@ const App = () => (
             <Route path="/auth" element={<AuthRoute />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/" element={<ProtectedRoute><HomeRedirect /></ProtectedRoute>} />
-            <Route path="/provas" element={<ProvasPage />} />
-            <Route path="/historico" element={<ProtectedRoute><HistoryPage /></ProtectedRoute>} />
+            <Route path="/provas" element={<StudentRoute><ProvasPage /></StudentRoute>} />
+            <Route path="/historico" element={<ProtectedRoute><AppLayout><HistoryPage /></AppLayout></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><AdminRoute><AdminPage /></AdminRoute></ProtectedRoute>} />
             <Route path="/prova/:id" element={<ExamPage />} />
             <Route path="*" element={<NotFound />} />
