@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Play, FileText, Loader2 } from "lucide-react";
+import { Play, FileText, Loader2, ShieldAlert } from "lucide-react";
 
 interface ExamItem {
   id: string;
@@ -13,10 +14,41 @@ interface ExamItem {
 
 export default function ProvasPage() {
   const navigate = useNavigate();
+  const { user, isAdmin } = useAuth();
   const [exams, setExams] = useState<ExamItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [allowed, setAllowed] = useState<boolean | null>(null);
 
   useEffect(() => {
+    const checkAccess = async () => {
+      if (!user?.email) {
+        setAllowed(false);
+        setLoading(false);
+        return;
+      }
+
+      // Admins always have access
+      if (isAdmin) {
+        setAllowed(true);
+        fetchExams();
+        return;
+      }
+
+      const { data } = await supabase
+        .from("allowed_emails")
+        .select("id")
+        .eq("email", user.email.toLowerCase())
+        .maybeSingle();
+
+      if (data) {
+        setAllowed(true);
+        fetchExams();
+      } else {
+        setAllowed(false);
+        setLoading(false);
+      }
+    };
+
     const fetchExams = async () => {
       const { data: examsData } = await supabase
         .from("exams")
@@ -50,13 +82,25 @@ export default function ProvasPage() {
       setLoading(false);
     };
 
-    fetchExams();
-  }, []);
+    checkAccess();
+  }, [user, isAdmin]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="w-6 h-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!allowed) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+        <ShieldAlert className="w-16 h-16 text-destructive opacity-60" />
+        <h2 className="text-xl font-display font-bold text-foreground">Acesso Restrito</h2>
+        <p className="text-muted-foreground max-w-md">
+          Seu email não está autorizado a acessar as provas. Entre em contato com o administrador para solicitar acesso.
+        </p>
       </div>
     );
   }
