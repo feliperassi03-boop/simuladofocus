@@ -71,6 +71,15 @@ export default function ExamPage() {
   const [guestEmail, setGuestEmail] = useState("");
   const [gabaritoReturnIndex, setGabaritoReturnIndex] = useState(0);
 
+  // Auto-fill name/email for logged-in users
+  useEffect(() => {
+    if (user) {
+      const fullName = user.user_metadata?.full_name || user.email?.split("@")[0] || "";
+      setGuestName(fullName);
+      setGuestEmail(user.email || "");
+    }
+  }, [user]);
+
   useEffect(() => {
     const fetchExam = async () => {
       if (!examId) return;
