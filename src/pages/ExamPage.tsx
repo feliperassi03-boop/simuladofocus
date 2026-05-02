@@ -71,6 +71,15 @@ export default function ExamPage() {
   const [guestEmail, setGuestEmail] = useState("");
   const [gabaritoReturnIndex, setGabaritoReturnIndex] = useState(0);
 
+  // Auto-fill name/email for logged-in users
+  useEffect(() => {
+    if (user) {
+      const fullName = user.user_metadata?.full_name || user.email?.split("@")[0] || "";
+      setGuestName(fullName);
+      setGuestEmail(user.email || "");
+    }
+  }, [user]);
+
   useEffect(() => {
     const fetchExam = async () => {
       if (!examId) return;
@@ -294,30 +303,36 @@ export default function ExamPage() {
               <User className="w-8 h-8 text-primary-foreground" />
             </div>
             <CardTitle className="font-display text-2xl">{exam?.title}</CardTitle>
-            <p className="text-muted-foreground mt-2">Identifique-se para iniciar a prova</p>
+            <p className="text-muted-foreground mt-2">
+              {user ? `Bem-vindo(a), ${guestName}!` : "Identifique-se para iniciar a prova"}
+            </p>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="guestName">Nome completo *</Label>
-              <Input
-                id="guestName"
-                value={guestName}
-                onChange={(e) => setGuestName(e.target.value)}
-                placeholder="Seu nome completo"
-                onKeyDown={(e) => e.key === "Enter" && handleIdentifySubmit()}
-              />
-            </div>
-            <div>
-              <Label htmlFor="guestEmail">E-mail (opcional)</Label>
-              <Input
-                id="guestEmail"
-                type="email"
-                value={guestEmail}
-                onChange={(e) => setGuestEmail(e.target.value)}
-                placeholder="seu@email.com"
-                onKeyDown={(e) => e.key === "Enter" && handleIdentifySubmit()}
-              />
-            </div>
+            {!user && (
+              <>
+                <div>
+                  <Label htmlFor="guestName">Nome completo *</Label>
+                  <Input
+                    id="guestName"
+                    value={guestName}
+                    onChange={(e) => setGuestName(e.target.value)}
+                    placeholder="Seu nome completo"
+                    onKeyDown={(e) => e.key === "Enter" && handleIdentifySubmit()}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="guestEmail">E-mail (opcional)</Label>
+                  <Input
+                    id="guestEmail"
+                    type="email"
+                    value={guestEmail}
+                    onChange={(e) => setGuestEmail(e.target.value)}
+                    placeholder="seu@email.com"
+                    onKeyDown={(e) => e.key === "Enter" && handleIdentifySubmit()}
+                  />
+                </div>
+              </>
+            )}
             <Button onClick={handleIdentifySubmit} className="w-full gradient-primary text-primary-foreground">
               Iniciar Prova
             </Button>

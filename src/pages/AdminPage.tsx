@@ -38,6 +38,7 @@ interface Attempt {
   guest_name: string | null;
   guest_email: string | null;
   exam_id: string | null;
+  exam_title?: string;
 }
 
 const emptyForm = {
@@ -121,8 +122,18 @@ export default function AdminPage() {
   };
 
   const fetchAttempts = async () => {
-    const { data } = await supabase.from("quiz_attempts").select("*").order("created_at", { ascending: false });
-    if (data) setAttempts(data);
+    const { data } = await supabase
+      .from("quiz_attempts")
+      .select("*, exams(title)")
+      .order("created_at", { ascending: false });
+    if (data) {
+      setAttempts(
+        data.map((a: any) => ({
+          ...a,
+          exam_title: a.exams?.title || "—",
+        }))
+      );
+    }
   };
 
   useEffect(() => {
@@ -456,6 +467,7 @@ export default function AdminPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Aluno</TableHead>
+                  <TableHead>Prova</TableHead>
                   <TableHead>Pontuação</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Data</TableHead>
@@ -471,6 +483,7 @@ export default function AdminPage() {
                         <span className="block text-xs text-muted-foreground">{a.guest_email}</span>
                       )}
                     </TableCell>
+                    <TableCell className="text-sm">{a.exam_title}</TableCell>
                     <TableCell>
                       <span className="font-bold font-display">
                         {a.score}/{a.total_questions}
@@ -508,7 +521,7 @@ export default function AdminPage() {
                 ))}
                 {attempts.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                       Nenhuma tentativa registrada ainda.
                     </TableCell>
                   </TableRow>
