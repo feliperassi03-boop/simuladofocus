@@ -1,6 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { BookOpen, LogOut, Shield, GraduationCap, History } from "lucide-react";
+import { BookOpen, LogOut, Shield, GraduationCap, History, FileText } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -19,13 +19,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </Link>
 
           <nav className="flex items-center gap-2">
-            <Link to="/">
+            <Link to="/provas">
               <Button
-                variant={location.pathname === "/" ? "default" : "ghost"}
+                variant={location.pathname === "/provas" ? "default" : "ghost"}
                 size="sm"
-                className={location.pathname === "/" ? "gradient-primary text-primary-foreground" : ""}
+                className={location.pathname === "/provas" ? "gradient-primary text-primary-foreground" : ""}
               >
-                <GraduationCap className="w-4 h-4 mr-1" /> Quiz
+                <FileText className="w-4 h-4 mr-1" /> Provas
               </Button>
             </Link>
             <Link to="/historico">
