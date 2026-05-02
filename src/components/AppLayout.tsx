@@ -1,6 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { BookOpen, LogOut, Shield, GraduationCap } from "lucide-react";
+import { BookOpen, LogOut, Shield, GraduationCap, History } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -26,6 +26,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 className={location.pathname === "/" ? "gradient-primary text-primary-foreground" : ""}
               >
                 <GraduationCap className="w-4 h-4 mr-1" /> Quiz
+              </Button>
+            </Link>
+            <Link to="/historico">
+              <Button
+                variant={location.pathname === "/historico" ? "default" : "ghost"}
+                size="sm"
+                className={location.pathname === "/historico" ? "gradient-primary text-primary-foreground" : ""}
+              >
+                <History className="w-4 h-4 mr-1" /> Histórico
               </Button>
             </Link>
             {isAdmin && (

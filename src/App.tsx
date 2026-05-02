@@ -8,6 +8,7 @@ import AuthPage from "./pages/AuthPage";
 import QuizPage from "./pages/QuizPage";
 import AdminPage from "./pages/AdminPage";
 import ExamPage from "./pages/ExamPage";
+import HistoryPage from "./pages/HistoryPage";
 import AppLayout from "./components/AppLayout";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import NotFound from "./pages/NotFound";
@@ -46,6 +47,7 @@ const App = () => (
             <Route path="/auth" element={<AuthRoute />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/" element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
+            <Route path="/historico" element={<ProtectedRoute><HistoryPage /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><AdminRoute><AdminPage /></AdminRoute></ProtectedRoute>} />
             <Route path="/prova/:id" element={<ExamPage />} />
             <Route path="*" element={<NotFound />} />
