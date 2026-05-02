@@ -9,6 +9,7 @@ import QuizPage from "./pages/QuizPage";
 import AdminPage from "./pages/AdminPage";
 import ExamPage from "./pages/ExamPage";
 import HistoryPage from "./pages/HistoryPage";
+import ProvasPage from "./pages/ProvasPage";
 import AppLayout from "./components/AppLayout";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import NotFound from "./pages/NotFound";
@@ -25,7 +26,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const { isAdmin, loading } = useAuth();
   if (loading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Carregando...</div>;
-  if (!isAdmin) return <Navigate to="/" replace />;
+  if (!isAdmin) return <Navigate to="/provas" replace />;
   return <>{children}</>;
 }
 
@@ -34,6 +35,12 @@ function AuthRoute() {
   if (loading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Carregando...</div>;
   if (user) return <Navigate to="/" replace />;
   return <AuthPage />;
+}
+
+function HomeRedirect() {
+  const { isAdmin, loading } = useAuth();
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Carregando...</div>;
+  return isAdmin ? <Navigate to="/admin" replace /> : <Navigate to="/provas" replace />;
 }
 
 const App = () => (
@@ -46,7 +53,8 @@ const App = () => (
           <Routes>
             <Route path="/auth" element={<AuthRoute />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/" element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
+            <Route path="/" element={<ProtectedRoute><HomeRedirect /></ProtectedRoute>} />
+            <Route path="/provas" element={<ProtectedRoute><ProvasPage /></ProtectedRoute>} />
             <Route path="/historico" element={<ProtectedRoute><HistoryPage /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><AdminRoute><AdminPage /></AdminRoute></ProtectedRoute>} />
             <Route path="/prova/:id" element={<ExamPage />} />
