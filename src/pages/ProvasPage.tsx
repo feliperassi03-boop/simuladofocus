@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Play, FileText, Loader2, ShieldAlert } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Play, FileText, Loader2, ShieldAlert, Lock } from "lucide-react";
 
 interface ExamItem {
   id: string;
@@ -18,6 +19,20 @@ export default function ProvasPage() {
   const [exams, setExams] = useState<ExamItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [allowed, setAllowed] = useState<boolean | null>(null);
+  const [unlocked, setUnlocked] = useState(false);
+  const [passwordInput, setPasswordInput] = useState("");
+  const [passwordError, setPasswordError] = useState(false);
+
+  const GLOBAL_PASSWORD = "tsa2026";
+
+  const handlePasswordSubmit = () => {
+    if (passwordInput === GLOBAL_PASSWORD) {
+      setUnlocked(true);
+      setPasswordError(false);
+    } else {
+      setPasswordError(true);
+    }
+  };
 
   useEffect(() => {
     const checkAccess = async () => {
@@ -101,6 +116,33 @@ export default function ProvasPage() {
         <p className="text-muted-foreground max-w-md">
           Seu email não está autorizado a acessar as provas. Entre em contato com o administrador para solicitar acesso.
         </p>
+      </div>
+    );
+  }
+
+  if (!unlocked && !isAdmin) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+        <Lock className="w-16 h-16 text-primary opacity-60" />
+        <h2 className="text-xl font-display font-bold text-foreground">Acesso Protegido</h2>
+        <p className="text-muted-foreground max-w-md">
+          Digite a senha de acesso para visualizar as provas disponíveis.
+        </p>
+        <div className="flex gap-2 w-full max-w-xs">
+          <Input
+            type="password"
+            placeholder="Senha de acesso"
+            value={passwordInput}
+            onChange={(e) => { setPasswordInput(e.target.value); setPasswordError(false); }}
+            onKeyDown={(e) => e.key === "Enter" && handlePasswordSubmit()}
+          />
+          <Button onClick={handlePasswordSubmit} className="gradient-primary text-primary-foreground">
+            Entrar
+          </Button>
+        </div>
+        {passwordError && (
+          <p className="text-sm text-destructive">Senha incorreta. Tente novamente.</p>
+        )}
       </div>
     );
   }
