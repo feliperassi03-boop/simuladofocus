@@ -5,7 +5,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Play, FileText, Loader2, ShieldAlert, Lock } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Play, FileText, Loader2, ShieldAlert, Lock, BookOpen } from "lucide-react";
 
 interface ExamItem {
   id: string;
@@ -13,58 +14,35 @@ interface ExamItem {
   question_count: number;
 }
 
+const GLOBAL_PASSWORD = "tsa2026";
+
 export default function ProvasPage() {
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
+
   const [exams, setExams] = useState<ExamItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [allowed, setAllowed] = useState<boolean | null>(null);
-  const [unlocked, setUnlocked] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [accessGranted, setAccessGranted] = useState(false);
+
+  // Gate fields
+  const [emailInput, setEmailInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
-  const [passwordError, setPasswordError] = useState(false);
+  const [error, setError] = useState("");
+  const [checking, setChecking] = useState(false);
 
-  const GLOBAL_PASSWORD = "tsa2026";
-
-  const handlePasswordSubmit = () => {
-    if (passwordInput === GLOBAL_PASSWORD) {
-      setUnlocked(true);
-      setPasswordError(false);
-    } else {
-      setPasswordError(true);
-    }
-  };
-
+  // Admin bypass – auto-grant access
   useEffect(() => {
-    const checkAccess = async () => {
-      if (!user?.email) {
-        setAllowed(false);
-        setLoading(false);
-        return;
-      }
+    if (isAdmin) {
+      setAccessGranted(true);
+    }
+  }, [isAdmin]);
 
-      // Admins always have access
-      if (isAdmin) {
-        setAllowed(true);
-        fetchExams();
-        return;
-      }
-
-      const { data } = await supabase
-        .from("allowed_emails")
-        .select("id")
-        .eq("email", user.email.toLowerCase())
-        .maybeSingle();
-
-      if (data) {
-        setAllowed(true);
-        fetchExams();
-      } else {
-        setAllowed(false);
-        setLoading(false);
-      }
-    };
+  // Fetch exams once access is granted
+  useEffect(() => {
+    if (!accessGranted) return;
 
     const fetchExams = async () => {
+      setLoading(true);
       const { data: examsData } = await supabase
         .from("exams")
         .select("id, title")
@@ -97,52 +75,100 @@ export default function ProvasPage() {
       setLoading(false);
     };
 
-    checkAccess();
-  }, [user, isAdmin]);
+    fetchExams();
+  }, [accessGranted]);
+
+  const handleAccessSubmit = async () => {
+    setError("");
+
+    if (!emailInput.trim() || !passwordInput.trim()) {
+      setError("Preencha todos os campos.");
+      return;
+    }
+
+    if (passwordInput !== GLOBAL_PASSWORD) {
+      setError("Senha incorreta.");
+      return;
+    }
+
+    setChecking(true);
+
+    const { data } = await supabase
+      .from("allowed_emails")
+      .select("id")
+      .eq("email", emailInput.trim().toLowerCase())
+      .maybeSingle();
+
+    if (data) {
+      setAccessGranted(true);
+    } else {
+      setError("E-mail não autorizado. Contate o administrador.");
+    }
+
+    setChecking(false);
+  };
+
+  // Access gate UI
+  if (!accessGranted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <div className="w-full max-w-md animate-fade-in">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl gradient-primary mb-4 shadow-glow">
+              <BookOpen className="w-8 h-8 text-primary-foreground" />
+            </div>
+            <h1 className="text-3xl font-bold font-display text-foreground">Simulado Focus</h1>
+            <p className="text-muted-foreground mt-2">Acesse as provas disponíveis</p>
+          </div>
+
+          <Card className="shadow-elevated border-border/50">
+            <CardHeader className="text-center">
+              <CardTitle className="font-display text-xl flex items-center justify-center gap-2">
+                <Lock className="w-5 h-5" /> Acesso às Provas
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="gate-email">E-mail</Label>
+                <Input
+                  id="gate-email"
+                  type="email"
+                  placeholder="seu@email.com"
+                  value={emailInput}
+                  onChange={(e) => { setEmailInput(e.target.value); setError(""); }}
+                  onKeyDown={(e) => e.key === "Enter" && handleAccessSubmit()}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="gate-password">Senha de acesso</Label>
+                <Input
+                  id="gate-password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={passwordInput}
+                  onChange={(e) => { setPasswordInput(e.target.value); setError(""); }}
+                  onKeyDown={(e) => e.key === "Enter" && handleAccessSubmit()}
+                />
+              </div>
+              {error && <p className="text-sm text-destructive">{error}</p>}
+              <Button
+                className="w-full gradient-primary text-primary-foreground"
+                onClick={handleAccessSubmit}
+                disabled={checking}
+              >
+                {checking ? "Verificando..." : "Acessar Provas"}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="w-6 h-6 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!allowed) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
-        <ShieldAlert className="w-16 h-16 text-destructive opacity-60" />
-        <h2 className="text-xl font-display font-bold text-foreground">Acesso Restrito</h2>
-        <p className="text-muted-foreground max-w-md">
-          Seu email não está autorizado a acessar as provas. Entre em contato com o administrador para solicitar acesso.
-        </p>
-      </div>
-    );
-  }
-
-  if (!unlocked && !isAdmin) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
-        <Lock className="w-16 h-16 text-primary opacity-60" />
-        <h2 className="text-xl font-display font-bold text-foreground">Acesso Protegido</h2>
-        <p className="text-muted-foreground max-w-md">
-          Digite a senha de acesso para visualizar as provas disponíveis.
-        </p>
-        <div className="flex gap-2 w-full max-w-xs">
-          <Input
-            type="password"
-            placeholder="Senha de acesso"
-            value={passwordInput}
-            onChange={(e) => { setPasswordInput(e.target.value); setPasswordError(false); }}
-            onKeyDown={(e) => e.key === "Enter" && handlePasswordSubmit()}
-          />
-          <Button onClick={handlePasswordSubmit} className="gradient-primary text-primary-foreground">
-            Entrar
-          </Button>
-        </div>
-        {passwordError && (
-          <p className="text-sm text-destructive">Senha incorreta. Tente novamente.</p>
-        )}
       </div>
     );
   }
