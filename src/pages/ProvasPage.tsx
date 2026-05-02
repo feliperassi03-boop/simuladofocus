@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Play, FileText, Loader2, ShieldAlert } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Play, FileText, Loader2, ShieldAlert, Lock } from "lucide-react";
 
 interface ExamItem {
   id: string;
