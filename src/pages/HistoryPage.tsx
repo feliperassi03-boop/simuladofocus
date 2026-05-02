@@ -265,10 +265,10 @@ export default function HistoryPage() {
         </Card>
 
         <div className="flex justify-between">
-          <Button variant="outline" onClick={() => setCurrentIndex(i => Math.max(0, i - 1))} disabled={currentIndex === 0}>
+          <Button variant="outline" onClick={() => setCurrentIndex(prev => Math.max(0, prev - 1))} disabled={currentIndex === 0}>
             <ArrowLeft className="w-4 h-4 mr-2" /> Anterior
           </Button>
-          <Button variant="outline" onClick={() => setCurrentIndex(i => Math.min(reviewQuestions.length - 1, i + 1))} disabled={currentIndex >= reviewQuestions.length - 1}>
+          <Button variant="outline" onClick={() => setCurrentIndex(prev => Math.min(reviewQuestions.length - 1, prev + 1))} disabled={currentIndex >= reviewQuestions.length - 1}>
             Próxima <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
