@@ -517,6 +517,10 @@ export default function AdminPage() {
             </Table>
           </Card>
         </TabsContent>
+
+        <TabsContent value="allowed-emails">
+          <AllowedEmailsTab />
+        </TabsContent>
       </Tabs>
     </div>
   );
