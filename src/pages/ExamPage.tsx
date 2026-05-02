@@ -69,6 +69,7 @@ export default function ExamPage() {
   const autoSubmitRef = useRef(false);
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
+  const [gabaritoReturnIndex, setGabaritoReturnIndex] = useState(0);
 
   useEffect(() => {
     const fetchExam = async () => {
