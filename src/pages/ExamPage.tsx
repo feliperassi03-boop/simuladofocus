@@ -56,7 +56,7 @@ export default function ExamPage() {
   };
   const [exam, setExam] = useState<Exam | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [state, setState] = useState<ExamState>("password");
+  const [state, setState] = useState<ExamState>("identify");
   const [passwordInput, setPasswordInput] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
