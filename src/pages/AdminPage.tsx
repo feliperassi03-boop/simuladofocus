@@ -467,6 +467,7 @@ export default function AdminPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Aluno</TableHead>
+                  <TableHead>Prova</TableHead>
                   <TableHead>Pontuação</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Data</TableHead>
