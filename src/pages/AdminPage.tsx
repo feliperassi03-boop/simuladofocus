@@ -483,6 +483,7 @@ export default function AdminPage() {
                         <span className="block text-xs text-muted-foreground">{a.guest_email}</span>
                       )}
                     </TableCell>
+                    <TableCell className="text-sm">{a.exam_title}</TableCell>
                     <TableCell>
                       <span className="font-bold font-display">
                         {a.score}/{a.total_questions}
