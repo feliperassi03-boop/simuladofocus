@@ -285,6 +285,7 @@ export default function ExamPage() {
     );
   }
 
+  if (state === "identify") {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="w-full max-w-md shadow-elevated animate-fade-in">
