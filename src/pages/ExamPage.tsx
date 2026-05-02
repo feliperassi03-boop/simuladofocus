@@ -285,35 +285,6 @@ export default function ExamPage() {
     );
   }
 
-  if (state === "password") {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-md shadow-elevated animate-fade-in">
-          <CardHeader className="text-center">
-            <div className="mx-auto w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mb-4 shadow-glow">
-              <Lock className="w-8 h-8 text-primary-foreground" />
-            </div>
-            <CardTitle className="font-display text-2xl">{exam?.title}</CardTitle>
-            <p className="text-muted-foreground mt-2">Digite a senha para iniciar a prova</p>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Input
-              type="password"
-              value={passwordInput}
-              onChange={(e) => setPasswordInput(e.target.value)}
-              placeholder="Senha da prova"
-              onKeyDown={(e) => e.key === "Enter" && handlePasswordSubmit()}
-            />
-            <Button onClick={handlePasswordSubmit} className="w-full gradient-primary text-primary-foreground">
-              Iniciar Prova
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (state === "identify") {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="w-full max-w-md shadow-elevated animate-fade-in">
