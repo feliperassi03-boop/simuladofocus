@@ -11,8 +11,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, Users, HelpCircle, BarChart3, ImagePlus, X, FileText, Video } from "lucide-react";
+import { Plus, Pencil, Trash2, Users, HelpCircle, BarChart3, ImagePlus, X, FileText, Video, MailCheck } from "lucide-react";
 import ExamsTab from "@/components/admin/ExamsTab";
+import AllowedEmailsTab from "@/components/admin/AllowedEmailsTab";
 import { useVideoConverter } from "@/hooks/useVideoConverter";
 
 interface Question {
@@ -239,6 +240,7 @@ export default function AdminPage() {
           <TabsTrigger value="questions">Perguntas</TabsTrigger>
           <TabsTrigger value="exams">Provas</TabsTrigger>
           <TabsTrigger value="results">Resultados</TabsTrigger>
+          <TabsTrigger value="allowed-emails">Emails Autorizados</TabsTrigger>
         </TabsList>
 
         <TabsContent value="questions" className="space-y-4">
@@ -514,6 +516,10 @@ export default function AdminPage() {
               </TableBody>
             </Table>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="allowed-emails">
+          <AllowedEmailsTab />
         </TabsContent>
       </Tabs>
     </div>
