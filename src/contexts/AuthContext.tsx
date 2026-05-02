@@ -19,6 +19,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [adminChecked, setAdminChecked] = useState(false);
 
   const checkAdmin = async (userId: string) => {
     try {
@@ -32,18 +33,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error("Error checking admin role:", error);
       setIsAdmin(false);
+    } finally {
+      setAdminChecked(true);
     }
   };
 
   useEffect(() => {
     let mounted = true;
 
-    // Set up auth state listener FIRST (before getSession)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         if (!mounted) return;
         
-        // Only update state if the user actually changed
         setSession((prev) => {
           if (prev?.user?.id === session?.user?.id) return prev;
           return session;
@@ -55,24 +56,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
 
         if (session?.user) {
-          // Fire-and-forget: never block onAuthStateChange
           setTimeout(() => {
             if (mounted) checkAdmin(session.user.id);
           }, 0);
         } else {
           setIsAdmin(false);
+          setAdminChecked(true);
         }
         setLoading(false);
       }
     );
 
-    // Then restore session from storage
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!mounted) return;
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
         checkAdmin(session.user.id);
+      } else {
+        setAdminChecked(true);
       }
       setLoading(false);
     });
@@ -105,8 +107,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error;
   };
 
+  const fullLoading = loading || (!!user && !adminChecked);
+
   return (
-    <AuthContext.Provider value={{ user, session, loading, isAdmin, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading: fullLoading, isAdmin, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
