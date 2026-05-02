@@ -628,7 +628,20 @@ export default function ExamPage() {
               </AlertDialog>
               <h2 className="text-lg font-display font-bold text-foreground truncate">{exam?.title}</h2>
             </div>
-            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-mono text-sm font-bold shrink-0 ${
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="shrink-0"
+                onClick={() => {
+                  setGabaritoReturnIndex(currentIndex);
+                  setState("gabarito");
+                }}
+              >
+                <BookOpen className="w-4 h-4 sm:mr-1.5" />
+                <span className="hidden sm:inline">Ver gabarito comentado</span>
+              </Button>
+              <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-mono text-sm font-bold shrink-0 ${
               timeLeft <= 300 ? "bg-destructive/10 text-destructive animate-pulse" : "bg-secondary text-secondary-foreground"
             }`}>
               <Clock className="w-4 h-4" />
