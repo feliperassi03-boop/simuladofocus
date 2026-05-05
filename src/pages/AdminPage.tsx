@@ -150,6 +150,7 @@ export default function AdminPage() {
         image_url: form.image_url || null,
         video_url: form.video_url || null,
         comment: form.comment || null,
+        comment_image_url: form.comment_image_url || null,
       };
       if (editingId) {
         const { error } = await supabase.from("questions").update(payload).eq("id", editingId);
