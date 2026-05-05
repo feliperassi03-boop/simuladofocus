@@ -366,6 +366,57 @@ export default function AdminPage() {
                     />
                   </div>
                   <div>
+                    <Label>Imagem do Comentário (opcional)</Label>
+                    {form.comment_image_url ? (
+                      <div className="relative mt-2 rounded-lg overflow-hidden border">
+                        <img src={form.comment_image_url} alt="Preview comentário" className="w-full max-h-48 object-contain bg-muted" />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-2 right-2 h-7 w-7"
+                          onClick={() => setForm((f) => ({ ...f, comment_image_url: "" }))}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <label className="mt-2 flex items-center gap-2 cursor-pointer border border-dashed rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                        <ImagePlus className="w-5 h-5 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">
+                          {uploading ? "Enviando..." : "Clique para adicionar imagem ao comentário"}
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            setUploading(true);
+                            try {
+                              const ext = file.name.split(".").pop();
+                              const filePath = `${crypto.randomUUID()}.${ext}`;
+                              const { error: uploadError } = await supabase.storage
+                                .from("question-images")
+                                .upload(filePath, file);
+                              if (uploadError) throw uploadError;
+                              const { data: { publicUrl } } = supabase.storage
+                                .from("question-images")
+                                .getPublicUrl(filePath);
+                              setForm((f) => ({ ...f, comment_image_url: publicUrl }));
+                              toast({ title: "Imagem do comentário enviada!" });
+                            } catch (error: any) {
+                              toast({ title: "Erro no upload", description: error.message, variant: "destructive" });
+                            } finally {
+                              setUploading(false);
+                            }
+                          }}
+                          disabled={uploading}
+                        />
+                      </label>
+                    )}
+                  <div>
                     <Label>Resposta Correta</Label>
                     <Select
                       value={form.correct_option}
