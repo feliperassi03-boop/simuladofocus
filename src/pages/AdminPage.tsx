@@ -51,6 +51,7 @@ const emptyForm = {
   image_url: "" as string,
   video_url: "" as string,
   comment: "" as string,
+  comment_image_url: "" as string,
 };
 
 export default function AdminPage() {
