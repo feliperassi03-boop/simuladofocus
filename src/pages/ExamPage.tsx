@@ -45,7 +45,7 @@ interface Exam {
   is_active: boolean;
 }
 
-type ExamState = "password" | "identify" | "playing" | "reviewing" | "gabarito" | "error";
+type ExamState = "password" | "identify" | "ready" | "playing" | "reviewing" | "gabarito" | "error";
 
 export default function ExamPage() {
   const { id: examId } = useParams<{ id: string }>();
@@ -57,7 +57,7 @@ export default function ExamPage() {
   };
   const [exam, setExam] = useState<Exam | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [state, setState] = useState<ExamState>("identify");
+  const [state, setState] = useState<ExamState>(user ? "ready" : "identify");
   const [passwordInput, setPasswordInput] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -110,12 +110,7 @@ export default function ExamPage() {
     setState("identify");
   };
 
-  const handleIdentifySubmit = async () => {
-    if (!guestName.trim()) {
-      toast({ title: "Digite seu nome para continuar.", variant: "destructive" });
-      return;
-    }
-
+  const startExam = async () => {
     const { data: eqData } = await supabase
       .from("exam_questions")
       .select("question_id, sort_order")
@@ -159,6 +154,14 @@ export default function ExamPage() {
     setAttemptId(attempt.id);
     setTimeLeft(getDurationByQuestionCount(sorted.length));
     setState("playing");
+  };
+
+  const handleIdentifySubmit = async () => {
+    if (!guestName.trim()) {
+      toast({ title: "Digite seu nome para continuar.", variant: "destructive" });
+      return;
+    }
+    await startExam();
   };
 
   // Timer effect
@@ -290,6 +293,27 @@ export default function ExamPage() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">Esta prova não existe ou não está mais disponível.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (state === "ready") {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-elevated animate-fade-in">
+          <CardHeader className="text-center">
+            <div className="mx-auto w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mb-4 shadow-glow">
+              <BookOpen className="w-8 h-8 text-primary-foreground" />
+            </div>
+            <CardTitle className="font-display text-2xl">{exam?.title}</CardTitle>
+            <p className="text-muted-foreground mt-2">Bem-vindo(a), {guestName}!</p>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={startExam} className="w-full gradient-primary text-primary-foreground">
+              Começar Prova
+            </Button>
           </CardContent>
         </Card>
       </div>
