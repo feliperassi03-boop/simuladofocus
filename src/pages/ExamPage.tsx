@@ -110,12 +110,7 @@ export default function ExamPage() {
     setState("identify");
   };
 
-  const handleIdentifySubmit = async () => {
-    if (!guestName.trim()) {
-      toast({ title: "Digite seu nome para continuar.", variant: "destructive" });
-      return;
-    }
-
+  const startExam = async () => {
     const { data: eqData } = await supabase
       .from("exam_questions")
       .select("question_id, sort_order")
@@ -159,6 +154,14 @@ export default function ExamPage() {
     setAttemptId(attempt.id);
     setTimeLeft(getDurationByQuestionCount(sorted.length));
     setState("playing");
+  };
+
+  const handleIdentifySubmit = async () => {
+    if (!guestName.trim()) {
+      toast({ title: "Digite seu nome para continuar.", variant: "destructive" });
+      return;
+    }
+    await startExam();
   };
 
   // Timer effect
