@@ -416,6 +416,7 @@ export default function AdminPage() {
                         />
                       </label>
                     )}
+                  </div>
                   <div>
                     <Label>Resposta Correta</Label>
                     <Select
