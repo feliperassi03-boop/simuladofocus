@@ -1,0 +1,1 @@
+ALTER TABLE public.questions ADD COLUMN comment_image_url text DEFAULT NULL;

@@ -119,6 +119,7 @@ export type Database = {
       questions: {
         Row: {
           comment: string | null
+          comment_image_url: string | null
           correct_option: string
           created_at: string
           created_by: string | null
@@ -133,6 +134,7 @@ export type Database = {
         }
         Insert: {
           comment?: string | null
+          comment_image_url?: string | null
           correct_option: string
           created_at?: string
           created_by?: string | null
@@ -147,6 +149,7 @@ export type Database = {
         }
         Update: {
           comment?: string | null
+          comment_image_url?: string | null
           correct_option?: string
           created_at?: string
           created_by?: string | null

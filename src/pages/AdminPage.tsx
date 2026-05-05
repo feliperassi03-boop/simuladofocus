@@ -51,6 +51,7 @@ const emptyForm = {
   image_url: "" as string,
   video_url: "" as string,
   comment: "" as string,
+  comment_image_url: "" as string,
 };
 
 export default function AdminPage() {
@@ -149,6 +150,7 @@ export default function AdminPage() {
         image_url: form.image_url || null,
         video_url: form.video_url || null,
         comment: form.comment || null,
+        comment_image_url: form.comment_image_url || null,
       };
       if (editingId) {
         const { error } = await supabase.from("questions").update(payload).eq("id", editingId);
@@ -181,6 +183,7 @@ export default function AdminPage() {
       image_url: q.image_url || "",
       video_url: (q as any).video_url || "",
       comment: (q as any).comment || "",
+      comment_image_url: (q as any).comment_image_url || "",
     });
     setEditingId(q.id);
     setDialogOpen(true);
@@ -361,6 +364,58 @@ export default function AdminPage() {
                       rows={6}
                       className="min-h-[120px]"
                     />
+                  </div>
+                  <div>
+                    <Label>Imagem do Comentário (opcional)</Label>
+                    {form.comment_image_url ? (
+                      <div className="relative mt-2 rounded-lg overflow-hidden border">
+                        <img src={form.comment_image_url} alt="Preview comentário" className="w-full max-h-48 object-contain bg-muted" />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-2 right-2 h-7 w-7"
+                          onClick={() => setForm((f) => ({ ...f, comment_image_url: "" }))}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <label className="mt-2 flex items-center gap-2 cursor-pointer border border-dashed rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                        <ImagePlus className="w-5 h-5 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">
+                          {uploading ? "Enviando..." : "Clique para adicionar imagem ao comentário"}
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            setUploading(true);
+                            try {
+                              const ext = file.name.split(".").pop();
+                              const filePath = `${crypto.randomUUID()}.${ext}`;
+                              const { error: uploadError } = await supabase.storage
+                                .from("question-images")
+                                .upload(filePath, file);
+                              if (uploadError) throw uploadError;
+                              const { data: { publicUrl } } = supabase.storage
+                                .from("question-images")
+                                .getPublicUrl(filePath);
+                              setForm((f) => ({ ...f, comment_image_url: publicUrl }));
+                              toast({ title: "Imagem do comentário enviada!" });
+                            } catch (error: any) {
+                              toast({ title: "Erro no upload", description: error.message, variant: "destructive" });
+                            } finally {
+                              setUploading(false);
+                            }
+                          }}
+                          disabled={uploading}
+                        />
+                      </label>
+                    )}
                   </div>
                   <div>
                     <Label>Resposta Correta</Label>
