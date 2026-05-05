@@ -440,7 +440,7 @@ export default function ExamPage() {
               })}
 
               {/* Comentário / Gabarito Comentado */}
-              {currentQuestion.comment && (
+              {(currentQuestion.comment || currentQuestion.comment_image_url) && (
                 <div className="mt-4 p-4 rounded-lg bg-muted/50 border border-border">
                   <div className="flex items-center gap-2 mb-2">
                     <MessageSquareText className="w-5 h-5 text-primary" />
@@ -449,6 +449,14 @@ export default function ExamPage() {
                   <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
                     {currentQuestion.comment}
                   </div>
+                  {currentQuestion.comment_image_url && (
+                    <img
+                      src={currentQuestion.comment_image_url}
+                      alt="Imagem do comentário"
+                      className="mt-3 rounded-lg max-h-64 object-contain cursor-pointer hover:opacity-90 transition-opacity"
+                      onClick={() => setLightboxImage(currentQuestion.comment_image_url)}
+                    />
+                  )}
                 </div>
               )}
             </CardContent>
