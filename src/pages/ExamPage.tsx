@@ -35,6 +35,7 @@ interface Question {
   image_url: string | null;
   video_url: string | null;
   comment: string | null;
+  comment_image_url: string | null;
 }
 
 interface Exam {
