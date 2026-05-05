@@ -760,7 +760,6 @@ export default function ExamPage() {
           )}
         </div>
       </div>
-    </div>
 
       {/* Lightbox */}
       {lightboxImage && (
