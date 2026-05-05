@@ -299,7 +299,27 @@ export default function ExamPage() {
     );
   }
 
-  if (state === "identify") {
+  if (state === "ready") {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-elevated animate-fade-in">
+          <CardHeader className="text-center">
+            <div className="mx-auto w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mb-4 shadow-glow">
+              <BookOpen className="w-8 h-8 text-primary-foreground" />
+            </div>
+            <CardTitle className="font-display text-2xl">{exam?.title}</CardTitle>
+            <p className="text-muted-foreground mt-2">Bem-vindo(a), {guestName}!</p>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={startExam} className="w-full gradient-primary text-primary-foreground">
+              Começar Prova
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="w-full max-w-md shadow-elevated animate-fade-in">
