@@ -183,6 +183,7 @@ export default function AdminPage() {
       image_url: q.image_url || "",
       video_url: (q as any).video_url || "",
       comment: (q as any).comment || "",
+      comment_image_url: (q as any).comment_image_url || "",
     });
     setEditingId(q.id);
     setDialogOpen(true);
