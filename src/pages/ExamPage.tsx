@@ -45,7 +45,7 @@ interface Exam {
   is_active: boolean;
 }
 
-type ExamState = "password" | "identify" | "playing" | "reviewing" | "gabarito" | "error";
+type ExamState = "password" | "identify" | "ready" | "playing" | "reviewing" | "gabarito" | "error";
 
 export default function ExamPage() {
   const { id: examId } = useParams<{ id: string }>();
