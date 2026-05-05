@@ -71,6 +71,7 @@ export default function ExamPage() {
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
   const [gabaritoReturnIndex, setGabaritoReturnIndex] = useState(0);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
 
   // Auto-fill name/email for logged-in users
   useEffect(() => {
