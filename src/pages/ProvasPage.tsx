@@ -1,15 +1,28 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Play, FileText, Loader2, BookOpen } from "lucide-react";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { Play, FileText, Loader2, FolderOpen } from "lucide-react";
 
 interface ExamItem {
   id: string;
   title: string;
   question_count: number;
+}
+
+// Deriva a categoria a partir do título da prova.
+// Regra: pega o primeiro "token" do título (até espaço ou número).
+// Ex.: "Cardio 1" -> "Cardio", "Cardio Hemodinâmica" -> "Cardio",
+// "Pneumo 2" -> "Pneumo", "Neuro AVC" -> "Neuro".
+function getCategory(title: string): string {
+  const trimmed = title.trim();
+  if (!trimmed) return "Outros";
+  // Pega o primeiro grupo alfabético
+  const match = trimmed.match(/^[A-Za-zÀ-ÿ]+/);
+  return match ? match[0] : trimmed.split(/\s+/)[0];
 }
 
 export default function ProvasPage() {
@@ -18,24 +31,18 @@ export default function ProvasPage() {
   const [exams, setExams] = useState<ExamItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Redirect to login if not authenticated
   useEffect(() => {
-    if (!authLoading && !user) {
-      navigate("/auth");
-    }
+    if (!authLoading && !user) navigate("/auth");
   }, [user, authLoading, navigate]);
 
-  // Fetch exams once authenticated
   useEffect(() => {
     if (!user) return;
-
     const fetchExams = async () => {
       setLoading(true);
       const { data: examsData } = await supabase
         .from("exams")
         .select("id, title")
-        .eq("is_active", true)
-        .order("created_at", { ascending: false });
+        .eq("is_active", true);
 
       if (!examsData) {
         setLoading(false);
@@ -62,9 +69,25 @@ export default function ProvasPage() {
       );
       setLoading(false);
     };
-
     fetchExams();
   }, [user]);
+
+  const grouped = useMemo(() => {
+    const map = new Map<string, ExamItem[]>();
+    for (const exam of exams) {
+      const cat = getCategory(exam.title);
+      if (!map.has(cat)) map.set(cat, []);
+      map.get(cat)!.push(exam);
+    }
+    const collator = new Intl.Collator("pt-BR", { sensitivity: "base", numeric: true });
+    const categories = Array.from(map.entries())
+      .map(([cat, items]) => ({
+        category: cat,
+        items: items.slice().sort((a, b) => collator.compare(a.title, b.title)),
+      }))
+      .sort((a, b) => collator.compare(a.category, b.category));
+    return categories;
+  }, [exams]);
 
   if (authLoading || loading) {
     return (
@@ -80,10 +103,10 @@ export default function ProvasPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-display font-bold text-foreground">Provas Disponíveis</h1>
-        <p className="text-muted-foreground mt-1">Selecione uma prova para iniciar</p>
+        <p className="text-muted-foreground mt-1">Escolha uma categoria e selecione a prova</p>
       </div>
 
-      {exams.length === 0 ? (
+      {grouped.length === 0 ? (
         <Card className="shadow-card">
           <CardContent className="py-12 text-center text-muted-foreground">
             <FileText className="w-12 h-12 mx-auto mb-4 opacity-40" />
@@ -91,26 +114,52 @@ export default function ProvasPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {exams.map((exam) => (
-            <Card key={exam.id} className="shadow-card hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg font-display">{exam.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  {exam.question_count} {exam.question_count === 1 ? "questão" : "questões"}
-                </p>
-                <Button
-                  className="w-full gradient-primary text-primary-foreground"
-                  onClick={() => navigate(`/prova/${exam.id}`)}
-                >
-                  <Play className="w-4 h-4 mr-2" /> Iniciar Prova
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <Card className="shadow-card">
+          <CardContent className="p-2 sm:p-4">
+            <Accordion type="multiple" className="w-full">
+              {grouped.map(({ category, items }) => (
+                <AccordionItem key={category} value={category}>
+                  <AccordionTrigger className="px-2 hover:no-underline">
+                    <div className="flex items-center gap-3 text-left">
+                      <FolderOpen className="w-5 h-5 text-primary shrink-0" />
+                      <span className="font-display font-semibold text-base sm:text-lg break-words">
+                        {category}
+                      </span>
+                      <span className="text-xs text-muted-foreground font-normal">
+                        ({items.length} {items.length === 1 ? "prova" : "provas"})
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="grid gap-2 sm:gap-3 px-2">
+                      {items.map((exam) => (
+                        <div
+                          key={exam.id}
+                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 rounded-lg border bg-card hover:bg-accent/30 transition-colors"
+                        >
+                          <div className="min-w-0">
+                            <p className="font-medium break-words">{exam.title}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {exam.question_count}{" "}
+                              {exam.question_count === 1 ? "questão" : "questões"}
+                            </p>
+                          </div>
+                          <Button
+                            size="sm"
+                            className="gradient-primary text-primary-foreground shrink-0"
+                            onClick={() => navigate(`/prova/${exam.id}`)}
+                          >
+                            <Play className="w-4 h-4 mr-2" /> Iniciar
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
