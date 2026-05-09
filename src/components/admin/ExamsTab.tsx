@@ -38,6 +38,20 @@ export default function ExamsTab() {
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
+  const [editingExam, setEditingExam] = useState<Exam | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+
+  const handleRename = async () => {
+    if (!editingExam || !editTitle.trim()) return;
+    const { error } = await supabase.from("exams").update({ title: editTitle.trim() }).eq("id", editingExam.id);
+    if (error) {
+      toast({ title: "Erro ao renomear", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Prova renomeada!" });
+      setEditingExam(null);
+      fetchExams();
+    }
+  };
 
   const fetchExams = async () => {
     const { data } = await supabase
