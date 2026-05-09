@@ -126,6 +126,7 @@ export default function AdminPage() {
     const { data } = await supabase
       .from("quiz_attempts")
       .select("*, exams(title)")
+      .not("completed_at", "is", null)
       .order("created_at", { ascending: false });
     if (data) {
       setAttempts(
