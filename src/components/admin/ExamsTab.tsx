@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play } from "lucide-react";
+import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play, Pencil } from "lucide-react";
 
 interface Question {
   id: string;
@@ -38,6 +38,20 @@ export default function ExamsTab() {
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
+  const [editingExam, setEditingExam] = useState<Exam | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+
+  const handleRename = async () => {
+    if (!editingExam || !editTitle.trim()) return;
+    const { error } = await supabase.from("exams").update({ title: editTitle.trim() }).eq("id", editingExam.id);
+    if (error) {
+      toast({ title: "Erro ao renomear", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Prova renomeada!" });
+      setEditingExam(null);
+      fetchExams();
+    }
+  };
 
   const fetchExams = async () => {
     const { data } = await supabase
@@ -224,6 +238,9 @@ export default function ExamsTab() {
                     <Button variant="ghost" size="icon" onClick={() => navigate(`/prova/${exam.id}`)} title="Iniciar prova">
                       <Play className="w-4 h-4 text-primary" />
                     </Button>
+                    <Button variant="ghost" size="icon" onClick={() => { setEditingExam(exam); setEditTitle(exam.title); }} title="Editar nome">
+                      <Pencil className="w-4 h-4" />
+                    </Button>
                     <Button variant="ghost" size="icon" onClick={() => copyLink(exam.id)} title="Copiar link">
                       <Copy className="w-4 h-4" />
                     </Button>
@@ -244,6 +261,24 @@ export default function ExamsTab() {
           </TableBody>
         </Table>
       </Card>
+
+      <Dialog open={!!editingExam} onOpenChange={(o) => !o && setEditingExam(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="font-display">Editar nome da prova</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Título</Label>
+              <Input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setEditingExam(null)}>Cancelar</Button>
+              <Button onClick={handleRename} className="gradient-primary text-primary-foreground">Salvar</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
