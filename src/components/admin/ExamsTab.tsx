@@ -261,6 +261,24 @@ export default function ExamsTab() {
           </TableBody>
         </Table>
       </Card>
+
+      <Dialog open={!!editingExam} onOpenChange={(o) => !o && setEditingExam(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="font-display">Editar nome da prova</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Título</Label>
+              <Input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setEditingExam(null)}>Cancelar</Button>
+              <Button onClick={handleRename} className="gradient-primary text-primary-foreground">Salvar</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
