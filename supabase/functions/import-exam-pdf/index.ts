@@ -9,29 +9,42 @@ const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-const SYSTEM_PROMPT = `Você é um extrator de provas de múltipla escolha em PDF.
+const SYSTEM_PROMPT = `Você é um extrator de provas de múltipla escolha em PDF (modelo SBA/TSA e similares).
 
-FORMATO DO PDF:
-- Cada questão começa com o número seguido de ")" — ex: "1)", "2)", "10)".
-- O enunciado vem logo depois do número.
-- Alternativas: "A)", "B)", "C)", "D)".
-- Gabarito: "RESPOSTA: X".
-- Justificativa: texto após "Justificativa:" com o comentário da questão.
+ESTRUTURA DO PDF:
+- A capa contém o título da prova (ex: "TÍTULO SUPERIOR EM ANESTESIOLOGIA - PROVA ESCRITA – 2017").
+- Toda página tem cabeçalho/rodapé que DEVEM SER IGNORADOS, ex:
+  "PROVA (A) MARFIM", "Prova Escrita para obtenção do TSA",
+  "A SBA preocupada com o meio ambiente, utiliza papel ecologicamente correto", números de página soltos.
+- Pode haver linha "INSTRUÇÕES: Cada questão tem QUATRO opções..." — IGNORE.
 
-Retorne SOMENTE JSON válido (sem markdown) no formato:
+QUESTÕES:
+- Cada questão começa com número seguido de ")" — ex: "1)", "2)", "10)".
+- O enunciado pode se estender por VÁRIAS PÁGINAS — junte tudo até encontrar a primeira alternativa "A)".
+- Alternativas: linhas começando com "A)", "B)", "C)", "D)". Sempre 4. Se houver "E)", ignore-a.
+- Gabarito: linha "RESPOSTA: X" (X = A, B, C ou D), pode estar em negrito.
+- Justificativa: texto após "Justificativa:" até o início de "Bibliografia:" — NÃO inclua a bibliografia no comentário. Junte texto que cruze páginas, ignorando cabeçalhos/rodapés.
+- Algumas questões têm IMAGENS (ECG, TC, gráficos). Se o enunciado mencionar uma figura, mantenha o texto e adicione " [Esta questão contém uma imagem no PDF original]" ao final do enunciado.
+
+SAÍDA — SOMENTE JSON válido, sem markdown:
 {
-  "titulo": "nome da prova",
+  "titulo": "título extraído da capa",
   "questoes": [
-    { "numero": 1, "enunciado": "...", "alternativas": {"A":"...","B":"...","C":"...","D":"..."}, "gabarito": "A", "comentario": "..." }
+    {
+      "numero": 1,
+      "enunciado": "...",
+      "alternativas": { "A": "...", "B": "...", "C": "...", "D": "..." },
+      "gabarito": "A",
+      "comentario": "texto da justificativa, sem a bibliografia"
+    }
   ]
 }
 
 REGRAS:
-- Extraia TODAS as questões, em ordem.
-- 4 alternativas (A-D). Se houver E, ignore.
-- gabarito é uma única letra A/B/C/D.
-- comentario = todo o texto após "Justificativa:" até a próxima questão. "" se não houver.
-- Não invente questões.`;
+- Extraia TODAS as questões do PDF, em ordem numérica, sem pular nenhuma.
+- Preserve acentuação e pontuação.
+- Não invente questões, alternativas ou gabaritos.
+- Se uma alternativa for apenas uma letra (ex: "A) A"), mantenha como está.`;
 
 function bytesToBase64(bytes: Uint8Array): string {
   let binary = "";
