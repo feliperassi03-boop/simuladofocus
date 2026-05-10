@@ -512,20 +512,42 @@ export default function ExamPage() {
     return (
       <div className="min-h-screen p-4 md:p-8">
         <div className="max-w-2xl mx-auto animate-fade-in">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-display font-bold text-foreground flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-primary" />
-              Gabarito Comentado
-            </h2>
-            <Button
-              onClick={() => {
-                setCurrentIndex(gabaritoReturnIndex);
-                setState("playing");
-              }}
-              className="gradient-primary text-primary-foreground"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" /> Voltar à Prova
-            </Button>
+          <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm pb-3 pt-2 -mx-4 px-4 md:-mx-8 md:px-8 mb-4 border-b border-border">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-xl font-display font-bold text-foreground flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-primary" />
+                Gabarito Comentado
+              </h2>
+              <Button
+                onClick={() => {
+                  setCurrentIndex(gabaritoReturnIndex);
+                  setState("playing");
+                }}
+                className="gradient-primary text-primary-foreground"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" /> Voltar à Prova
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {questions.map((q, i) => {
+                const ans = answers[q.id];
+                const isCorrect = ans === q.correct_option;
+                return (
+                  <button
+                    key={q.id}
+                    onClick={() => {
+                      document.getElementById(`gabarito-q-${i}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }}
+                    className={`w-9 h-9 rounded-lg text-sm font-bold transition-all ${
+                      isCorrect ? "bg-success/20 text-success hover:bg-success/30" : "bg-destructive/20 text-destructive hover:bg-destructive/30"
+                    }`}
+                    aria-label={`Ir para questão ${i + 1}`}
+                  >
+                    {i + 1}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="space-y-6">
@@ -539,7 +561,7 @@ export default function ExamPage() {
               ];
 
               return (
-                <Card key={q.id} className="shadow-elevated">
+                <Card key={q.id} id={`gabarito-q-${i}`} className="shadow-elevated scroll-mt-32">
                   <CardHeader>
                     <CardTitle className="font-display text-lg leading-relaxed">
                       <span className="text-primary font-bold mr-2">{i + 1}.</span>
