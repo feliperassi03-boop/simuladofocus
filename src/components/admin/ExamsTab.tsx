@@ -62,13 +62,15 @@ export default function ExamsTab() {
     setImportLoading(true);
     setImportedExam(null);
     try {
-      const buf = await file.arrayBuffer();
-      let binary = "";
-      const bytes = new Uint8Array(buf);
-      for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
-      const pdfBase64 = btoa(binary);
+      // Upload PDF to private storage bucket (avoids edge function payload limits)
+      const storagePath = `${user!.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+      const { error: upErr } = await supabase.storage
+        .from("exam-pdfs")
+        .upload(storagePath, file, { contentType: "application/pdf", upsert: false });
+      if (upErr) throw upErr;
+
       const { data, error } = await supabase.functions.invoke("import-exam-pdf", {
-        body: { pdfBase64, fileName: file.name },
+        body: { storagePath, fileName: file.name },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
