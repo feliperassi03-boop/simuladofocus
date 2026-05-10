@@ -3,23 +3,35 @@ import { corsHeaders } from "https://esm.sh/@supabase/supabase-js@2.95.0/cors";
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
 
 const SYSTEM_PROMPT = `Você é um extrator de provas de múltipla escolha em PDF.
-Extraia TODAS as questões e retorne SOMENTE JSON válido (sem markdown, sem texto extra) no formato:
+
+FORMATO DO PDF:
+- Cada questão começa com o número seguido de ")" — ex: "1)", "2)", "10)".
+- O enunciado vem logo depois do número, na mesma linha ou nas seguintes.
+- As alternativas são marcadas como "A)", "B)", "C)", "D)".
+- O gabarito aparece como "RESPOSTA: X" (X = A, B, C ou D).
+- Após "RESPOSTA:" pode haver "Justificativa:" com o comentário explicativo da questão.
+
+Retorne SOMENTE JSON válido (sem markdown, sem texto extra) no formato:
 {
-  "titulo": "nome da prova",
+  "titulo": "nome da prova (use o título do documento ou um nome curto descritivo)",
   "questoes": [
     {
       "numero": 1,
-      "enunciado": "texto completo da questão",
+      "enunciado": "texto completo da questão (sem o número inicial)",
       "alternativas": { "A": "texto", "B": "texto", "C": "texto", "D": "texto" },
-      "gabarito": "A"
+      "gabarito": "A",
+      "comentario": "texto da justificativa, se houver"
     }
   ]
 }
-Regras:
-- Sempre 4 alternativas (A, B, C, D). Se a prova tiver 5, ignore a E.
-- "gabarito" deve ser uma única letra A, B, C ou D.
-- Se não houver gabarito explícito, use "A" como padrão e siga em frente.
-- Preserve acentuação e formatação do enunciado.`;
+
+REGRAS:
+- Extraia TODAS as questões do PDF, em ordem.
+- Sempre 4 alternativas (A, B, C, D). Se houver 5, ignore a E.
+- "gabarito" é uma única letra A, B, C ou D, pegue de "RESPOSTA: X".
+- "comentario" deve conter todo o texto após "Justificativa:" até o início da próxima questão. String vazia se não houver.
+- Preserve acentuação e quebras de parágrafo importantes.
+- Não invente questões nem alternativas.`;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
