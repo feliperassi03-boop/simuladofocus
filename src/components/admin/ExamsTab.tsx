@@ -10,7 +10,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play, Pencil } from "lucide-react";
+import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play, Pencil, FileUp, Loader2 } from "lucide-react";
+
+interface ImportedQuestion {
+  numero: number;
+  enunciado: string;
+  alternativas: { A: string; B: string; C: string; D: string };
+  gabarito: "A" | "B" | "C" | "D";
+}
+interface ImportedExam { titulo: string; questoes: ImportedQuestion[] }
 
 interface Question {
   id: string;
