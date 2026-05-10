@@ -10,16 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play, Pencil, FileUp, Loader2 } from "lucide-react";
-
-interface ImportedQuestion {
-  numero: number;
-  enunciado: string;
-  alternativas: { A: string; B: string; C: string; D: string };
-  gabarito: "A" | "B" | "C" | "D";
-  comentario?: string;
-}
-interface ImportedExam { titulo: string; questoes: ImportedQuestion[] }
+import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play, Pencil } from "lucide-react";
 
 interface Question {
   id: string;
@@ -49,89 +40,6 @@ export default function ExamsTab() {
   const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
   const [editingExam, setEditingExam] = useState<Exam | null>(null);
   const [editTitle, setEditTitle] = useState("");
-
-  // PDF Import
-  const [importOpen, setImportOpen] = useState(false);
-  const [importLoading, setImportLoading] = useState(false);
-  const [importedExam, setImportedExam] = useState<ImportedExam | null>(null);
-  const [importTitle, setImportTitle] = useState("");
-  const [importPassword, setImportPassword] = useState("");
-  const [savingImport, setSavingImport] = useState(false);
-
-  const handlePdfUpload = async (file: File) => {
-    setImportLoading(true);
-    setImportedExam(null);
-    try {
-      // Upload PDF to private storage bucket (avoids edge function payload limits)
-      const storagePath = `${user!.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-      const { error: upErr } = await supabase.storage
-        .from("exam-pdfs")
-        .upload(storagePath, file, { contentType: "application/pdf", upsert: false });
-      if (upErr) throw upErr;
-
-      const { data, error } = await supabase.functions.invoke("import-exam-pdf", {
-        body: { storagePath, fileName: file.name },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      const ex = data as ImportedExam;
-      if (!ex?.questoes?.length) throw new Error("Nenhuma questão extraída do PDF.");
-      setImportedExam(ex);
-      setImportTitle(ex.titulo || file.name.replace(/\.pdf$/i, ""));
-      toast({ title: `${ex.questoes.length} questões extraídas!` });
-    } catch (e: any) {
-      toast({ title: "Erro ao importar PDF", description: e.message, variant: "destructive" });
-    } finally {
-      setImportLoading(false);
-    }
-  };
-
-  const handleSaveImported = async () => {
-    if (!importedExam || !importTitle.trim() || !importPassword.trim()) {
-      toast({ title: "Preencha título e senha", variant: "destructive" });
-      return;
-    }
-    setSavingImport(true);
-    try {
-      const questionsToInsert = importedExam.questoes.map((q) => ({
-        question_text: q.enunciado,
-        option_a: q.alternativas.A || "",
-        option_b: q.alternativas.B || "",
-        option_c: q.alternativas.C || "",
-        option_d: q.alternativas.D || "",
-        correct_option: q.gabarito,
-        comment: q.comentario?.trim() || null,
-        created_by: user!.id,
-      }));
-      const { data: insertedQs, error: qErr } = await supabase
-        .from("questions").insert(questionsToInsert).select("id");
-      if (qErr) throw qErr;
-
-      const { data: exam, error: eErr } = await supabase
-        .from("exams")
-        .insert({ title: importTitle.trim(), password: importPassword.trim(), created_by: user!.id })
-        .select().single();
-      if (eErr) throw eErr;
-
-      const examQuestions = insertedQs!.map((q, i) => ({
-        exam_id: exam.id, question_id: q.id, sort_order: i,
-      }));
-      const { error: linkErr } = await supabase.from("exam_questions").insert(examQuestions);
-      if (linkErr) throw linkErr;
-
-      toast({ title: "Prova importada com sucesso!" });
-      setImportOpen(false);
-      setImportedExam(null);
-      setImportTitle("");
-      setImportPassword("");
-      fetchExams();
-      fetchQuestions();
-    } catch (e: any) {
-      toast({ title: "Erro ao salvar", description: e.message, variant: "destructive" });
-    } finally {
-      setSavingImport(false);
-    }
-  };
 
   const handleRename = async () => {
     if (!editingExam || !editTitle.trim()) return;
@@ -240,78 +148,10 @@ export default function ExamsTab() {
   return (
     <div className="space-y-4">
       <div className="flex justify-end gap-2">
-        <Button onClick={() => setImportOpen(true)} variant="outline">
-          <FileUp className="w-4 h-4 mr-2" /> Importar PDF
-        </Button>
         <Button onClick={() => setDialogOpen(true)} className="gradient-primary text-primary-foreground">
           <Plus className="w-4 h-4 mr-2" /> Nova Prova
         </Button>
       </div>
-
-      <Dialog open={importOpen} onOpenChange={(o) => { setImportOpen(o); if (!o) { setImportedExam(null); setImportTitle(""); setImportPassword(""); } }}>
-        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="font-display">Importar prova de PDF</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            {!importedExam && (
-              <div>
-                <Label>Selecione o PDF da prova</Label>
-                <Input
-                  type="file"
-                  accept="application/pdf"
-                  disabled={importLoading}
-                  onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePdfUpload(f); }}
-                />
-                {importLoading && (
-                  <div className="flex items-center gap-2 mt-3 text-sm text-muted-foreground">
-                    <Loader2 className="w-4 h-4 animate-spin" /> Extraindo questões com IA... pode levar até 1 min.
-                  </div>
-                )}
-              </div>
-            )}
-            {importedExam && (
-              <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <Label>Título da prova</Label>
-                    <Input value={importTitle} onChange={(e) => setImportTitle(e.target.value)} />
-                  </div>
-                  <div>
-                    <Label>Senha de acesso</Label>
-                    <Input value={importPassword} onChange={(e) => setImportPassword(e.target.value)} placeholder="ex: tsa2026" />
-                  </div>
-                </div>
-                <div>
-                  <Label>{importedExam.questoes.length} questões extraídas</Label>
-                  <div className="mt-2 border rounded-lg max-h-80 overflow-y-auto divide-y">
-                    {importedExam.questoes.map((q, i) => (
-                      <div key={i} className="p-3 text-sm">
-                        <p className="font-medium mb-1">{q.numero}. {q.enunciado}</p>
-                        {(["A","B","C","D"] as const).map((l) => (
-                          <p key={l} className={q.gabarito === l ? "text-success font-medium" : "text-muted-foreground"}>
-                            {l}) {q.alternativas[l]}
-                          </p>
-                        ))}
-                        <p className="text-xs mt-1">Gabarito: <span className="font-bold">{q.gabarito}</span></p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex gap-2 justify-end">
-                  <Button variant="outline" onClick={() => { setImportedExam(null); setImportTitle(""); setImportPassword(""); }}>
-                    Trocar PDF
-                  </Button>
-                  <Button onClick={handleSaveImported} disabled={savingImport} className="gradient-primary text-primary-foreground">
-                    {savingImport ? "Salvando..." : "Criar prova"}
-                  </Button>
-                </div>
-              </>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
-
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
