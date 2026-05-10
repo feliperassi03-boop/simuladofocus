@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play, Pencil } from "lucide-react";
+import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play, Pencil, ListChecks } from "lucide-react";
 
 interface Question {
   id: string;
@@ -40,6 +40,10 @@ export default function ExamsTab() {
   const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
   const [editingExam, setEditingExam] = useState<Exam | null>(null);
   const [editTitle, setEditTitle] = useState("");
+  const [editingQuestionsExam, setEditingQuestionsExam] = useState<Exam | null>(null);
+  const [editSelectedQuestions, setEditSelectedQuestions] = useState<string[]>([]);
+  const [editQuestionsLoading, setEditQuestionsLoading] = useState(false);
+  const [editQuestionsSearch, setEditQuestionsSearch] = useState("");
 
   const handleRename = async () => {
     if (!editingExam || !editTitle.trim()) return;
@@ -50,6 +54,56 @@ export default function ExamsTab() {
       toast({ title: "Prova renomeada!" });
       setEditingExam(null);
       fetchExams();
+    }
+  };
+
+  const openEditQuestions = async (exam: Exam) => {
+    setEditingQuestionsExam(exam);
+    setEditQuestionsSearch("");
+    const { data } = await supabase
+      .from("exam_questions")
+      .select("question_id")
+      .eq("exam_id", exam.id)
+      .order("sort_order");
+    setEditSelectedQuestions(data?.map((eq) => eq.question_id) ?? []);
+  };
+
+  const toggleEditQuestion = (id: string) => {
+    setEditSelectedQuestions((prev) =>
+      prev.includes(id) ? prev.filter((q) => q !== id) : [...prev, id]
+    );
+  };
+
+  const handleSaveExamQuestions = async () => {
+    if (!editingQuestionsExam) return;
+    if (editSelectedQuestions.length === 0) {
+      toast({ title: "Selecione ao menos uma pergunta.", variant: "destructive" });
+      return;
+    }
+    setEditQuestionsLoading(true);
+    try {
+      const { error: delError } = await supabase
+        .from("exam_questions")
+        .delete()
+        .eq("exam_id", editingQuestionsExam.id);
+      if (delError) throw delError;
+
+      const rows = editSelectedQuestions.map((qId, i) => ({
+        exam_id: editingQuestionsExam.id,
+        question_id: qId,
+        sort_order: i,
+      }));
+      const { error: insError } = await supabase.from("exam_questions").insert(rows);
+      if (insError) throw insError;
+
+      toast({ title: "Questões da prova atualizadas!" });
+      setEditingQuestionsExam(null);
+      setEditSelectedQuestions([]);
+      fetchExams();
+    } catch (error: any) {
+      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+    } finally {
+      setEditQuestionsLoading(false);
     }
   };
 
@@ -241,6 +295,9 @@ export default function ExamsTab() {
                     <Button variant="ghost" size="icon" onClick={() => { setEditingExam(exam); setEditTitle(exam.title); }} title="Editar nome">
                       <Pencil className="w-4 h-4" />
                     </Button>
+                    <Button variant="ghost" size="icon" onClick={() => openEditQuestions(exam)} title="Editar questões">
+                      <ListChecks className="w-4 h-4" />
+                    </Button>
                     <Button variant="ghost" size="icon" onClick={() => copyLink(exam.id)} title="Copiar link">
                       <Copy className="w-4 h-4" />
                     </Button>
@@ -275,6 +332,61 @@ export default function ExamsTab() {
             <div className="flex gap-2 justify-end">
               <Button variant="outline" onClick={() => setEditingExam(null)}>Cancelar</Button>
               <Button onClick={handleRename} className="gradient-primary text-primary-foreground">Salvar</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!editingQuestionsExam} onOpenChange={(o) => { if (!o) { setEditingQuestionsExam(null); setEditSelectedQuestions([]); } }}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display">
+              Editar questões — {editingQuestionsExam?.title}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Buscar</Label>
+              <Input
+                value={editQuestionsSearch}
+                onChange={(e) => setEditQuestionsSearch(e.target.value)}
+                placeholder="Filtrar perguntas..."
+              />
+            </div>
+            <div>
+              <Label>Perguntas ({editSelectedQuestions.length} selecionadas)</Label>
+              <div className="mt-2 border rounded-lg max-h-[50vh] overflow-y-auto">
+                {questions
+                  .filter((q) => q.question_text.toLowerCase().includes(editQuestionsSearch.toLowerCase()))
+                  .map((q) => (
+                    <label
+                      key={q.id}
+                      className="flex items-start gap-3 p-3 hover:bg-muted/50 cursor-pointer border-b last:border-b-0"
+                    >
+                      <Checkbox
+                        checked={editSelectedQuestions.includes(q.id)}
+                        onCheckedChange={() => toggleEditQuestion(q.id)}
+                        className="mt-0.5"
+                      />
+                      <span className="text-sm break-words">{q.question_text}</span>
+                    </label>
+                  ))}
+                {questions.length === 0 && (
+                  <p className="text-sm text-muted-foreground p-4 text-center">
+                    Nenhuma pergunta cadastrada.
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setEditingQuestionsExam(null)}>Cancelar</Button>
+              <Button
+                onClick={handleSaveExamQuestions}
+                disabled={editQuestionsLoading}
+                className="gradient-primary text-primary-foreground"
+              >
+                {editQuestionsLoading ? "Salvando..." : "Salvar alterações"}
+              </Button>
             </div>
           </div>
         </DialogContent>
