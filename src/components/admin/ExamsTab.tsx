@@ -40,6 +40,10 @@ export default function ExamsTab() {
   const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
   const [editingExam, setEditingExam] = useState<Exam | null>(null);
   const [editTitle, setEditTitle] = useState("");
+  const [editingQuestionsExam, setEditingQuestionsExam] = useState<Exam | null>(null);
+  const [editSelectedQuestions, setEditSelectedQuestions] = useState<string[]>([]);
+  const [editQuestionsLoading, setEditQuestionsLoading] = useState(false);
+  const [editQuestionsSearch, setEditQuestionsSearch] = useState("");
 
   const handleRename = async () => {
     if (!editingExam || !editTitle.trim()) return;
@@ -50,6 +54,56 @@ export default function ExamsTab() {
       toast({ title: "Prova renomeada!" });
       setEditingExam(null);
       fetchExams();
+    }
+  };
+
+  const openEditQuestions = async (exam: Exam) => {
+    setEditingQuestionsExam(exam);
+    setEditQuestionsSearch("");
+    const { data } = await supabase
+      .from("exam_questions")
+      .select("question_id")
+      .eq("exam_id", exam.id)
+      .order("sort_order");
+    setEditSelectedQuestions(data?.map((eq) => eq.question_id) ?? []);
+  };
+
+  const toggleEditQuestion = (id: string) => {
+    setEditSelectedQuestions((prev) =>
+      prev.includes(id) ? prev.filter((q) => q !== id) : [...prev, id]
+    );
+  };
+
+  const handleSaveExamQuestions = async () => {
+    if (!editingQuestionsExam) return;
+    if (editSelectedQuestions.length === 0) {
+      toast({ title: "Selecione ao menos uma pergunta.", variant: "destructive" });
+      return;
+    }
+    setEditQuestionsLoading(true);
+    try {
+      const { error: delError } = await supabase
+        .from("exam_questions")
+        .delete()
+        .eq("exam_id", editingQuestionsExam.id);
+      if (delError) throw delError;
+
+      const rows = editSelectedQuestions.map((qId, i) => ({
+        exam_id: editingQuestionsExam.id,
+        question_id: qId,
+        sort_order: i,
+      }));
+      const { error: insError } = await supabase.from("exam_questions").insert(rows);
+      if (insError) throw insError;
+
+      toast({ title: "Questões da prova atualizadas!" });
+      setEditingQuestionsExam(null);
+      setEditSelectedQuestions([]);
+      fetchExams();
+    } catch (error: any) {
+      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+    } finally {
+      setEditQuestionsLoading(false);
     }
   };
 
