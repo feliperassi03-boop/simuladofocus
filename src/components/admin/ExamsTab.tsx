@@ -17,6 +17,7 @@ interface ImportedQuestion {
   enunciado: string;
   alternativas: { A: string; B: string; C: string; D: string };
   gabarito: "A" | "B" | "C" | "D";
+  comentario?: string;
 }
 interface ImportedExam { titulo: string; questoes: ImportedQuestion[] }
 
