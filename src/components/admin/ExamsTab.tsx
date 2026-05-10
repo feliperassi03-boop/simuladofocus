@@ -235,11 +235,79 @@ export default function ExamsTab() {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
+        <Button onClick={() => setImportOpen(true)} variant="outline">
+          <FileUp className="w-4 h-4 mr-2" /> Importar PDF
+        </Button>
         <Button onClick={() => setDialogOpen(true)} className="gradient-primary text-primary-foreground">
           <Plus className="w-4 h-4 mr-2" /> Nova Prova
         </Button>
       </div>
+
+      <Dialog open={importOpen} onOpenChange={(o) => { setImportOpen(o); if (!o) { setImportedExam(null); setImportTitle(""); setImportPassword(""); } }}>
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display">Importar prova de PDF</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {!importedExam && (
+              <div>
+                <Label>Selecione o PDF da prova</Label>
+                <Input
+                  type="file"
+                  accept="application/pdf"
+                  disabled={importLoading}
+                  onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePdfUpload(f); }}
+                />
+                {importLoading && (
+                  <div className="flex items-center gap-2 mt-3 text-sm text-muted-foreground">
+                    <Loader2 className="w-4 h-4 animate-spin" /> Extraindo questões com IA... pode levar até 1 min.
+                  </div>
+                )}
+              </div>
+            )}
+            {importedExam && (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <Label>Título da prova</Label>
+                    <Input value={importTitle} onChange={(e) => setImportTitle(e.target.value)} />
+                  </div>
+                  <div>
+                    <Label>Senha de acesso</Label>
+                    <Input value={importPassword} onChange={(e) => setImportPassword(e.target.value)} placeholder="ex: tsa2026" />
+                  </div>
+                </div>
+                <div>
+                  <Label>{importedExam.questoes.length} questões extraídas</Label>
+                  <div className="mt-2 border rounded-lg max-h-80 overflow-y-auto divide-y">
+                    {importedExam.questoes.map((q, i) => (
+                      <div key={i} className="p-3 text-sm">
+                        <p className="font-medium mb-1">{q.numero}. {q.enunciado}</p>
+                        {(["A","B","C","D"] as const).map((l) => (
+                          <p key={l} className={q.gabarito === l ? "text-success font-medium" : "text-muted-foreground"}>
+                            {l}) {q.alternativas[l]}
+                          </p>
+                        ))}
+                        <p className="text-xs mt-1">Gabarito: <span className="font-bold">{q.gabarito}</span></p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <Button variant="outline" onClick={() => { setImportedExam(null); setImportTitle(""); setImportPassword(""); }}>
+                    Trocar PDF
+                  </Button>
+                  <Button onClick={handleSaveImported} disabled={savingImport} className="gradient-primary text-primary-foreground">
+                    {savingImport ? "Salvando..." : "Criar prova"}
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
