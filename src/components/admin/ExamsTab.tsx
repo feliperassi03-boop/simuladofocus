@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play, Pencil } from "lucide-react";
+import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play, Pencil, ListChecks } from "lucide-react";
 
 interface Question {
   id: string;
