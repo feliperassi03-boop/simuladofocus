@@ -98,6 +98,7 @@ export default function ExamsTab() {
         option_c: q.alternativas.C || "",
         option_d: q.alternativas.D || "",
         correct_option: q.gabarito,
+        comment: q.comentario?.trim() || null,
         created_by: user!.id,
       }));
       const { data: insertedQs, error: qErr } = await supabase
