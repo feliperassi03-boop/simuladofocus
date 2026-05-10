@@ -336,6 +336,61 @@ export default function ExamsTab() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={!!editingQuestionsExam} onOpenChange={(o) => { if (!o) { setEditingQuestionsExam(null); setEditSelectedQuestions([]); } }}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display">
+              Editar questões — {editingQuestionsExam?.title}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Buscar</Label>
+              <Input
+                value={editQuestionsSearch}
+                onChange={(e) => setEditQuestionsSearch(e.target.value)}
+                placeholder="Filtrar perguntas..."
+              />
+            </div>
+            <div>
+              <Label>Perguntas ({editSelectedQuestions.length} selecionadas)</Label>
+              <div className="mt-2 border rounded-lg max-h-[50vh] overflow-y-auto">
+                {questions
+                  .filter((q) => q.question_text.toLowerCase().includes(editQuestionsSearch.toLowerCase()))
+                  .map((q) => (
+                    <label
+                      key={q.id}
+                      className="flex items-start gap-3 p-3 hover:bg-muted/50 cursor-pointer border-b last:border-b-0"
+                    >
+                      <Checkbox
+                        checked={editSelectedQuestions.includes(q.id)}
+                        onCheckedChange={() => toggleEditQuestion(q.id)}
+                        className="mt-0.5"
+                      />
+                      <span className="text-sm break-words">{q.question_text}</span>
+                    </label>
+                  ))}
+                {questions.length === 0 && (
+                  <p className="text-sm text-muted-foreground p-4 text-center">
+                    Nenhuma pergunta cadastrada.
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setEditingQuestionsExam(null)}>Cancelar</Button>
+              <Button
+                onClick={handleSaveExamQuestions}
+                disabled={editQuestionsLoading}
+                className="gradient-primary text-primary-foreground"
+              >
+                {editQuestionsLoading ? "Salvando..." : "Salvar alterações"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
