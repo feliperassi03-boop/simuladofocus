@@ -49,6 +49,86 @@ export default function ExamsTab() {
   const [editingExam, setEditingExam] = useState<Exam | null>(null);
   const [editTitle, setEditTitle] = useState("");
 
+  // PDF Import
+  const [importOpen, setImportOpen] = useState(false);
+  const [importLoading, setImportLoading] = useState(false);
+  const [importedExam, setImportedExam] = useState<ImportedExam | null>(null);
+  const [importTitle, setImportTitle] = useState("");
+  const [importPassword, setImportPassword] = useState("");
+  const [savingImport, setSavingImport] = useState(false);
+
+  const handlePdfUpload = async (file: File) => {
+    setImportLoading(true);
+    setImportedExam(null);
+    try {
+      const buf = await file.arrayBuffer();
+      let binary = "";
+      const bytes = new Uint8Array(buf);
+      for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+      const pdfBase64 = btoa(binary);
+      const { data, error } = await supabase.functions.invoke("import-exam-pdf", {
+        body: { pdfBase64, fileName: file.name },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const ex = data as ImportedExam;
+      if (!ex?.questoes?.length) throw new Error("Nenhuma questão extraída do PDF.");
+      setImportedExam(ex);
+      setImportTitle(ex.titulo || file.name.replace(/\.pdf$/i, ""));
+      toast({ title: `${ex.questoes.length} questões extraídas!` });
+    } catch (e: any) {
+      toast({ title: "Erro ao importar PDF", description: e.message, variant: "destructive" });
+    } finally {
+      setImportLoading(false);
+    }
+  };
+
+  const handleSaveImported = async () => {
+    if (!importedExam || !importTitle.trim() || !importPassword.trim()) {
+      toast({ title: "Preencha título e senha", variant: "destructive" });
+      return;
+    }
+    setSavingImport(true);
+    try {
+      const questionsToInsert = importedExam.questoes.map((q) => ({
+        question_text: q.enunciado,
+        option_a: q.alternativas.A || "",
+        option_b: q.alternativas.B || "",
+        option_c: q.alternativas.C || "",
+        option_d: q.alternativas.D || "",
+        correct_option: q.gabarito,
+        created_by: user!.id,
+      }));
+      const { data: insertedQs, error: qErr } = await supabase
+        .from("questions").insert(questionsToInsert).select("id");
+      if (qErr) throw qErr;
+
+      const { data: exam, error: eErr } = await supabase
+        .from("exams")
+        .insert({ title: importTitle.trim(), password: importPassword.trim(), created_by: user!.id })
+        .select().single();
+      if (eErr) throw eErr;
+
+      const examQuestions = insertedQs!.map((q, i) => ({
+        exam_id: exam.id, question_id: q.id, sort_order: i,
+      }));
+      const { error: linkErr } = await supabase.from("exam_questions").insert(examQuestions);
+      if (linkErr) throw linkErr;
+
+      toast({ title: "Prova importada com sucesso!" });
+      setImportOpen(false);
+      setImportedExam(null);
+      setImportTitle("");
+      setImportPassword("");
+      fetchExams();
+      fetchQuestions();
+    } catch (e: any) {
+      toast({ title: "Erro ao salvar", description: e.message, variant: "destructive" });
+    } finally {
+      setSavingImport(false);
+    }
+  };
+
   const handleRename = async () => {
     if (!editingExam || !editTitle.trim()) return;
     const { error } = await supabase.from("exams").update({ title: editTitle.trim() }).eq("id", editingExam.id);
