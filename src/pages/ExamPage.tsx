@@ -561,7 +561,7 @@ export default function ExamPage() {
               ];
 
               return (
-                <Card key={q.id} className="shadow-elevated">
+                <Card key={q.id} id={`gabarito-q-${i}`} className="shadow-elevated scroll-mt-32">
                   <CardHeader>
                     <CardTitle className="font-display text-lg leading-relaxed">
                       <span className="text-primary font-bold mr-2">{i + 1}.</span>
