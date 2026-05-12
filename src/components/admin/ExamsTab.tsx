@@ -526,6 +526,118 @@ export default function ExamsTab() {
           </div>
         </DialogContent>
       </Dialog>
+      <Dialog open={!!managingExam} onOpenChange={(o) => { if (!o) { setManagingExam(null); setExamQuestions([]); } }}>
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display">
+              Gerenciar conteúdo — {managingExam?.title}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-muted-foreground">
+                {examQuestions.length} questão(ões) nesta prova
+              </p>
+              <Button onClick={addNewQuestionToExam} disabled={manageLoading} size="sm" className="gradient-primary text-primary-foreground">
+                <Plus className="w-4 h-4 mr-1" /> Nova questão
+              </Button>
+            </div>
+
+            {manageLoading && examQuestions.length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-6">Carregando...</p>
+            )}
+
+            <div className="space-y-4">
+              {examQuestions.map((q, idx) => (
+                <Card key={q.id} className="p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-primary">Questão {idx + 1}</span>
+                    <div className="flex gap-1">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => saveQuestion(q)}
+                        disabled={savingQuestionId === q.id}
+                      >
+                        <Save className="w-3 h-3 mr-1" />
+                        {savingQuestionId === q.id ? "Salvando..." : "Salvar"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => removeQuestionFromExam(q.id)}
+                        title="Remover da prova"
+                      >
+                        <X className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs">Enunciado</Label>
+                    <Textarea
+                      value={q.question_text}
+                      onChange={(e) => updateExamQuestionField(q.id, "question_text", e.target.value)}
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {(["A", "B", "C", "D"] as const).map((letter) => {
+                      const field = `option_${letter.toLowerCase()}` as keyof FullQuestion;
+                      return (
+                        <div key={letter}>
+                          <Label className="text-xs">Alternativa {letter}</Label>
+                          <Textarea
+                            value={(q as any)[field] ?? ""}
+                            onChange={(e) => updateExamQuestionField(q.id, field, e.target.value)}
+                            rows={2}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div>
+                    <Label className="text-xs">Gabarito (resposta correta)</Label>
+                    <RadioGroup
+                      value={q.correct_option}
+                      onValueChange={(v) => updateExamQuestionField(q.id, "correct_option", v)}
+                      className="flex gap-4 mt-1"
+                    >
+                      {(["A", "B", "C", "D"] as const).map((letter) => (
+                        <div key={letter} className="flex items-center gap-1">
+                          <RadioGroupItem value={letter} id={`r-${q.id}-${letter}`} />
+                          <Label htmlFor={`r-${q.id}-${letter}`} className="cursor-pointer">{letter}</Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs">Comentário / Gabarito comentado</Label>
+                    <Textarea
+                      value={q.comment ?? ""}
+                      onChange={(e) => updateExamQuestionField(q.id, "comment", e.target.value)}
+                      rows={3}
+                    />
+                  </div>
+                </Card>
+              ))}
+
+              {!manageLoading && examQuestions.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-6">
+                  Nenhuma questão nesta prova. Clique em "Nova questão" para adicionar.
+                </p>
+              )}
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <Button variant="outline" onClick={() => setManagingExam(null)}>Fechar</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
