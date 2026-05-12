@@ -58,6 +58,124 @@ export default function ExamsTab() {
   const [editSelectedQuestions, setEditSelectedQuestions] = useState<string[]>([]);
   const [editQuestionsLoading, setEditQuestionsLoading] = useState(false);
   const [editQuestionsSearch, setEditQuestionsSearch] = useState("");
+  const [managingExam, setManagingExam] = useState<Exam | null>(null);
+  const [examQuestions, setExamQuestions] = useState<FullQuestion[]>([]);
+  const [manageLoading, setManageLoading] = useState(false);
+  const [savingQuestionId, setSavingQuestionId] = useState<string | null>(null);
+
+  const openManageExam = async (exam: Exam) => {
+    setManagingExam(exam);
+    setManageLoading(true);
+    try {
+      const { data: eqData, error: eqError } = await supabase
+        .from("exam_questions")
+        .select("question_id, sort_order")
+        .eq("exam_id", exam.id)
+        .order("sort_order");
+      if (eqError) throw eqError;
+      const ids = (eqData ?? []).map((e) => e.question_id);
+      if (ids.length === 0) {
+        setExamQuestions([]);
+        return;
+      }
+      const { data: qData, error: qError } = await supabase
+        .from("questions")
+        .select("id, question_text, option_a, option_b, option_c, option_d, correct_option, comment")
+        .in("id", ids);
+      if (qError) throw qError;
+      const map = new Map((qData ?? []).map((q) => [q.id, q]));
+      const ordered: FullQuestion[] = (eqData ?? [])
+        .map((e) => {
+          const q = map.get(e.question_id);
+          return q ? { ...q, sort_order: e.sort_order } : null;
+        })
+        .filter(Boolean) as FullQuestion[];
+      setExamQuestions(ordered);
+    } catch (error: any) {
+      toast({ title: "Erro ao carregar", description: error.message, variant: "destructive" });
+    } finally {
+      setManageLoading(false);
+    }
+  };
+
+  const updateExamQuestionField = (id: string, field: keyof FullQuestion, value: string) => {
+    setExamQuestions((prev) => prev.map((q) => (q.id === id ? { ...q, [field]: value } : q)));
+  };
+
+  const saveQuestion = async (q: FullQuestion) => {
+    setSavingQuestionId(q.id);
+    const { error } = await supabase
+      .from("questions")
+      .update({
+        question_text: q.question_text,
+        option_a: q.option_a,
+        option_b: q.option_b,
+        option_c: q.option_c,
+        option_d: q.option_d,
+        correct_option: q.correct_option,
+        comment: q.comment,
+      })
+      .eq("id", q.id);
+    setSavingQuestionId(null);
+    if (error) {
+      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Questão atualizada!" });
+    }
+  };
+
+  const removeQuestionFromExam = async (questionId: string) => {
+    if (!managingExam) return;
+    if (!confirm("Remover esta questão da prova? (a questão continuará no banco)")) return;
+    const { error } = await supabase
+      .from("exam_questions")
+      .delete()
+      .eq("exam_id", managingExam.id)
+      .eq("question_id", questionId);
+    if (error) {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } else {
+      setExamQuestions((prev) => prev.filter((q) => q.id !== questionId));
+      toast({ title: "Questão removida da prova" });
+      fetchExams();
+    }
+  };
+
+  const addNewQuestionToExam = async () => {
+    if (!managingExam) return;
+    setManageLoading(true);
+    try {
+      const { data: newQ, error: qError } = await supabase
+        .from("questions")
+        .insert({
+          question_text: "Nova questão",
+          option_a: "",
+          option_b: "",
+          option_c: "",
+          option_d: "",
+          correct_option: "A",
+          created_by: user!.id,
+        })
+        .select()
+        .single();
+      if (qError) throw qError;
+
+      const nextOrder = examQuestions.length;
+      const { error: eqError } = await supabase
+        .from("exam_questions")
+        .insert({ exam_id: managingExam.id, question_id: newQ.id, sort_order: nextOrder });
+      if (eqError) throw eqError;
+
+      setExamQuestions((prev) => [...prev, { ...newQ, sort_order: nextOrder }]);
+      fetchQuestions();
+      fetchExams();
+      toast({ title: "Nova questão adicionada — edite abaixo" });
+    } catch (error: any) {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } finally {
+      setManageLoading(false);
+    }
+  };
 
   const handleRename = async () => {
     if (!editingExam || !editTitle.trim()) return;
