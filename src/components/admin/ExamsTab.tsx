@@ -9,12 +9,26 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play, Pencil, ListChecks } from "lucide-react";
+import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play, Pencil, ListChecks, Wrench, X, Save } from "lucide-react";
 
 interface Question {
   id: string;
   question_text: string;
+}
+
+interface FullQuestion {
+  id: string;
+  question_text: string;
+  option_a: string;
+  option_b: string;
+  option_c: string;
+  option_d: string;
+  correct_option: string;
+  comment: string | null;
+  sort_order?: number;
 }
 
 interface Exam {
