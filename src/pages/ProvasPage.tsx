@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Play, FileText, Loader2, FolderOpen } from "lucide-react";
+import provasBg from "@/assets/provas-bg.jpeg";
 
 interface ExamItem {
   id: string;
@@ -100,7 +101,10 @@ export default function ProvasPage() {
   if (!user) return null;
 
   return (
-    <div className="space-y-6">
+    <div
+      className="space-y-6 -mx-4 -my-8 px-4 py-8 min-h-[calc(100vh-4rem)] bg-cover bg-center bg-no-repeat bg-fixed"
+      style={{ backgroundImage: `linear-gradient(to bottom, hsl(var(--background)/0.85), hsl(var(--background)/0.92)), url(${provasBg})` }}
+    >
       <div>
         <h1 className="text-2xl font-display font-bold text-foreground">Provas Disponíveis</h1>
         <p className="text-muted-foreground mt-1">Escolha uma categoria e selecione a prova</p>
