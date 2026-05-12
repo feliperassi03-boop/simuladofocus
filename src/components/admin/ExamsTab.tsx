@@ -9,12 +9,26 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play, Pencil, ListChecks } from "lucide-react";
+import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play, Pencil, ListChecks, Wrench, X, Save } from "lucide-react";
 
 interface Question {
   id: string;
   question_text: string;
+}
+
+interface FullQuestion {
+  id: string;
+  question_text: string;
+  option_a: string;
+  option_b: string;
+  option_c: string;
+  option_d: string;
+  correct_option: string;
+  comment: string | null;
+  sort_order?: number;
 }
 
 interface Exam {
@@ -44,6 +58,124 @@ export default function ExamsTab() {
   const [editSelectedQuestions, setEditSelectedQuestions] = useState<string[]>([]);
   const [editQuestionsLoading, setEditQuestionsLoading] = useState(false);
   const [editQuestionsSearch, setEditQuestionsSearch] = useState("");
+  const [managingExam, setManagingExam] = useState<Exam | null>(null);
+  const [examQuestions, setExamQuestions] = useState<FullQuestion[]>([]);
+  const [manageLoading, setManageLoading] = useState(false);
+  const [savingQuestionId, setSavingQuestionId] = useState<string | null>(null);
+
+  const openManageExam = async (exam: Exam) => {
+    setManagingExam(exam);
+    setManageLoading(true);
+    try {
+      const { data: eqData, error: eqError } = await supabase
+        .from("exam_questions")
+        .select("question_id, sort_order")
+        .eq("exam_id", exam.id)
+        .order("sort_order");
+      if (eqError) throw eqError;
+      const ids = (eqData ?? []).map((e) => e.question_id);
+      if (ids.length === 0) {
+        setExamQuestions([]);
+        return;
+      }
+      const { data: qData, error: qError } = await supabase
+        .from("questions")
+        .select("id, question_text, option_a, option_b, option_c, option_d, correct_option, comment")
+        .in("id", ids);
+      if (qError) throw qError;
+      const map = new Map((qData ?? []).map((q) => [q.id, q]));
+      const ordered: FullQuestion[] = (eqData ?? [])
+        .map((e) => {
+          const q = map.get(e.question_id);
+          return q ? { ...q, sort_order: e.sort_order } : null;
+        })
+        .filter(Boolean) as FullQuestion[];
+      setExamQuestions(ordered);
+    } catch (error: any) {
+      toast({ title: "Erro ao carregar", description: error.message, variant: "destructive" });
+    } finally {
+      setManageLoading(false);
+    }
+  };
+
+  const updateExamQuestionField = (id: string, field: keyof FullQuestion, value: string) => {
+    setExamQuestions((prev) => prev.map((q) => (q.id === id ? { ...q, [field]: value } : q)));
+  };
+
+  const saveQuestion = async (q: FullQuestion) => {
+    setSavingQuestionId(q.id);
+    const { error } = await supabase
+      .from("questions")
+      .update({
+        question_text: q.question_text,
+        option_a: q.option_a,
+        option_b: q.option_b,
+        option_c: q.option_c,
+        option_d: q.option_d,
+        correct_option: q.correct_option,
+        comment: q.comment,
+      })
+      .eq("id", q.id);
+    setSavingQuestionId(null);
+    if (error) {
+      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Questão atualizada!" });
+    }
+  };
+
+  const removeQuestionFromExam = async (questionId: string) => {
+    if (!managingExam) return;
+    if (!confirm("Remover esta questão da prova? (a questão continuará no banco)")) return;
+    const { error } = await supabase
+      .from("exam_questions")
+      .delete()
+      .eq("exam_id", managingExam.id)
+      .eq("question_id", questionId);
+    if (error) {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } else {
+      setExamQuestions((prev) => prev.filter((q) => q.id !== questionId));
+      toast({ title: "Questão removida da prova" });
+      fetchExams();
+    }
+  };
+
+  const addNewQuestionToExam = async () => {
+    if (!managingExam) return;
+    setManageLoading(true);
+    try {
+      const { data: newQ, error: qError } = await supabase
+        .from("questions")
+        .insert({
+          question_text: "Nova questão",
+          option_a: "",
+          option_b: "",
+          option_c: "",
+          option_d: "",
+          correct_option: "A",
+          created_by: user!.id,
+        })
+        .select()
+        .single();
+      if (qError) throw qError;
+
+      const nextOrder = examQuestions.length;
+      const { error: eqError } = await supabase
+        .from("exam_questions")
+        .insert({ exam_id: managingExam.id, question_id: newQ.id, sort_order: nextOrder });
+      if (eqError) throw eqError;
+
+      setExamQuestions((prev) => [...prev, { ...newQ, sort_order: nextOrder }]);
+      fetchQuestions();
+      fetchExams();
+      toast({ title: "Nova questão adicionada — edite abaixo" });
+    } catch (error: any) {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } finally {
+      setManageLoading(false);
+    }
+  };
 
   const handleRename = async () => {
     if (!editingExam || !editTitle.trim()) return;
@@ -295,8 +427,11 @@ export default function ExamsTab() {
                     <Button variant="ghost" size="icon" onClick={() => { setEditingExam(exam); setEditTitle(exam.title); }} title="Editar nome">
                       <Pencil className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => openEditQuestions(exam)} title="Editar questões">
+                    <Button variant="ghost" size="icon" onClick={() => openEditQuestions(exam)} title="Editar questões (do banco)">
                       <ListChecks className="w-4 h-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => openManageExam(exam)} title="Gerenciar conteúdo da prova">
+                      <Wrench className="w-4 h-4 text-primary" />
                     </Button>
                     <Button variant="ghost" size="icon" onClick={() => copyLink(exam.id)} title="Copiar link">
                       <Copy className="w-4 h-4" />
@@ -387,6 +522,118 @@ export default function ExamsTab() {
               >
                 {editQuestionsLoading ? "Salvando..." : "Salvar alterações"}
               </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={!!managingExam} onOpenChange={(o) => { if (!o) { setManagingExam(null); setExamQuestions([]); } }}>
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display">
+              Gerenciar conteúdo — {managingExam?.title}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-muted-foreground">
+                {examQuestions.length} questão(ões) nesta prova
+              </p>
+              <Button onClick={addNewQuestionToExam} disabled={manageLoading} size="sm" className="gradient-primary text-primary-foreground">
+                <Plus className="w-4 h-4 mr-1" /> Nova questão
+              </Button>
+            </div>
+
+            {manageLoading && examQuestions.length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-6">Carregando...</p>
+            )}
+
+            <div className="space-y-4">
+              {examQuestions.map((q, idx) => (
+                <Card key={q.id} className="p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-primary">Questão {idx + 1}</span>
+                    <div className="flex gap-1">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => saveQuestion(q)}
+                        disabled={savingQuestionId === q.id}
+                      >
+                        <Save className="w-3 h-3 mr-1" />
+                        {savingQuestionId === q.id ? "Salvando..." : "Salvar"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => removeQuestionFromExam(q.id)}
+                        title="Remover da prova"
+                      >
+                        <X className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs">Enunciado</Label>
+                    <Textarea
+                      value={q.question_text}
+                      onChange={(e) => updateExamQuestionField(q.id, "question_text", e.target.value)}
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {(["A", "B", "C", "D"] as const).map((letter) => {
+                      const field = `option_${letter.toLowerCase()}` as keyof FullQuestion;
+                      return (
+                        <div key={letter}>
+                          <Label className="text-xs">Alternativa {letter}</Label>
+                          <Textarea
+                            value={(q as any)[field] ?? ""}
+                            onChange={(e) => updateExamQuestionField(q.id, field, e.target.value)}
+                            rows={2}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div>
+                    <Label className="text-xs">Gabarito (resposta correta)</Label>
+                    <RadioGroup
+                      value={q.correct_option}
+                      onValueChange={(v) => updateExamQuestionField(q.id, "correct_option", v)}
+                      className="flex gap-4 mt-1"
+                    >
+                      {(["A", "B", "C", "D"] as const).map((letter) => (
+                        <div key={letter} className="flex items-center gap-1">
+                          <RadioGroupItem value={letter} id={`r-${q.id}-${letter}`} />
+                          <Label htmlFor={`r-${q.id}-${letter}`} className="cursor-pointer">{letter}</Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs">Comentário / Gabarito comentado</Label>
+                    <Textarea
+                      value={q.comment ?? ""}
+                      onChange={(e) => updateExamQuestionField(q.id, "comment", e.target.value)}
+                      rows={3}
+                    />
+                  </div>
+                </Card>
+              ))}
+
+              {!manageLoading && examQuestions.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-6">
+                  Nenhuma questão nesta prova. Clique em "Nova questão" para adicionar.
+                </p>
+              )}
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <Button variant="outline" onClick={() => setManagingExam(null)}>Fechar</Button>
             </div>
           </div>
         </DialogContent>
