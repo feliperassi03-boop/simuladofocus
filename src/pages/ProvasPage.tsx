@@ -51,15 +51,23 @@ export default function ProvasPage() {
       }
 
       const examIds = examsData.map((e) => e.id);
-      const { data: eqData } = await supabase
-        .from("exam_questions")
-        .select("exam_id")
-        .in("exam_id", examIds);
-
+      // Busca em páginas para evitar o limite padrão de 1000 linhas do Supabase
       const counts: Record<string, number> = {};
-      eqData?.forEach((eq) => {
-        counts[eq.exam_id] = (counts[eq.exam_id] || 0) + 1;
-      });
+      const pageSize = 1000;
+      let from = 0;
+      while (true) {
+        const { data: eqData, error } = await supabase
+          .from("exam_questions")
+          .select("exam_id")
+          .in("exam_id", examIds)
+          .range(from, from + pageSize - 1);
+        if (error || !eqData || eqData.length === 0) break;
+        eqData.forEach((eq) => {
+          counts[eq.exam_id] = (counts[eq.exam_id] || 0) + 1;
+        });
+        if (eqData.length < pageSize) break;
+        from += pageSize;
+      }
 
       setExams(
         examsData.map((e) => ({
