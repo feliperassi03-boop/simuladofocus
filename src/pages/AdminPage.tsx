@@ -118,8 +118,22 @@ export default function AdminPage() {
   };
 
   const fetchQuestions = async () => {
-    const { data } = await supabase.from("questions").select("*").order("created_at", { ascending: false });
-    if (data) setQuestions(data);
+    // Pagina para evitar o limite padrão de 1000 linhas do Supabase
+    const pageSize = 1000;
+    let from = 0;
+    const all: Question[] = [];
+    while (true) {
+      const { data, error } = await supabase
+        .from("questions")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .range(from, from + pageSize - 1);
+      if (error || !data || data.length === 0) break;
+      all.push(...(data as Question[]));
+      if (data.length < pageSize) break;
+      from += pageSize;
+    }
+    setQuestions(all);
   };
 
   const fetchAttempts = async () => {
