@@ -287,6 +287,26 @@ export default function AdminPage() {
                   </DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
+                  <div className="rounded-lg border border-dashed p-3 bg-muted/30">
+                    <Label className="text-xs uppercase tracking-wide text-muted-foreground">Importação rápida (colar texto)</Label>
+                    <Textarea
+                      value={quickImport}
+                      onChange={(e) => setQuickImport(e.target.value)}
+                      placeholder={"Cole aqui:\nEnunciado...\nA) ...\nB) ...\nC) ...\nD) ...\nResposta: A"}
+                      rows={5}
+                      className="mt-2 font-mono text-xs"
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="secondary"
+                      className="mt-2"
+                      onClick={handleQuickImport}
+                      disabled={!quickImport.trim()}
+                    >
+                      Processar
+                    </Button>
+                  </div>
                   <div>
                     <Label>Pergunta</Label>
                     <Textarea
