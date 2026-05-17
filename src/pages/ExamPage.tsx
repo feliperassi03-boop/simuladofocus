@@ -762,11 +762,32 @@ export default function ExamPage() {
               </Button>
             </div>
             {revealedAnswers[currentQuestion.id] && (
-              <div className="mt-3 p-3 rounded-lg bg-primary/5 border border-primary/20 animate-fade-in">
-                <p className="text-sm text-primary font-medium flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4" />
-                  Gabarito: Alternativa {currentQuestion?.correct_option}
-                </p>
+              <div className="mt-3 space-y-3 animate-fade-in">
+                <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+                  <p className="text-sm text-primary font-medium flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" />
+                    Gabarito: Alternativa {currentQuestion?.correct_option}
+                  </p>
+                </div>
+                {(currentQuestion?.comment || currentQuestion?.comment_image_url) && (
+                  <div className="p-4 rounded-lg bg-muted/50 border border-border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <MessageSquareText className="w-5 h-5 text-primary" />
+                      <span className="font-display font-semibold text-foreground">Comentário</span>
+                    </div>
+                    <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                      {currentQuestion.comment}
+                    </div>
+                    {currentQuestion.comment_image_url && (
+                      <img
+                        src={currentQuestion.comment_image_url}
+                        alt="Imagem do comentário"
+                        className="mt-3 rounded-lg max-h-64 object-contain cursor-pointer hover:opacity-90 transition-opacity"
+                        onClick={() => setLightboxImage(currentQuestion.comment_image_url)}
+                      />
+                    )}
+                  </div>
+                )}
               </div>
             )}
             {currentQuestion?.image_url && (
