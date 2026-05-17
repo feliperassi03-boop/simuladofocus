@@ -740,9 +740,35 @@ export default function ExamPage() {
 
         <Card className="shadow-elevated mb-6">
           <CardHeader>
-            <CardTitle className="font-display text-xl leading-relaxed">
-              {currentQuestion?.question_text}
-            </CardTitle>
+            <div className="flex items-start justify-between gap-3">
+              <CardTitle className="font-display text-xl leading-relaxed flex-1">
+                {currentQuestion?.question_text}
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="shrink-0 mt-0.5 text-muted-foreground hover:text-primary"
+                onClick={() => toggleRevealedAnswer(currentQuestion.id)}
+              >
+                {revealedAnswers[currentQuestion.id] ? (
+                  <>
+                    <EyeOff className="w-4 h-4 mr-1.5" /> <span className="hidden sm:inline text-xs">Ocultar gabarito</span>
+                  </>
+                ) : (
+                  <>
+                    <Eye className="w-4 h-4 mr-1.5" /> <span className="hidden sm:inline text-xs">Ver gabarito</span>
+                  </>
+                )}
+              </Button>
+            </div>
+            {revealedAnswers[currentQuestion.id] && (
+              <div className="mt-3 p-3 rounded-lg bg-primary/5 border border-primary/20 animate-fade-in">
+                <p className="text-sm text-primary font-medium flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4" />
+                  Gabarito: Alternativa {currentQuestion?.correct_option}
+                </p>
+              </div>
+            )}
             {currentQuestion?.image_url && (
               <img
                 src={currentQuestion.image_url}
