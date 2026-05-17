@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock, User, MessageSquareText, Home, BookOpen } from "lucide-react";
+import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock, User, MessageSquareText, Home, BookOpen, Eye, EyeOff } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
 import {
   AlertDialog,
