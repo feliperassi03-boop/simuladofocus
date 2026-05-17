@@ -233,6 +233,10 @@ export default function ExamPage() {
     setAnswers((prev) => ({ ...prev, [questionId]: option }));
   };
 
+  const toggleRevealedAnswer = (questionId: string) => {
+    setRevealedAnswers((prev) => ({ ...prev, [questionId]: !prev[questionId] }));
+  };
+
   const goToQuestion = (index: number) => {
     if (index >= 0 && index < questions.length) {
       setCurrentIndex(index);
