@@ -64,6 +64,7 @@ export default function AdminPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [quickImport, setQuickImport] = useState("");
   const { convertToMp4, needsConversion, converting, progress: convertProgress } = useVideoConverter();
 
   const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -217,7 +218,60 @@ export default function AdminPage() {
   const openNew = () => {
     setForm(emptyForm);
     setEditingId(null);
+    setQuickImport("");
     setDialogOpen(true);
+  };
+
+  const handleQuickImport = () => {
+    const text = quickImport.replace(/\r/g, "").trim();
+    if (!text) return;
+
+    // Find first alternative marker (A) / A. / A -
+    const altRegex = /(^|\n)\s*([A-Da-d])\s*[\)\.\-]\s*/g;
+    const matches: { letter: string; index: number; matchLen: number }[] = [];
+    let m: RegExpExecArray | null;
+    while ((m = altRegex.exec(text)) !== null) {
+      matches.push({
+        letter: m[2].toUpperCase(),
+        index: m.index + m[1].length,
+        matchLen: m[0].length - m[1].length,
+      });
+    }
+
+    if (matches.length < 4) {
+      toast({ title: "Formato inválido", description: "Não foi possível identificar as 4 alternativas.", variant: "destructive" });
+      return;
+    }
+
+    const enunciado = text.slice(0, matches[0].index).trim();
+
+    // Extract answer letter from "Resposta:" or "Gabarito:"
+    const answerMatch = text.match(/(?:resposta|gabarito)\s*[:\-]?\s*([A-Da-d])/i);
+    const correct = answerMatch ? answerMatch[1].toUpperCase() : "A";
+
+    // Cut answer line out of last alternative
+    const opts: Record<string, string> = { A: "", B: "", C: "", D: "" };
+    for (let i = 0; i < matches.length; i++) {
+      const start = matches[i].index + matches[i].matchLen;
+      const end = i + 1 < matches.length ? matches[i + 1].index : text.length;
+      let chunk = text.slice(start, end).trim();
+      // Remove "Resposta: X" / "Gabarito: X" line from chunk
+      chunk = chunk.replace(/\n?\s*(?:resposta|gabarito)\s*[:\-]?\s*[A-Da-d]\s*$/i, "").trim();
+      if (["A", "B", "C", "D"].includes(matches[i].letter)) {
+        opts[matches[i].letter] = chunk;
+      }
+    }
+
+    setForm((f) => ({
+      ...f,
+      question_text: enunciado,
+      option_a: opts.A,
+      option_b: opts.B,
+      option_c: opts.C,
+      option_d: opts.D,
+      correct_option: correct,
+    }));
+    toast({ title: "Importado", description: "Campos preenchidos. Revise e salve." });
   };
 
   return (
@@ -287,6 +341,26 @@ export default function AdminPage() {
                   </DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
+                  <div className="rounded-lg border border-dashed p-3 bg-muted/30">
+                    <Label className="text-xs uppercase tracking-wide text-muted-foreground">Importação rápida (colar texto)</Label>
+                    <Textarea
+                      value={quickImport}
+                      onChange={(e) => setQuickImport(e.target.value)}
+                      placeholder={"Cole aqui:\nEnunciado...\nA) ...\nB) ...\nC) ...\nD) ...\nResposta: A"}
+                      rows={5}
+                      className="mt-2 font-mono text-xs"
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="secondary"
+                      className="mt-2"
+                      onClick={handleQuickImport}
+                      disabled={!quickImport.trim()}
+                    >
+                      Processar
+                    </Button>
+                  </div>
                   <div>
                     <Label>Pergunta</Label>
                     <Textarea
