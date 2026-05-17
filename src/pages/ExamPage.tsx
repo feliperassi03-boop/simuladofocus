@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock, User, MessageSquareText, Home, BookOpen } from "lucide-react";
+import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock, User, MessageSquareText, Home, BookOpen, Eye, EyeOff } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
 import {
   AlertDialog,
@@ -61,6 +61,7 @@ export default function ExamPage() {
   const [passwordInput, setPasswordInput] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [revealedAnswers, setRevealedAnswers] = useState<Record<string, boolean>>({});
   const [attemptId, setAttemptId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -230,6 +231,10 @@ export default function ExamPage() {
   const handleSelect = (option: string) => {
     const questionId = questions[currentIndex].id;
     setAnswers((prev) => ({ ...prev, [questionId]: option }));
+  };
+
+  const toggleRevealedAnswer = (questionId: string) => {
+    setRevealedAnswers((prev) => ({ ...prev, [questionId]: !prev[questionId] }));
   };
 
   const goToQuestion = (index: number) => {
@@ -735,9 +740,35 @@ export default function ExamPage() {
 
         <Card className="shadow-elevated mb-6">
           <CardHeader>
-            <CardTitle className="font-display text-xl leading-relaxed">
-              {currentQuestion?.question_text}
-            </CardTitle>
+            <div className="flex items-start justify-between gap-3">
+              <CardTitle className="font-display text-xl leading-relaxed flex-1">
+                {currentQuestion?.question_text}
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="shrink-0 mt-0.5 text-muted-foreground hover:text-primary"
+                onClick={() => toggleRevealedAnswer(currentQuestion.id)}
+              >
+                {revealedAnswers[currentQuestion.id] ? (
+                  <>
+                    <EyeOff className="w-4 h-4 mr-1.5" /> <span className="hidden sm:inline text-xs">Ocultar gabarito</span>
+                  </>
+                ) : (
+                  <>
+                    <Eye className="w-4 h-4 mr-1.5" /> <span className="hidden sm:inline text-xs">Ver gabarito</span>
+                  </>
+                )}
+              </Button>
+            </div>
+            {revealedAnswers[currentQuestion.id] && (
+              <div className="mt-3 p-3 rounded-lg bg-primary/5 border border-primary/20 animate-fade-in">
+                <p className="text-sm text-primary font-medium flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4" />
+                  Gabarito: Alternativa {currentQuestion?.correct_option}
+                </p>
+              </div>
+            )}
             {currentQuestion?.image_url && (
               <img
                 src={currentQuestion.image_url}
