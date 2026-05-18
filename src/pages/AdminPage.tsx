@@ -222,11 +222,10 @@ export default function AdminPage() {
     setDialogOpen(true);
   };
 
-  const handleQuickImport = () => {
+  const handleQuickImport = async () => {
     const text = quickImport.replace(/\r/g, "").trim();
     if (!text) return;
 
-    // Find first alternative marker (A) / A. / A -
     const altRegex = /(^|\n)\s*([A-Da-d])\s*[\)\.\-]\s*/g;
     const matches: { letter: string; index: number; matchLen: number }[] = [];
     let m: RegExpExecArray | null;
@@ -245,33 +244,71 @@ export default function AdminPage() {
 
     const enunciado = text.slice(0, matches[0].index).trim();
 
-    // Extract answer letter from "Resposta:" or "Gabarito:"
-    const answerMatch = text.match(/(?:resposta|gabarito)\s*[:\-]?\s*([A-Da-d])/i);
-    const correct = answerMatch ? answerMatch[1].toUpperCase() : "A";
+    // Locate "Resposta:" / "Gabarito:" line
+    const answerRe = /(^|\n)\s*(?:resposta|gabarito)\s*[:\-]?\s*([A-Da-d])\b[^\n]*/i;
+    const answerExec = answerRe.exec(text);
+    const correct = answerExec ? answerExec[2].toUpperCase() : "A";
+    const answerStart = answerExec ? answerExec.index + answerExec[1].length : -1;
+    const answerEnd = answerExec ? answerExec.index + answerExec[0].length : -1;
 
-    // Cut answer line out of last alternative
+    // Locate "Comentário:" / "Comentario:" / "Comment:" line
+    const commentRe = /(^|\n)\s*(?:coment[áa]rio|comment)\s*[:\-]?\s*/i;
+    const commentExec = commentRe.exec(text);
+    const commentHeaderStart = commentExec ? commentExec.index + commentExec[1].length : -1;
+    const commentBodyStart = commentExec ? commentExec.index + commentExec[0].length : -1;
+    const comment = commentExec ? text.slice(commentBodyStart).trim() : "";
+
+    // Determine cutoff for last alternative
+    const cutoffs = [answerStart, commentHeaderStart].filter((v) => v >= 0);
+    const lastAltCutoff = cutoffs.length ? Math.min(...cutoffs) : text.length;
+
     const opts: Record<string, string> = { A: "", B: "", C: "", D: "" };
     for (let i = 0; i < matches.length; i++) {
       const start = matches[i].index + matches[i].matchLen;
-      const end = i + 1 < matches.length ? matches[i + 1].index : text.length;
+      let end = i + 1 < matches.length ? matches[i + 1].index : text.length;
+      if (i === matches.length - 1) end = Math.min(end, lastAltCutoff);
       let chunk = text.slice(start, end).trim();
-      // Remove "Resposta: X" / "Gabarito: X" line from chunk
-      chunk = chunk.replace(/\n?\s*(?:resposta|gabarito)\s*[:\-]?\s*[A-Da-d]\s*$/i, "").trim();
+      chunk = chunk.replace(/\n?\s*(?:resposta|gabarito)\s*[:\-]?\s*[A-Da-d][^\n]*$/i, "").trim();
       if (["A", "B", "C", "D"].includes(matches[i].letter)) {
         opts[matches[i].letter] = chunk;
       }
     }
 
-    setForm((f) => ({
-      ...f,
+    const newForm = {
+      ...form,
       question_text: enunciado,
       option_a: opts.A,
       option_b: opts.B,
       option_c: opts.C,
       option_d: opts.D,
       correct_option: correct,
-    }));
-    toast({ title: "Importado", description: "Campos preenchidos. Revise e salve." });
+      comment: comment || form.comment,
+    };
+    setForm(newForm);
+
+    // Auto-save the question
+    setLoading(true);
+    try {
+      const payload = {
+        ...newForm,
+        image_url: newForm.image_url || null,
+        video_url: newForm.video_url || null,
+        comment: newForm.comment || null,
+        comment_image_url: newForm.comment_image_url || null,
+      };
+      const { error } = await supabase.from("questions").insert({ ...payload, created_by: user!.id });
+      if (error) throw error;
+      toast({ title: "Pergunta criada!", description: "Importada e salva automaticamente." });
+      setForm(emptyForm);
+      setQuickImport("");
+      setEditingId(null);
+      setDialogOpen(false);
+      fetchQuestions();
+    } catch (error: any) {
+      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
