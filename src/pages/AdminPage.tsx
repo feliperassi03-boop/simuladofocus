@@ -244,19 +244,23 @@ export default function AdminPage() {
 
     const enunciado = text.slice(0, matches[0].index).trim();
 
-    // Locate "Resposta:" / "Gabarito:" line
-    const answerRe = /(^|\n)\s*(?:resposta|gabarito)\s*[:\-]?\s*([A-Da-d])\b[^\n]*/i;
+    // Locate "Resposta:" / "Gabarito:" line (tolerant: "Gabarito: letra A.", "Resposta - a)", etc.)
+    const answerRe = /(^|\n)[^\n]*?\b(?:resposta|gabarito)\b[^A-Za-z\n]*(?:letra\s+)?([A-Da-d])\b[^\n]*/i;
     const answerExec = answerRe.exec(text);
     const correct = answerExec ? answerExec[2].toUpperCase() : "A";
     const answerStart = answerExec ? answerExec.index + answerExec[1].length : -1;
     const answerEnd = answerExec ? answerExec.index + answerExec[0].length : -1;
 
-    // Locate "Comentário:" / "Comentario:" / "Comment:" line
-    const commentRe = /(^|\n)\s*(?:coment[áa]rio|comment)\s*[:\-]?\s*/i;
+    // Locate "Comentário" header (with or without colon, e.g. "Comentário da questão")
+    const commentRe = /(^|\n)\s*(?:coment[áa]rio|comment)\b[^\n]*\n?/i;
     const commentExec = commentRe.exec(text);
     const commentHeaderStart = commentExec ? commentExec.index + commentExec[1].length : -1;
     const commentBodyStart = commentExec ? commentExec.index + commentExec[0].length : -1;
-    const comment = commentExec ? text.slice(commentBodyStart).trim() : "";
+    let comment = commentExec ? text.slice(commentBodyStart).trim() : "";
+    // If no explicit comment header, use text after the answer line as comment
+    if (!comment && answerEnd >= 0) {
+      comment = text.slice(answerEnd).trim();
+    }
 
     // Determine cutoff for last alternative
     const cutoffs = [answerStart, commentHeaderStart].filter((v) => v >= 0);
