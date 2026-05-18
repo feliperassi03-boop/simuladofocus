@@ -371,7 +371,7 @@ export default function AdminPage() {
                   <Plus className="w-4 h-4 mr-2" /> Nova Pergunta
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-lg">
+              <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle className="font-display">
                     {editingId ? "Editar Pergunta" : "Nova Pergunta"}
