@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, Users, HelpCircle, BarChart3, ImagePlus, X, FileText, Video, MailCheck } from "lucide-react";
+import { Plus, Pencil, Trash2, Users, HelpCircle, BarChart3, ImagePlus, X, FileText, Video, MailCheck, Search } from "lucide-react";
 import ExamsTab from "@/components/admin/ExamsTab";
 import AllowedEmailsTab from "@/components/admin/AllowedEmailsTab";
 import { useVideoConverter } from "@/hooks/useVideoConverter";
@@ -65,6 +65,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [quickImport, setQuickImport] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [parsedPreview, setParsedPreview] = useState<{
     enunciado: string;
     A: string;
@@ -364,7 +365,16 @@ export default function AdminPage() {
         </TabsList>
 
         <TabsContent value="questions" className="space-y-4">
-          <div className="flex justify-end">
+          <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center">
+            <div className="relative w-full sm:max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar no enunciado ou alternativas..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button onClick={openNew} className="gradient-primary text-primary-foreground">
@@ -596,35 +606,52 @@ export default function AdminPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {questions.map((q) => (
-                  <TableRow key={q.id}>
-                    <TableCell className="font-medium max-w-md break-words whitespace-normal">
-                      {q.question_text}
-                    </TableCell>
-                    <TableCell>
-                      <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary font-bold text-sm">
-                        {q.correct_option}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => handleEdit(q)}>
-                          <Pencil className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(q.id)}>
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {questions.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
-                      Nenhuma pergunta cadastrada. Clique em "Nova Pergunta" para começar.
-                    </TableCell>
-                  </TableRow>
-                )}
+                {(() => {
+                  const lower = searchQuery.trim().toLowerCase();
+                  const filtered = lower
+                    ? questions.filter(
+                        (q) =>
+                          q.question_text.toLowerCase().includes(lower) ||
+                          q.option_a.toLowerCase().includes(lower) ||
+                          q.option_b.toLowerCase().includes(lower) ||
+                          q.option_c.toLowerCase().includes(lower) ||
+                          q.option_d.toLowerCase().includes(lower)
+                      )
+                    : questions;
+                  return (
+                    <>
+                      {filtered.map((q) => (
+                        <TableRow key={q.id}>
+                          <TableCell className="font-medium max-w-md break-words whitespace-normal">
+                            {q.question_text}
+                          </TableCell>
+                          <TableCell>
+                            <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary font-bold text-sm">
+                              {q.correct_option}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-1">
+                              <Button variant="ghost" size="icon" onClick={() => handleEdit(q)}>
+                                <Pencil className="w-4 h-4" />
+                              </Button>
+                              <Button variant="ghost" size="icon" onClick={() => handleDelete(q.id)}>
+                                <Trash2 className="w-4 h-4 text-destructive" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                      {filtered.length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
+                            {lower ? "Nenhuma pergunta encontrada para esta busca." : "Nenhuma pergunta cadastrada. Clique em \"Nova Pergunta\" para começar."}
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </>
+                  );
+                })()}
               </TableBody>
             </Table>
           </Card>
