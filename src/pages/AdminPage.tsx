@@ -65,6 +65,15 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [quickImport, setQuickImport] = useState("");
+  const [parsedPreview, setParsedPreview] = useState<{
+    enunciado: string;
+    A: string;
+    B: string;
+    C: string;
+    D: string;
+    gabarito: string;
+    comentario: string;
+  } | null>(null);
   const { convertToMp4, needsConversion, converting, progress: convertProgress } = useVideoConverter();
 
   const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
