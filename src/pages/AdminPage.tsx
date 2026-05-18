@@ -272,7 +272,8 @@ export default function AdminPage() {
       let end = i + 1 < matches.length ? matches[i + 1].index : text.length;
       if (i === matches.length - 1) end = Math.min(end, lastAltCutoff);
       let chunk = text.slice(start, end).trim();
-      chunk = chunk.replace(/\n?\s*(?:resposta|gabarito)\s*[:\-]?\s*[A-Da-d][^\n]*$/i, "").trim();
+      chunk = chunk.replace(/\n?[^\n]*\b(?:resposta|gabarito)\b[^\n]*$/i, "").trim();
+      chunk = chunk.replace(/\n?\s*(?:coment[áa]rio|comment)\b[\s\S]*$/i, "").trim();
       if (["A", "B", "C", "D"].includes(matches[i].letter)) {
         opts[matches[i].letter] = chunk;
       }
