@@ -606,35 +606,52 @@ export default function AdminPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {questions.map((q) => (
-                  <TableRow key={q.id}>
-                    <TableCell className="font-medium max-w-md break-words whitespace-normal">
-                      {q.question_text}
-                    </TableCell>
-                    <TableCell>
-                      <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary font-bold text-sm">
-                        {q.correct_option}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => handleEdit(q)}>
-                          <Pencil className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(q.id)}>
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {questions.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
-                      Nenhuma pergunta cadastrada. Clique em "Nova Pergunta" para começar.
-                    </TableCell>
-                  </TableRow>
-                )}
+                {(() => {
+                  const lower = searchQuery.trim().toLowerCase();
+                  const filtered = lower
+                    ? questions.filter(
+                        (q) =>
+                          q.question_text.toLowerCase().includes(lower) ||
+                          q.option_a.toLowerCase().includes(lower) ||
+                          q.option_b.toLowerCase().includes(lower) ||
+                          q.option_c.toLowerCase().includes(lower) ||
+                          q.option_d.toLowerCase().includes(lower)
+                      )
+                    : questions;
+                  return (
+                    <>
+                      {filtered.map((q) => (
+                        <TableRow key={q.id}>
+                          <TableCell className="font-medium max-w-md break-words whitespace-normal">
+                            {q.question_text}
+                          </TableCell>
+                          <TableCell>
+                            <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary font-bold text-sm">
+                              {q.correct_option}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-1">
+                              <Button variant="ghost" size="icon" onClick={() => handleEdit(q)}>
+                                <Pencil className="w-4 h-4" />
+                              </Button>
+                              <Button variant="ghost" size="icon" onClick={() => handleDelete(q.id)}>
+                                <Trash2 className="w-4 h-4 text-destructive" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                      {filtered.length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
+                            {lower ? "Nenhuma pergunta encontrada para esta busca." : "Nenhuma pergunta cadastrada. Clique em \"Nova Pergunta\" para começar."}
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </>
+                  );
+                })()}
               </TableBody>
             </Table>
           </Card>
