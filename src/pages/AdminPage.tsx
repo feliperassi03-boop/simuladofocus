@@ -65,6 +65,15 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [quickImport, setQuickImport] = useState("");
+  const [parsedPreview, setParsedPreview] = useState<{
+    enunciado: string;
+    A: string;
+    B: string;
+    C: string;
+    D: string;
+    gabarito: string;
+    comentario: string;
+  } | null>(null);
   const { convertToMp4, needsConversion, converting, progress: convertProgress } = useVideoConverter();
 
   const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -219,6 +228,7 @@ export default function AdminPage() {
     setForm(emptyForm);
     setEditingId(null);
     setQuickImport("");
+    setParsedPreview(null);
     setDialogOpen(true);
   };
 
@@ -226,61 +236,79 @@ export default function AdminPage() {
     const text = quickImport.replace(/\r/g, "").trim();
     if (!text) return;
 
-    const altRegex = /(^|\n)\s*([A-Da-d])\s*[\)\.\-]\s*/g;
-    const matches: { letter: string; index: number; matchLen: number }[] = [];
-    let m: RegExpExecArray | null;
-    while ((m = altRegex.exec(text)) !== null) {
-      matches.push({
-        letter: m[2].toUpperCase(),
-        index: m.index + m[1].length,
-        matchLen: m[0].length - m[1].length,
-      });
+    const lines = text.split("\n");
+    // Strict line-start matchers — each block is delimited by the *line* it starts on
+    const altLineRe = /^\s*([A-Da-d])\s*[\)\.\-]\s*(.*)$/;
+    const answerLineRe = /^\s*(?:resposta|gabarito)\b[^A-Za-z\n]*(?:letra\s+)?([A-Da-d])\b.*$/i;
+
+    let block: "enunciado" | "alt" | "comentario" = "enunciado";
+    let currentAlt = "";
+    const enunciadoLines: string[] = [];
+    const alts: Record<string, string[]> = { A: [], B: [], C: [], D: [] };
+    const comentarioLines: string[] = [];
+    let gabarito = "";
+
+    for (const raw of lines) {
+      const line = raw;
+
+      // 1) Answer line — strict separator. Consumes the whole line; never part of any alt or comment.
+      const ans = line.match(answerLineRe);
+      if (ans && block !== "comentario") {
+        gabarito = ans[1].toUpperCase();
+        block = "comentario";
+        continue;
+      }
+
+      // 2) Alternative start line
+      const alt = block !== "comentario" ? line.match(altLineRe) : null;
+      if (alt) {
+        currentAlt = alt[1].toUpperCase();
+        block = "alt";
+        if (alt[2]) alts[currentAlt].push(alt[2]);
+        continue;
+      }
+
+      // 3) Continuation lines
+      if (block === "enunciado") enunciadoLines.push(line);
+      else if (block === "alt" && currentAlt) alts[currentAlt].push(line);
+      else if (block === "comentario") comentarioLines.push(line);
     }
 
-    if (matches.length < 4) {
-      toast({ title: "Formato inválido", description: "Não foi possível identificar as 4 alternativas.", variant: "destructive" });
+    if (!alts.A.length || !alts.B.length || !alts.C.length || !alts.D.length) {
+      toast({ title: "Formato inválido", description: "Não foi possível identificar as 4 alternativas (A, B, C, D).", variant: "destructive" });
       return;
     }
 
-    const enunciado = text.slice(0, matches[0].index).trim();
+    // Strip optional "Comentário:" / "Comentário da questão" header from comment
+    let comentario = comentarioLines.join("\n").trim();
+    comentario = comentario.replace(/^\s*(?:coment[áa]rio|comment)\b[^\n]*\n?/i, "").trim();
 
-    // Locate "Resposta:" / "Gabarito:" line (tolerant: "Gabarito: letra A.", "Resposta - a)", etc.)
-    const answerRe = /(^|\n)[^\n]*?\b(?:resposta|gabarito)\b[^A-Za-z\n]*(?:letra\s+)?([A-Da-d])\b[^\n]*/i;
-    const answerExec = answerRe.exec(text);
-    const correct = answerExec ? answerExec[2].toUpperCase() : "A";
-    const answerStart = answerExec ? answerExec.index + answerExec[1].length : -1;
-    const answerEnd = answerExec ? answerExec.index + answerExec[0].length : -1;
+    setParsedPreview({
+      enunciado: enunciadoLines.join("\n").trim(),
+      A: alts.A.join("\n").trim(),
+      B: alts.B.join("\n").trim(),
+      C: alts.C.join("\n").trim(),
+      D: alts.D.join("\n").trim(),
+      gabarito: gabarito || "A",
+      comentario,
+    });
+  };
 
-    // Everything after the answer line becomes the comment (multi-paragraph supported)
-    let comment = answerEnd >= 0 ? text.slice(answerEnd).trim() : "";
-    // Strip optional leading "Comentário:" / "Comentário da questão" header
-    comment = comment.replace(/^\s*(?:coment[áa]rio|comment)\b[^\n]*\n?/i, "").trim();
-
-    const lastAltCutoff = answerStart >= 0 ? answerStart : text.length;
-
-    const opts: Record<string, string> = { A: "", B: "", C: "", D: "" };
-    for (let i = 0; i < matches.length; i++) {
-      const start = matches[i].index + matches[i].matchLen;
-      let end = i + 1 < matches.length ? matches[i + 1].index : text.length;
-      if (i === matches.length - 1) end = Math.min(end, lastAltCutoff);
-      const chunk = text.slice(start, end).trim();
-      if (["A", "B", "C", "D"].includes(matches[i].letter)) {
-        opts[matches[i].letter] = chunk;
-      }
-    }
-
+  const applyPreviewToForm = () => {
+    if (!parsedPreview) return;
     setForm({
       ...form,
-      question_text: enunciado,
-      option_a: opts.A,
-      option_b: opts.B,
-      option_c: opts.C,
-      option_d: opts.D,
-      correct_option: correct,
-      comment: comment || form.comment,
+      question_text: parsedPreview.enunciado,
+      option_a: parsedPreview.A,
+      option_b: parsedPreview.B,
+      option_c: parsedPreview.C,
+      option_d: parsedPreview.D,
+      correct_option: parsedPreview.gabarito,
+      comment: parsedPreview.comentario || form.comment,
     });
-
-    toast({ title: "Importado!", description: "Revise os campos e complete imagens/vídeos antes de salvar." });
+    setParsedPreview(null);
+    setQuickImport("");
+    toast({ title: "Aplicado!", description: "Revise e clique em Salvar quando estiver pronto." });
   };
 
   return (
@@ -369,6 +397,24 @@ export default function AdminPage() {
                     >
                       Processar
                     </Button>
+                    {parsedPreview && (
+                      <div className="mt-3 space-y-2 rounded-md border bg-background p-3 text-xs">
+                        <div className="font-semibold text-foreground">Prévia do parsing</div>
+                        <div><span className="font-medium text-muted-foreground">Enunciado:</span> <span className="whitespace-pre-wrap">{parsedPreview.enunciado || <em className="text-destructive">vazio</em>}</span></div>
+                        {(["A","B","C","D"] as const).map((l) => (
+                          <div key={l}>
+                            <span className="font-medium text-muted-foreground">{l}):</span>{" "}
+                            <span className="whitespace-pre-wrap">{parsedPreview[l] || <em className="text-destructive">vazio</em>}</span>
+                          </div>
+                        ))}
+                        <div><span className="font-medium text-muted-foreground">Gabarito:</span> <span className="font-semibold text-primary">{parsedPreview.gabarito}</span></div>
+                        <div><span className="font-medium text-muted-foreground">Comentário:</span> <span className="whitespace-pre-wrap">{parsedPreview.comentario || <em className="text-muted-foreground">(nenhum)</em>}</span></div>
+                        <div className="flex gap-2 pt-2">
+                          <Button type="button" size="sm" onClick={applyPreviewToForm}>Aplicar ao formulário</Button>
+                          <Button type="button" size="sm" variant="ghost" onClick={() => setParsedPreview(null)}>Cancelar</Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <Label>Pergunta</Label>
