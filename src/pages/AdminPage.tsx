@@ -222,7 +222,7 @@ export default function AdminPage() {
     setDialogOpen(true);
   };
 
-  const handleQuickImport = async () => {
+  const handleQuickImport = () => {
     const text = quickImport.replace(/\r/g, "").trim();
     if (!text) return;
 
@@ -251,35 +251,25 @@ export default function AdminPage() {
     const answerStart = answerExec ? answerExec.index + answerExec[1].length : -1;
     const answerEnd = answerExec ? answerExec.index + answerExec[0].length : -1;
 
-    // Locate "Comentário" header (with or without colon, e.g. "Comentário da questão")
-    const commentRe = /(^|\n)\s*(?:coment[áa]rio|comment)\b[^\n]*\n?/i;
-    const commentExec = commentRe.exec(text);
-    const commentHeaderStart = commentExec ? commentExec.index + commentExec[1].length : -1;
-    const commentBodyStart = commentExec ? commentExec.index + commentExec[0].length : -1;
-    let comment = commentExec ? text.slice(commentBodyStart).trim() : "";
-    // If no explicit comment header, use text after the answer line as comment
-    if (!comment && answerEnd >= 0) {
-      comment = text.slice(answerEnd).trim();
-    }
+    // Everything after the answer line becomes the comment (multi-paragraph supported)
+    let comment = answerEnd >= 0 ? text.slice(answerEnd).trim() : "";
+    // Strip optional leading "Comentário:" / "Comentário da questão" header
+    comment = comment.replace(/^\s*(?:coment[áa]rio|comment)\b[^\n]*\n?/i, "").trim();
 
-    // Determine cutoff for last alternative
-    const cutoffs = [answerStart, commentHeaderStart].filter((v) => v >= 0);
-    const lastAltCutoff = cutoffs.length ? Math.min(...cutoffs) : text.length;
+    const lastAltCutoff = answerStart >= 0 ? answerStart : text.length;
 
     const opts: Record<string, string> = { A: "", B: "", C: "", D: "" };
     for (let i = 0; i < matches.length; i++) {
       const start = matches[i].index + matches[i].matchLen;
       let end = i + 1 < matches.length ? matches[i + 1].index : text.length;
       if (i === matches.length - 1) end = Math.min(end, lastAltCutoff);
-      let chunk = text.slice(start, end).trim();
-      chunk = chunk.replace(/\n?[^\n]*\b(?:resposta|gabarito)\b[^\n]*$/i, "").trim();
-      chunk = chunk.replace(/\n?\s*(?:coment[áa]rio|comment)\b[\s\S]*$/i, "").trim();
+      const chunk = text.slice(start, end).trim();
       if (["A", "B", "C", "D"].includes(matches[i].letter)) {
         opts[matches[i].letter] = chunk;
       }
     }
 
-    const newForm = {
+    setForm({
       ...form,
       question_text: enunciado,
       option_a: opts.A,
@@ -288,32 +278,9 @@ export default function AdminPage() {
       option_d: opts.D,
       correct_option: correct,
       comment: comment || form.comment,
-    };
-    setForm(newForm);
+    });
 
-    // Auto-save the question
-    setLoading(true);
-    try {
-      const payload = {
-        ...newForm,
-        image_url: newForm.image_url || null,
-        video_url: newForm.video_url || null,
-        comment: newForm.comment || null,
-        comment_image_url: newForm.comment_image_url || null,
-      };
-      const { error } = await supabase.from("questions").insert({ ...payload, created_by: user!.id });
-      if (error) throw error;
-      toast({ title: "Pergunta criada!", description: "Importada e salva automaticamente." });
-      setForm(emptyForm);
-      setQuickImport("");
-      setEditingId(null);
-      setDialogOpen(false);
-      fetchQuestions();
-    } catch (error: any) {
-      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
-    } finally {
-      setLoading(false);
-    }
+    toast({ title: "Importado!", description: "Revise os campos e complete imagens/vídeos antes de salvar." });
   };
 
   return (
