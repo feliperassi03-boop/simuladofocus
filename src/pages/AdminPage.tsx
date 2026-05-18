@@ -65,6 +65,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [quickImport, setQuickImport] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [parsedPreview, setParsedPreview] = useState<{
     enunciado: string;
     A: string;
