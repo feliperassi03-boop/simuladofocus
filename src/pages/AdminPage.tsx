@@ -228,6 +228,7 @@ export default function AdminPage() {
     setForm(emptyForm);
     setEditingId(null);
     setQuickImport("");
+    setParsedPreview(null);
     setDialogOpen(true);
   };
 
