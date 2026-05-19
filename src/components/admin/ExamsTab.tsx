@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play, Pencil, ListChecks, Wrench, X, Save } from "lucide-react";
+import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play, Pencil, ListChecks, Wrench, X, Save, Search } from "lucide-react";
 
 interface Question {
   id: string;
