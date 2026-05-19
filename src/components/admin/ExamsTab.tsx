@@ -302,6 +302,7 @@ export default function ExamsTab() {
       setTitle("");
       setPassword("");
       setSelectedQuestions([]);
+      setCreateSearch("");
       fetchExams();
     } catch (error: any) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
