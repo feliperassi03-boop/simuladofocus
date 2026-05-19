@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play, Pencil, ListChecks, Wrench, X, Save } from "lucide-react";
+import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play, Pencil, ListChecks, Wrench, X, Save, Search } from "lucide-react";
 
 interface Question {
   id: string;
@@ -50,6 +50,7 @@ export default function ExamsTab() {
   const [title, setTitle] = useState("");
   const [password, setPassword] = useState("");
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
+  const [createSearch, setCreateSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
   const [editingExam, setEditingExam] = useState<Exam | null>(null);
@@ -301,6 +302,7 @@ export default function ExamsTab() {
       setTitle("");
       setPassword("");
       setSelectedQuestions([]);
+      setCreateSearch("");
       fetchExams();
     } catch (error: any) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
@@ -355,23 +357,34 @@ export default function ExamsTab() {
             </div>
             <div>
               <Label>Selecione as Perguntas ({selectedQuestions.length} selecionadas)</Label>
-              <div className="mt-2 border rounded-lg max-h-64 overflow-y-auto">
-                {questions.map((q) => (
-                  <label
-                    key={q.id}
-                    className="flex items-start gap-3 p-3 hover:bg-muted/50 cursor-pointer border-b last:border-b-0"
-                  >
-                    <Checkbox
-                      checked={selectedQuestions.includes(q.id)}
-                      onCheckedChange={() => toggleQuestion(q.id)}
-                      className="mt-0.5"
-                    />
-                    <span className="text-sm">{q.question_text}</span>
-                  </label>
-                ))}
-                {questions.length === 0 && (
+              <div className="relative mt-2 mb-2">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  value={createSearch}
+                  onChange={(e) => setCreateSearch(e.target.value)}
+                  placeholder="Buscar no enunciado..."
+                  className="pl-9"
+                />
+              </div>
+              <div className="border rounded-lg max-h-64 overflow-y-auto">
+                {questions
+                  .filter((q) => q.question_text.toLowerCase().includes(createSearch.toLowerCase()))
+                  .map((q) => (
+                    <label
+                      key={q.id}
+                      className="flex items-start gap-3 p-3 hover:bg-muted/50 cursor-pointer border-b last:border-b-0"
+                    >
+                      <Checkbox
+                        checked={selectedQuestions.includes(q.id)}
+                        onCheckedChange={() => toggleQuestion(q.id)}
+                        className="mt-0.5"
+                      />
+                      <span className="text-sm">{q.question_text}</span>
+                    </label>
+                  ))}
+                {questions.filter((q) => q.question_text.toLowerCase().includes(createSearch.toLowerCase())).length === 0 && (
                   <p className="text-sm text-muted-foreground p-4 text-center">
-                    Nenhuma pergunta cadastrada.
+                    {createSearch.trim() ? "Nenhuma pergunta encontrada para esta busca." : "Nenhuma pergunta cadastrada."}
                   </p>
                 )}
               </div>
