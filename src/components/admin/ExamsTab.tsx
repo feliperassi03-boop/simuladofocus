@@ -50,6 +50,7 @@ export default function ExamsTab() {
   const [title, setTitle] = useState("");
   const [password, setPassword] = useState("");
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
+  const [createSearch, setCreateSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
   const [editingExam, setEditingExam] = useState<Exam | null>(null);
