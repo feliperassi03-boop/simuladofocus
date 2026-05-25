@@ -247,8 +247,13 @@ export default function ExamsTab() {
       .order("created_at", { ascending: false });
     if (!data) return;
 
+    // Ordena alfabeticamente por título (pt-BR)
+    const sorted = data.slice().sort((a, b) =>
+      new Intl.Collator("pt-BR", { sensitivity: "base", numeric: true }).compare(a.title, b.title)
+    );
+
     // Get question counts
-    const examIds = data.map((e) => e.id);
+    const examIds = sorted.map((e) => e.id);
     const { data: eqData } = await supabase
       .from("exam_questions")
       .select("exam_id")
@@ -259,7 +264,7 @@ export default function ExamsTab() {
       counts[eq.exam_id] = (counts[eq.exam_id] || 0) + 1;
     });
 
-    setExams(data.map((e) => ({ ...e, question_count: counts[e.id] || 0 })));
+    setExams(sorted.map((e) => ({ ...e, question_count: counts[e.id] || 0 })));
   };
 
   const fetchQuestions = async () => {
