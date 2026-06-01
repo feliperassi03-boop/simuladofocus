@@ -15,6 +15,7 @@ import { Plus, Pencil, Trash2, Users, HelpCircle, BarChart3, ImagePlus, X, FileT
 import ExamsTab from "@/components/admin/ExamsTab";
 import AllowedEmailsTab from "@/components/admin/AllowedEmailsTab";
 import { useVideoConverter } from "@/hooks/useVideoConverter";
+import { normalizeQuestionText } from "@/lib/utils";
 
 interface Question {
   id: string;
@@ -173,9 +174,14 @@ export default function AdminPage() {
     try {
       const payload = {
         ...form,
+        question_text: normalizeQuestionText(form.question_text),
+        option_a: normalizeQuestionText(form.option_a),
+        option_b: normalizeQuestionText(form.option_b),
+        option_c: normalizeQuestionText(form.option_c),
+        option_d: normalizeQuestionText(form.option_d),
         image_url: form.image_url || null,
         video_url: form.video_url || null,
-        comment: form.comment || null,
+        comment: normalizeQuestionText(form.comment) || null,
         comment_image_url: form.comment_image_url || null,
       };
       if (editingId) {
@@ -299,13 +305,13 @@ export default function AdminPage() {
     if (!parsedPreview) return;
     setForm({
       ...form,
-      question_text: parsedPreview.enunciado,
-      option_a: parsedPreview.A,
-      option_b: parsedPreview.B,
-      option_c: parsedPreview.C,
-      option_d: parsedPreview.D,
+      question_text: normalizeQuestionText(parsedPreview.enunciado),
+      option_a: normalizeQuestionText(parsedPreview.A),
+      option_b: normalizeQuestionText(parsedPreview.B),
+      option_c: normalizeQuestionText(parsedPreview.C),
+      option_d: normalizeQuestionText(parsedPreview.D),
       correct_option: parsedPreview.gabarito,
-      comment: parsedPreview.comentario || form.comment,
+      comment: normalizeQuestionText(parsedPreview.comentario) || form.comment,
     });
     setParsedPreview(null);
     setQuickImport("");
