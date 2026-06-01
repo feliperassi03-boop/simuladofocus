@@ -475,7 +475,7 @@ export default function ExamPage() {
                     <MessageSquareText className="w-5 h-5 text-primary" />
                     <span className="font-display font-semibold text-foreground">Comentário</span>
                   </div>
-                  <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                  <div className="text-sm text-foreground leading-relaxed whitespace-normal break-words">
                     {currentQuestion.comment}
                   </div>
                   {currentQuestion.comment_image_url && (
@@ -607,7 +607,7 @@ export default function ExamPage() {
                           <MessageSquareText className="w-5 h-5 text-primary" />
                           <span className="font-display font-semibold text-foreground">Comentário</span>
                         </div>
-                        <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                        <div className="text-sm text-foreground leading-relaxed whitespace-normal break-words">
                           {q.comment}
                         </div>
                         {q.comment_image_url && (
@@ -775,7 +775,7 @@ export default function ExamPage() {
                       <MessageSquareText className="w-5 h-5 text-primary" />
                       <span className="font-display font-semibold text-foreground">Comentário</span>
                     </div>
-                    <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                    <div className="text-sm text-foreground leading-relaxed whitespace-normal break-words">
                       {currentQuestion.comment}
                     </div>
                     {currentQuestion.comment_image_url && (
