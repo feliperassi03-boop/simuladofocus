@@ -416,15 +416,15 @@ export default function AdminPage() {
                     {parsedPreview && (
                       <div className="mt-3 space-y-2 rounded-md border bg-background p-3 text-xs">
                         <div className="font-semibold text-foreground">Prévia do parsing</div>
-                        <div><span className="font-medium text-muted-foreground">Enunciado:</span> <span className="whitespace-normal break-words">{parsedPreview.enunciado || <em className="text-destructive">vazio</em>}</span></div>
+                        <div><span className="font-medium text-muted-foreground">Enunciado:</span> <span className="whitespace-normal break-words">{normalizeQuestionText(parsedPreview.enunciado) || <em className="text-destructive">vazio</em>}</span></div>
                         {(["A","B","C","D"] as const).map((l) => (
                           <div key={l}>
                             <span className="font-medium text-muted-foreground">{l}):</span>{" "}
-                            <span className="whitespace-normal break-words">{parsedPreview[l] || <em className="text-destructive">vazio</em>}</span>
+                            <span className="whitespace-normal break-words">{normalizeQuestionText(parsedPreview[l]) || <em className="text-destructive">vazio</em>}</span>
                           </div>
                         ))}
                         <div><span className="font-medium text-muted-foreground">Gabarito:</span> <span className="font-semibold text-primary">{parsedPreview.gabarito}</span></div>
-                        <div><span className="font-medium text-muted-foreground">Comentário:</span> <span className="whitespace-normal break-words">{parsedPreview.comentario || <em className="text-muted-foreground">(nenhum)</em>}</span></div>
+                        <div><span className="font-medium text-muted-foreground">Comentário:</span> <span className="whitespace-normal break-words">{normalizeQuestionText(parsedPreview.comentario) || <em className="text-muted-foreground">(nenhum)</em>}</span></div>
                         <div className="flex gap-2 pt-2">
                           <Button type="button" size="sm" onClick={applyPreviewToForm}>Aplicar ao formulário</Button>
                           <Button type="button" size="sm" variant="ghost" onClick={() => setParsedPreview(null)}>Cancelar</Button>
@@ -629,7 +629,7 @@ export default function AdminPage() {
                       {filtered.map((q) => (
                         <TableRow key={q.id}>
                           <TableCell className="font-medium max-w-md break-words whitespace-normal">
-                            {q.question_text}
+                            {normalizeQuestionText(q.question_text)}
                           </TableCell>
                           <TableCell>
                             <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary font-bold text-sm">
