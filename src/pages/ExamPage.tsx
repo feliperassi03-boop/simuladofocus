@@ -442,7 +442,7 @@ export default function ExamPage() {
           <Card className="shadow-elevated mb-6">
             <CardHeader>
               <CardTitle className="font-display text-xl leading-relaxed">
-                {currentQuestion.question_text}
+                {normalizeQuestionText(currentQuestion.question_text)}
               </CardTitle>
               {currentQuestion.image_url && (
                 <img
@@ -472,7 +472,7 @@ export default function ExamPage() {
                     <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-secondary text-secondary-foreground font-bold mr-3 shrink-0">
                       {opt.key}
                     </span>
-                    <span className="flex-1 break-words whitespace-normal overflow-hidden max-w-full">{opt.text}</span>
+                    <span className="flex-1 break-words whitespace-normal overflow-hidden max-w-full">{normalizeQuestionText(opt.text)}</span>
                     {isCorrect && <CheckCircle className="w-5 h-5 text-success ml-2 shrink-0" />}
                     {isSelected && !isCorrect && <XCircle className="w-5 h-5 text-destructive ml-2 shrink-0" />}
                   </Button>
@@ -487,7 +487,7 @@ export default function ExamPage() {
                     <span className="font-display font-semibold text-foreground">Comentário</span>
                   </div>
                   <div className="text-sm text-foreground leading-relaxed whitespace-normal break-words">
-                    {(currentQuestion.comment || "").replace(/\s*\n+\s*/g, " ")}
+                    {normalizeQuestionText(currentQuestion.comment)}
                   </div>
                   {currentQuestion.comment_image_url && (
                     <img
@@ -581,7 +581,7 @@ export default function ExamPage() {
                   <CardHeader>
                     <CardTitle className="font-display text-lg leading-relaxed">
                       <span className="text-primary font-bold mr-2">{i + 1}.</span>
-                      {q.question_text}
+                      {normalizeQuestionText(q.question_text)}
                     </CardTitle>
                     {q.image_url && (
                       <img src={q.image_url} alt="Imagem da questão" className="mt-3 rounded-lg w-full max-h-64 object-contain bg-muted" />
@@ -605,7 +605,7 @@ export default function ExamPage() {
                           <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-secondary text-secondary-foreground font-bold mr-3 shrink-0">
                             {opt.key}
                           </span>
-                          <span className="flex-1 break-words whitespace-normal overflow-hidden max-w-full">{opt.text}</span>
+                          <span className="flex-1 break-words whitespace-normal overflow-hidden max-w-full">{normalizeQuestionText(opt.text)}</span>
                           {isCorrect && <CheckCircle className="w-5 h-5 text-success ml-2 shrink-0" />}
                           {isStudentPick && !isCorrect && <XCircle className="w-5 h-5 text-destructive ml-2 shrink-0" />}
                         </Button>
@@ -619,7 +619,7 @@ export default function ExamPage() {
                           <span className="font-display font-semibold text-foreground">Comentário</span>
                         </div>
                         <div className="text-sm text-foreground leading-relaxed whitespace-normal break-words">
-                          {(q.comment || "").replace(/\s*\n+\s*/g, " ")}
+                          {normalizeQuestionText(q.comment)}
                         </div>
                         {q.comment_image_url && (
                           <img
@@ -753,7 +753,7 @@ export default function ExamPage() {
           <CardHeader>
             <div className="flex items-start justify-between gap-3">
               <CardTitle className="font-display text-xl leading-relaxed flex-1">
-                {currentQuestion?.question_text}
+                {normalizeQuestionText(currentQuestion?.question_text)}
               </CardTitle>
               <Button
                 variant="ghost"
@@ -787,7 +787,7 @@ export default function ExamPage() {
                       <span className="font-display font-semibold text-foreground">Comentário</span>
                     </div>
                     <div className="text-sm text-foreground leading-relaxed whitespace-normal break-words">
-                      {(currentQuestion.comment || "").replace(/\s*\n+\s*/g, " ")}
+                      {normalizeQuestionText(currentQuestion.comment)}
                     </div>
                     {currentQuestion.comment_image_url && (
                       <img
@@ -833,7 +833,7 @@ export default function ExamPage() {
                   <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-secondary text-secondary-foreground font-bold mr-3 shrink-0">
                     {opt.key}
                   </span>
-                  <span className="flex-1 break-words whitespace-normal overflow-hidden max-w-full">{opt.text}</span>
+                  <span className="flex-1 break-words whitespace-normal overflow-hidden max-w-full">{normalizeQuestionText(opt.text)}</span>
                 </Button>
               );
             })}
