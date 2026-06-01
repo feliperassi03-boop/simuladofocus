@@ -393,7 +393,7 @@ export default function ExamsTab() {
                         onCheckedChange={() => toggleQuestion(q.id)}
                         className="mt-0.5"
                       />
-                      <span className="text-sm">{q.question_text}</span>
+                      <span className="text-sm">{normalizeQuestionText(q.question_text)}</span>
                     </label>
                   ))}
                 {questions.filter((q) => q.question_text.toLowerCase().includes(createSearch.toLowerCase())).length === 0 && (
@@ -530,7 +530,7 @@ export default function ExamsTab() {
                         onCheckedChange={() => toggleEditQuestion(q.id)}
                         className="mt-0.5"
                       />
-                      <span className="text-sm break-words">{q.question_text}</span>
+                      <span className="text-sm break-words">{normalizeQuestionText(q.question_text)}</span>
                     </label>
                   ))}
                 {questions.length === 0 && (
@@ -603,7 +603,7 @@ export default function ExamsTab() {
                   <div>
                     <Label className="text-xs">Enunciado</Label>
                     <Textarea
-                      value={q.question_text}
+                      value={normalizeQuestionText(q.question_text)}
                       onChange={(e) => updateExamQuestionField(q.id, "question_text", e.target.value)}
                       rows={3}
                     />
@@ -616,7 +616,7 @@ export default function ExamsTab() {
                         <div key={letter}>
                           <Label className="text-xs">Alternativa {letter}</Label>
                           <Textarea
-                            value={(q as any)[field] ?? ""}
+                            value={normalizeQuestionText((q as any)[field])}
                             onChange={(e) => updateExamQuestionField(q.id, field, e.target.value)}
                             rows={2}
                           />
@@ -644,7 +644,7 @@ export default function ExamsTab() {
                   <div>
                     <Label className="text-xs">Comentário / Gabarito comentado</Label>
                     <Textarea
-                      value={q.comment ?? ""}
+                      value={normalizeQuestionText(q.comment)}
                       onChange={(e) => updateExamQuestionField(q.id, "comment", e.target.value)}
                       rows={3}
                     />
