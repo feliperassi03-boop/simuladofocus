@@ -141,7 +141,14 @@ export default function AdminPage() {
         .order("created_at", { ascending: false })
         .range(from, from + pageSize - 1);
       if (error || !data || data.length === 0) break;
-      all.push(...(data as Question[]));
+      all.push(...(data as Question[]).map((q) => ({
+        ...q,
+        question_text: normalizeQuestionText(q.question_text),
+        option_a: normalizeQuestionText(q.option_a),
+        option_b: normalizeQuestionText(q.option_b),
+        option_c: normalizeQuestionText(q.option_c),
+        option_d: normalizeQuestionText(q.option_d),
+      })));
       if (data.length < pageSize) break;
       from += pageSize;
     }
@@ -206,15 +213,15 @@ export default function AdminPage() {
 
   const handleEdit = (q: Question) => {
     setForm({
-      question_text: q.question_text,
-      option_a: q.option_a,
-      option_b: q.option_b,
-      option_c: q.option_c,
-      option_d: q.option_d,
+      question_text: normalizeQuestionText(q.question_text),
+      option_a: normalizeQuestionText(q.option_a),
+      option_b: normalizeQuestionText(q.option_b),
+      option_c: normalizeQuestionText(q.option_c),
+      option_d: normalizeQuestionText(q.option_d),
       correct_option: q.correct_option,
       image_url: q.image_url || "",
       video_url: (q as any).video_url || "",
-      comment: (q as any).comment || "",
+      comment: normalizeQuestionText((q as any).comment),
       comment_image_url: (q as any).comment_image_url || "",
     });
     setEditingId(q.id);
