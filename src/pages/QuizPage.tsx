@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
+import { normalizeQuestionText } from "@/lib/utils";
 import { CheckCircle, XCircle, ArrowRight, RotateCcw, Trophy, BookOpen, ClipboardList, Clock, Target, Timer } from "lucide-react";
 import quizBanner from "@/assets/quiz-banner.png";
 import QuestionVideo from "@/components/QuestionVideo";
@@ -84,7 +85,15 @@ export default function QuizPage() {
     }
 
     // Shuffle
-    const shuffled = data.sort(() => Math.random() - 0.5).slice(0, 25);
+    const shuffled = data.sort(() => Math.random() - 0.5).slice(0, 25).map((q) => ({
+      ...q,
+      question_text: normalizeQuestionText(q.question_text),
+      option_a: normalizeQuestionText(q.option_a),
+      option_b: normalizeQuestionText(q.option_b),
+      option_c: normalizeQuestionText(q.option_c),
+      option_d: normalizeQuestionText(q.option_d),
+      comment: normalizeQuestionText(q.comment) || null,
+    }));
     setQuestions(shuffled);
 
     // Create attempt
@@ -255,8 +264,8 @@ export default function QuizPage() {
 
       <Card className="shadow-elevated mb-6">
         <CardHeader>
-          <CardTitle className="font-display text-xl leading-relaxed">
-            {currentQuestion?.question_text}
+          <CardTitle className="font-display text-xl leading-relaxed whitespace-normal break-words">
+            {normalizeQuestionText(currentQuestion?.question_text)}
           </CardTitle>
           {currentQuestion?.image_url && (
             <img
@@ -297,7 +306,7 @@ export default function QuizPage() {
                 <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-secondary text-secondary-foreground font-bold mr-3 shrink-0">
                   {opt.key}
                 </span>
-                <span className="flex-1">{opt.text}</span>
+                <span className="flex-1 break-words whitespace-normal overflow-hidden max-w-full">{normalizeQuestionText(opt.text)}</span>
                 {answered && isCorrect && <CheckCircle className="w-5 h-5 text-success ml-2 shrink-0" />}
                 {answered && isSelected && !isCorrect && <XCircle className="w-5 h-5 text-destructive ml-2 shrink-0" />}
               </Button>
