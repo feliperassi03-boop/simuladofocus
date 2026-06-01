@@ -476,7 +476,7 @@ export default function ExamPage() {
                     <span className="font-display font-semibold text-foreground">Comentário</span>
                   </div>
                   <div className="text-sm text-foreground leading-relaxed whitespace-normal break-words">
-                    {currentQuestion.comment}
+                    {(currentQuestion.comment || "").replace(/\s*\n+\s*/g, " ")}
                   </div>
                   {currentQuestion.comment_image_url && (
                     <img
@@ -608,7 +608,7 @@ export default function ExamPage() {
                           <span className="font-display font-semibold text-foreground">Comentário</span>
                         </div>
                         <div className="text-sm text-foreground leading-relaxed whitespace-normal break-words">
-                          {q.comment}
+                          {(q.comment || "").replace(/\s*\n+\s*/g, " ")}
                         </div>
                         {q.comment_image_url && (
                           <img
@@ -776,7 +776,7 @@ export default function ExamPage() {
                       <span className="font-display font-semibold text-foreground">Comentário</span>
                     </div>
                     <div className="text-sm text-foreground leading-relaxed whitespace-normal break-words">
-                      {currentQuestion.comment}
+                      {(currentQuestion.comment || "").replace(/\s*\n+\s*/g, " ")}
                     </div>
                     {currentQuestion.comment_image_url && (
                       <img
