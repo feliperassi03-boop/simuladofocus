@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
+import { normalizeQuestionText } from "@/lib/utils";
 import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock, User, MessageSquareText, Home, BookOpen, Eye, EyeOff } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
 import {
@@ -132,7 +133,17 @@ export default function ExamPage() {
     if (!qData) return;
 
     const orderMap = new Map(eqData.map((eq) => [eq.question_id, eq.sort_order]));
-    const sorted = qData.sort((a, b) => (orderMap.get(a.id) || 0) - (orderMap.get(b.id) || 0));
+    const sorted = qData
+      .sort((a, b) => (orderMap.get(a.id) || 0) - (orderMap.get(b.id) || 0))
+      .map((q) => ({
+        ...q,
+        question_text: normalizeQuestionText(q.question_text),
+        option_a: normalizeQuestionText(q.option_a),
+        option_b: normalizeQuestionText(q.option_b),
+        option_c: normalizeQuestionText(q.option_c),
+        option_d: normalizeQuestionText(q.option_d),
+        comment: normalizeQuestionText(q.comment) || null,
+      }));
     setQuestions(sorted);
 
     const { data: attempt, error } = await supabase
