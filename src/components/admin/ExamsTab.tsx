@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
+import { normalizeQuestionText } from "@/lib/utils";
 import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play, Pencil, ListChecks, Wrench, X, Save, Search } from "lucide-react";
 
 interface Question {
@@ -91,7 +92,15 @@ export default function ExamsTab() {
           return q ? { ...q, sort_order: e.sort_order } : null;
         })
         .filter(Boolean) as FullQuestion[];
-      setExamQuestions(ordered);
+      setExamQuestions(ordered.map((q) => ({
+        ...q,
+        question_text: normalizeQuestionText(q.question_text),
+        option_a: normalizeQuestionText(q.option_a),
+        option_b: normalizeQuestionText(q.option_b),
+        option_c: normalizeQuestionText(q.option_c),
+        option_d: normalizeQuestionText(q.option_d),
+        comment: normalizeQuestionText(q.comment) || null,
+      })));
     } catch (error: any) {
       toast({ title: "Erro ao carregar", description: error.message, variant: "destructive" });
     } finally {
@@ -108,13 +117,13 @@ export default function ExamsTab() {
     const { error } = await supabase
       .from("questions")
       .update({
-        question_text: q.question_text,
-        option_a: q.option_a,
-        option_b: q.option_b,
-        option_c: q.option_c,
-        option_d: q.option_d,
+        question_text: normalizeQuestionText(q.question_text),
+        option_a: normalizeQuestionText(q.option_a),
+        option_b: normalizeQuestionText(q.option_b),
+        option_c: normalizeQuestionText(q.option_c),
+        option_d: normalizeQuestionText(q.option_d),
         correct_option: q.correct_option,
-        comment: q.comment,
+        comment: normalizeQuestionText(q.comment) || null,
       })
       .eq("id", q.id);
     setSavingQuestionId(null);
