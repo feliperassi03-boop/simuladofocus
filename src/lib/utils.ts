@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export function normalizeQuestionText(text?: string | null) {
   return (text ?? "")
-    .replace(/\\r\\n|\\n|\\r/g, " ")
+    .replace(/\\+[rn]/g, " ")
     .replace(/[\r\n\t]+/g, " ")
     .replace(/\s{2,}/g, " ")
     .trim();
