@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
+import { normalizeQuestionText } from "@/lib/utils";
 import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play, Pencil, ListChecks, Wrench, X, Save, Search } from "lucide-react";
 
 interface Question {
@@ -91,7 +92,15 @@ export default function ExamsTab() {
           return q ? { ...q, sort_order: e.sort_order } : null;
         })
         .filter(Boolean) as FullQuestion[];
-      setExamQuestions(ordered);
+      setExamQuestions(ordered.map((q) => ({
+        ...q,
+        question_text: normalizeQuestionText(q.question_text),
+        option_a: normalizeQuestionText(q.option_a),
+        option_b: normalizeQuestionText(q.option_b),
+        option_c: normalizeQuestionText(q.option_c),
+        option_d: normalizeQuestionText(q.option_d),
+        comment: normalizeQuestionText(q.comment) || null,
+      })));
     } catch (error: any) {
       toast({ title: "Erro ao carregar", description: error.message, variant: "destructive" });
     } finally {
@@ -108,13 +117,13 @@ export default function ExamsTab() {
     const { error } = await supabase
       .from("questions")
       .update({
-        question_text: q.question_text,
-        option_a: q.option_a,
-        option_b: q.option_b,
-        option_c: q.option_c,
-        option_d: q.option_d,
+        question_text: normalizeQuestionText(q.question_text),
+        option_a: normalizeQuestionText(q.option_a),
+        option_b: normalizeQuestionText(q.option_b),
+        option_c: normalizeQuestionText(q.option_c),
+        option_d: normalizeQuestionText(q.option_d),
         correct_option: q.correct_option,
-        comment: q.comment,
+        comment: normalizeQuestionText(q.comment) || null,
       })
       .eq("id", q.id);
     setSavingQuestionId(null);
@@ -384,7 +393,7 @@ export default function ExamsTab() {
                         onCheckedChange={() => toggleQuestion(q.id)}
                         className="mt-0.5"
                       />
-                      <span className="text-sm">{q.question_text}</span>
+                      <span className="text-sm">{normalizeQuestionText(q.question_text)}</span>
                     </label>
                   ))}
                 {questions.filter((q) => q.question_text.toLowerCase().includes(createSearch.toLowerCase())).length === 0 && (
@@ -521,7 +530,7 @@ export default function ExamsTab() {
                         onCheckedChange={() => toggleEditQuestion(q.id)}
                         className="mt-0.5"
                       />
-                      <span className="text-sm break-words">{q.question_text}</span>
+                      <span className="text-sm break-words">{normalizeQuestionText(q.question_text)}</span>
                     </label>
                   ))}
                 {questions.length === 0 && (
@@ -594,7 +603,7 @@ export default function ExamsTab() {
                   <div>
                     <Label className="text-xs">Enunciado</Label>
                     <Textarea
-                      value={q.question_text}
+                      value={normalizeQuestionText(q.question_text)}
                       onChange={(e) => updateExamQuestionField(q.id, "question_text", e.target.value)}
                       rows={3}
                     />
@@ -607,7 +616,7 @@ export default function ExamsTab() {
                         <div key={letter}>
                           <Label className="text-xs">Alternativa {letter}</Label>
                           <Textarea
-                            value={(q as any)[field] ?? ""}
+                            value={normalizeQuestionText((q as any)[field])}
                             onChange={(e) => updateExamQuestionField(q.id, field, e.target.value)}
                             rows={2}
                           />
@@ -635,7 +644,7 @@ export default function ExamsTab() {
                   <div>
                     <Label className="text-xs">Comentário / Gabarito comentado</Label>
                     <Textarea
-                      value={q.comment ?? ""}
+                      value={normalizeQuestionText(q.comment)}
                       onChange={(e) => updateExamQuestionField(q.id, "comment", e.target.value)}
                       rows={3}
                     />

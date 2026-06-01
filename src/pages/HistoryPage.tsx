@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { normalizeQuestionText } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -121,6 +122,16 @@ export default function HistoryPage() {
       }
     }
 
+    orderedQuestions = orderedQuestions.map((q) => ({
+      ...q,
+      question_text: normalizeQuestionText(q.question_text),
+      option_a: normalizeQuestionText(q.option_a),
+      option_b: normalizeQuestionText(q.option_b),
+      option_c: normalizeQuestionText(q.option_c),
+      option_d: normalizeQuestionText(q.option_d),
+      comment: normalizeQuestionText(q.comment) || null,
+    }));
+
     const answersMap: Record<string, string> = {};
     answerData.forEach(a => {
       if (a.selected_option) answersMap[a.question_id] = a.selected_option;
@@ -216,8 +227,8 @@ export default function HistoryPage() {
         {/* Question review */}
         <Card className="shadow-elevated mb-6">
           <CardHeader>
-            <CardTitle className="font-display text-xl leading-relaxed">
-              {currentQuestion.question_text}
+            <CardTitle className="font-display text-xl leading-relaxed whitespace-normal break-words">
+              {normalizeQuestionText(currentQuestion.question_text)}
             </CardTitle>
             {currentQuestion.image_url && (
               <img src={currentQuestion.image_url} alt="Imagem da questão" className="mt-3 rounded-lg w-full max-h-64 object-contain bg-muted" />
@@ -243,7 +254,7 @@ export default function HistoryPage() {
                   <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-secondary text-secondary-foreground font-bold mr-3 shrink-0">
                     {opt.key}
                   </span>
-                  <span className="flex-1 break-words whitespace-normal overflow-hidden max-w-full">{opt.text}</span>
+                  <span className="flex-1 break-words whitespace-normal overflow-hidden max-w-full">{normalizeQuestionText(opt.text)}</span>
                   {isCorrect && <CheckCircle className="w-5 h-5 text-success ml-2 shrink-0" />}
                   {isSelected && !isCorrect && <XCircle className="w-5 h-5 text-destructive ml-2 shrink-0" />}
                 </Button>
@@ -257,7 +268,7 @@ export default function HistoryPage() {
                   <span className="font-display font-semibold text-foreground">Comentário</span>
                 </div>
                 <div className="text-sm text-foreground leading-relaxed whitespace-normal break-words">
-                  {(currentQuestion.comment || "").replace(/\s*\n+\s*/g, " ")}
+                  {normalizeQuestionText(currentQuestion.comment)}
                 </div>
               </div>
             )}

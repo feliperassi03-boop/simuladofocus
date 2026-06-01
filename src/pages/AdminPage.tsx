@@ -15,6 +15,7 @@ import { Plus, Pencil, Trash2, Users, HelpCircle, BarChart3, ImagePlus, X, FileT
 import ExamsTab from "@/components/admin/ExamsTab";
 import AllowedEmailsTab from "@/components/admin/AllowedEmailsTab";
 import { useVideoConverter } from "@/hooks/useVideoConverter";
+import { normalizeQuestionText } from "@/lib/utils";
 
 interface Question {
   id: string;
@@ -140,7 +141,14 @@ export default function AdminPage() {
         .order("created_at", { ascending: false })
         .range(from, from + pageSize - 1);
       if (error || !data || data.length === 0) break;
-      all.push(...(data as Question[]));
+      all.push(...(data as Question[]).map((q) => ({
+        ...q,
+        question_text: normalizeQuestionText(q.question_text),
+        option_a: normalizeQuestionText(q.option_a),
+        option_b: normalizeQuestionText(q.option_b),
+        option_c: normalizeQuestionText(q.option_c),
+        option_d: normalizeQuestionText(q.option_d),
+      })));
       if (data.length < pageSize) break;
       from += pageSize;
     }
@@ -173,9 +181,14 @@ export default function AdminPage() {
     try {
       const payload = {
         ...form,
+        question_text: normalizeQuestionText(form.question_text),
+        option_a: normalizeQuestionText(form.option_a),
+        option_b: normalizeQuestionText(form.option_b),
+        option_c: normalizeQuestionText(form.option_c),
+        option_d: normalizeQuestionText(form.option_d),
         image_url: form.image_url || null,
         video_url: form.video_url || null,
-        comment: form.comment || null,
+        comment: normalizeQuestionText(form.comment) || null,
         comment_image_url: form.comment_image_url || null,
       };
       if (editingId) {
@@ -200,15 +213,15 @@ export default function AdminPage() {
 
   const handleEdit = (q: Question) => {
     setForm({
-      question_text: q.question_text,
-      option_a: q.option_a,
-      option_b: q.option_b,
-      option_c: q.option_c,
-      option_d: q.option_d,
+      question_text: normalizeQuestionText(q.question_text),
+      option_a: normalizeQuestionText(q.option_a),
+      option_b: normalizeQuestionText(q.option_b),
+      option_c: normalizeQuestionText(q.option_c),
+      option_d: normalizeQuestionText(q.option_d),
       correct_option: q.correct_option,
       image_url: q.image_url || "",
       video_url: (q as any).video_url || "",
-      comment: (q as any).comment || "",
+      comment: normalizeQuestionText((q as any).comment),
       comment_image_url: (q as any).comment_image_url || "",
     });
     setEditingId(q.id);
@@ -299,13 +312,13 @@ export default function AdminPage() {
     if (!parsedPreview) return;
     setForm({
       ...form,
-      question_text: parsedPreview.enunciado,
-      option_a: parsedPreview.A,
-      option_b: parsedPreview.B,
-      option_c: parsedPreview.C,
-      option_d: parsedPreview.D,
+      question_text: normalizeQuestionText(parsedPreview.enunciado),
+      option_a: normalizeQuestionText(parsedPreview.A),
+      option_b: normalizeQuestionText(parsedPreview.B),
+      option_c: normalizeQuestionText(parsedPreview.C),
+      option_d: normalizeQuestionText(parsedPreview.D),
       correct_option: parsedPreview.gabarito,
-      comment: parsedPreview.comentario || form.comment,
+      comment: normalizeQuestionText(parsedPreview.comentario) || form.comment,
     });
     setParsedPreview(null);
     setQuickImport("");
@@ -410,15 +423,15 @@ export default function AdminPage() {
                     {parsedPreview && (
                       <div className="mt-3 space-y-2 rounded-md border bg-background p-3 text-xs">
                         <div className="font-semibold text-foreground">Prévia do parsing</div>
-                        <div><span className="font-medium text-muted-foreground">Enunciado:</span> <span className="whitespace-normal break-words">{parsedPreview.enunciado || <em className="text-destructive">vazio</em>}</span></div>
+                        <div><span className="font-medium text-muted-foreground">Enunciado:</span> <span className="whitespace-normal break-words">{normalizeQuestionText(parsedPreview.enunciado) || <em className="text-destructive">vazio</em>}</span></div>
                         {(["A","B","C","D"] as const).map((l) => (
                           <div key={l}>
                             <span className="font-medium text-muted-foreground">{l}):</span>{" "}
-                            <span className="whitespace-normal break-words">{parsedPreview[l] || <em className="text-destructive">vazio</em>}</span>
+                            <span className="whitespace-normal break-words">{normalizeQuestionText(parsedPreview[l]) || <em className="text-destructive">vazio</em>}</span>
                           </div>
                         ))}
                         <div><span className="font-medium text-muted-foreground">Gabarito:</span> <span className="font-semibold text-primary">{parsedPreview.gabarito}</span></div>
-                        <div><span className="font-medium text-muted-foreground">Comentário:</span> <span className="whitespace-normal break-words">{parsedPreview.comentario || <em className="text-muted-foreground">(nenhum)</em>}</span></div>
+                        <div><span className="font-medium text-muted-foreground">Comentário:</span> <span className="whitespace-normal break-words">{normalizeQuestionText(parsedPreview.comentario) || <em className="text-muted-foreground">(nenhum)</em>}</span></div>
                         <div className="flex gap-2 pt-2">
                           <Button type="button" size="sm" onClick={applyPreviewToForm}>Aplicar ao formulário</Button>
                           <Button type="button" size="sm" variant="ghost" onClick={() => setParsedPreview(null)}>Cancelar</Button>
@@ -623,7 +636,7 @@ export default function AdminPage() {
                       {filtered.map((q) => (
                         <TableRow key={q.id}>
                           <TableCell className="font-medium max-w-md break-words whitespace-normal">
-                            {q.question_text}
+                            {normalizeQuestionText(q.question_text)}
                           </TableCell>
                           <TableCell>
                             <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary font-bold text-sm">
