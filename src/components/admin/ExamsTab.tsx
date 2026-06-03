@@ -18,6 +18,10 @@ import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play, Pencil, ListChecks, Wrenc
 interface Question {
   id: string;
   question_text: string;
+  option_a: string;
+  option_b: string;
+  option_c: string;
+  option_d: string;
 }
 
 interface FullQuestion {
@@ -277,11 +281,26 @@ export default function ExamsTab() {
   };
 
   const fetchQuestions = async () => {
-    const { data } = await supabase
-      .from("questions")
-      .select("id, question_text")
-      .order("created_at", { ascending: false });
-    if (data) setQuestions(data);
+    const pageSize = 1000;
+    const allQuestions: Question[] = [];
+
+    for (let from = 0; ; from += pageSize) {
+      const { data, error } = await supabase
+        .from("questions")
+        .select("id, question_text, option_a, option_b, option_c, option_d")
+        .order("created_at", { ascending: false })
+        .range(from, from + pageSize - 1);
+
+      if (error) {
+        toast({ title: "Erro ao carregar perguntas", description: error.message, variant: "destructive" });
+        return;
+      }
+
+      allQuestions.push(...(data ?? []));
+      if (!data || data.length < pageSize) break;
+    }
+
+    setQuestions(allQuestions);
   };
 
   useEffect(() => {
