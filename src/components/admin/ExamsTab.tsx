@@ -45,6 +45,9 @@ interface Exam {
   question_count?: number;
 }
 
+const getErrorMessage = (error: unknown) =>
+  error instanceof Error ? error.message : "Ocorreu um erro inesperado.";
+
 export default function ExamsTab() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -105,8 +108,8 @@ export default function ExamsTab() {
         option_d: normalizeQuestionText(q.option_d),
         comment: normalizeQuestionText(q.comment) || null,
       })));
-    } catch (error: any) {
-      toast({ title: "Erro ao carregar", description: error.message, variant: "destructive" });
+    } catch (error: unknown) {
+      toast({ title: "Erro ao carregar", description: getErrorMessage(error), variant: "destructive" });
     } finally {
       setManageLoading(false);
     }
@@ -184,8 +187,8 @@ export default function ExamsTab() {
       fetchQuestions();
       fetchExams();
       toast({ title: "Nova questão adicionada — edite abaixo" });
-    } catch (error: any) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } catch (error: unknown) {
+      toast({ title: "Erro", description: getErrorMessage(error), variant: "destructive" });
     } finally {
       setManageLoading(false);
     }
@@ -246,8 +249,8 @@ export default function ExamsTab() {
       setEditingQuestionsExam(null);
       setEditSelectedQuestions([]);
       fetchExams();
-    } catch (error: any) {
-      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+    } catch (error: unknown) {
+      toast({ title: "Erro ao salvar", description: getErrorMessage(error), variant: "destructive" });
     } finally {
       setEditQuestionsLoading(false);
     }
@@ -337,8 +340,8 @@ export default function ExamsTab() {
       setSelectedQuestions([]);
       setCreateSearch("");
       fetchExams();
-    } catch (error: any) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } catch (error: unknown) {
+      toast({ title: "Erro", description: getErrorMessage(error), variant: "destructive" });
     } finally {
       setLoading(false);
     }
