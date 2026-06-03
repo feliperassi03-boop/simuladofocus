@@ -381,26 +381,37 @@ export default function ExamsTab() {
                 />
               </div>
               <div className="border rounded-lg max-h-64 overflow-y-auto">
-                {questions
-                  .filter((q) => q.question_text.toLowerCase().includes(createSearch.toLowerCase()))
-                  .map((q) => (
-                    <label
-                      key={q.id}
-                      className="flex items-start gap-3 p-3 hover:bg-muted/50 cursor-pointer border-b last:border-b-0"
-                    >
-                      <Checkbox
-                        checked={selectedQuestions.includes(q.id)}
-                        onCheckedChange={() => toggleQuestion(q.id)}
-                        className="mt-0.5"
-                      />
-                      <span className="text-sm">{normalizeQuestionText(q.question_text)}</span>
-                    </label>
-                  ))}
-                {questions.filter((q) => q.question_text.toLowerCase().includes(createSearch.toLowerCase())).length === 0 && (
-                  <p className="text-sm text-muted-foreground p-4 text-center">
-                    {createSearch.trim() ? "Nenhuma pergunta encontrada para esta busca." : "Nenhuma pergunta cadastrada."}
-                  </p>
-                )}
+                {(() => {
+                  const term = normalizeQuestionText(createSearch).toLowerCase();
+                  const matches = (q: any) => {
+                    if (!term) return true;
+                    return [q.question_text, q.option_a, q.option_b, q.option_c, q.option_d]
+                      .some((t) => normalizeQuestionText(t).toLowerCase().includes(term));
+                  };
+                  const filtered = questions.filter(matches);
+                  return (
+                    <>
+                      {filtered.map((q) => (
+                        <label
+                          key={q.id}
+                          className="flex items-start gap-3 p-3 hover:bg-muted/50 cursor-pointer border-b last:border-b-0"
+                        >
+                          <Checkbox
+                            checked={selectedQuestions.includes(q.id)}
+                            onCheckedChange={() => toggleQuestion(q.id)}
+                            className="mt-0.5"
+                          />
+                          <span className="text-sm">{normalizeQuestionText(q.question_text)}</span>
+                        </label>
+                      ))}
+                      {filtered.length === 0 && (
+                        <p className="text-sm text-muted-foreground p-4 text-center">
+                          {createSearch.trim() ? "Nenhuma pergunta encontrada para esta busca." : "Nenhuma pergunta cadastrada."}
+                        </p>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             </div>
             <Button onClick={handleCreate} disabled={loading} className="w-full gradient-primary text-primary-foreground">
@@ -518,26 +529,37 @@ export default function ExamsTab() {
             <div>
               <Label>Perguntas ({editSelectedQuestions.length} selecionadas)</Label>
               <div className="mt-2 border rounded-lg max-h-[50vh] overflow-y-auto">
-                {questions
-                  .filter((q) => q.question_text.toLowerCase().includes(editQuestionsSearch.toLowerCase()))
-                  .map((q) => (
-                    <label
-                      key={q.id}
-                      className="flex items-start gap-3 p-3 hover:bg-muted/50 cursor-pointer border-b last:border-b-0"
-                    >
-                      <Checkbox
-                        checked={editSelectedQuestions.includes(q.id)}
-                        onCheckedChange={() => toggleEditQuestion(q.id)}
-                        className="mt-0.5"
-                      />
-                      <span className="text-sm break-words">{normalizeQuestionText(q.question_text)}</span>
-                    </label>
-                  ))}
-                {questions.length === 0 && (
-                  <p className="text-sm text-muted-foreground p-4 text-center">
-                    Nenhuma pergunta cadastrada.
-                  </p>
-                )}
+                {(() => {
+                  const term = normalizeQuestionText(editQuestionsSearch).toLowerCase();
+                  const matches = (q: any) => {
+                    if (!term) return true;
+                    return [q.question_text, q.option_a, q.option_b, q.option_c, q.option_d]
+                      .some((t) => normalizeQuestionText(t).toLowerCase().includes(term));
+                  };
+                  const filtered = questions.filter(matches);
+                  return (
+                    <>
+                      {filtered.map((q) => (
+                        <label
+                          key={q.id}
+                          className="flex items-start gap-3 p-3 hover:bg-muted/50 cursor-pointer border-b last:border-b-0"
+                        >
+                          <Checkbox
+                            checked={editSelectedQuestions.includes(q.id)}
+                            onCheckedChange={() => toggleEditQuestion(q.id)}
+                            className="mt-0.5"
+                          />
+                          <span className="text-sm break-words">{normalizeQuestionText(q.question_text)}</span>
+                        </label>
+                      ))}
+                      {filtered.length === 0 && (
+                        <p className="text-sm text-muted-foreground p-4 text-center">
+                          {editQuestionsSearch.trim() ? "Nenhuma pergunta encontrada para esta busca." : "Nenhuma pergunta cadastrada."}
+                        </p>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             </div>
             <div className="flex gap-2 justify-end">
