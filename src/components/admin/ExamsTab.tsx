@@ -48,6 +48,8 @@ interface Exam {
 const getErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : "Ocorreu um erro inesperado.";
 
+const optionFields = ["option_a", "option_b", "option_c", "option_d"] as const;
+
 export default function ExamsTab() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -654,13 +656,13 @@ export default function ExamsTab() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {(["A", "B", "C", "D"] as const).map((letter) => {
-                      const field = `option_${letter.toLowerCase()}` as keyof FullQuestion;
+                    {optionFields.map((field, index) => {
+                      const letter = (["A", "B", "C", "D"] as const)[index];
                       return (
                         <div key={letter}>
                           <Label className="text-xs">Alternativa {letter}</Label>
                           <Textarea
-                            value={normalizeQuestionText((q as any)[field])}
+                            value={normalizeQuestionText(q[field])}
                             onChange={(e) => updateExamQuestionField(q.id, field, e.target.value)}
                             rows={2}
                           />
