@@ -402,7 +402,7 @@ export default function ExamsTab() {
               <div className="border rounded-lg max-h-64 overflow-y-auto">
                 {(() => {
                   const term = normalizeQuestionText(createSearch).toLowerCase();
-                  const matches = (q: any) => {
+                  const matches = (q: Question) => {
                     if (!term) return true;
                     return [q.question_text, q.option_a, q.option_b, q.option_c, q.option_d]
                       .some((t) => normalizeQuestionText(t).toLowerCase().includes(term));
@@ -550,7 +550,7 @@ export default function ExamsTab() {
               <div className="mt-2 border rounded-lg max-h-[50vh] overflow-y-auto">
                 {(() => {
                   const term = normalizeQuestionText(editQuestionsSearch).toLowerCase();
-                  const matches = (q: any) => {
+                  const matches = (q: Question) => {
                     if (!term) return true;
                     return [q.question_text, q.option_a, q.option_b, q.option_c, q.option_d]
                       .some((t) => normalizeQuestionText(t).toLowerCase().includes(term));
