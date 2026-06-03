@@ -18,6 +18,10 @@ import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play, Pencil, ListChecks, Wrenc
 interface Question {
   id: string;
   question_text: string;
+  option_a: string;
+  option_b: string;
+  option_c: string;
+  option_d: string;
 }
 
 interface FullQuestion {
@@ -40,6 +44,11 @@ interface Exam {
   created_at: string;
   question_count?: number;
 }
+
+const getErrorMessage = (error: unknown) =>
+  error instanceof Error ? error.message : "Ocorreu um erro inesperado.";
+
+const optionFields = ["option_a", "option_b", "option_c", "option_d"] as const;
 
 export default function ExamsTab() {
   const { user } = useAuth();
@@ -101,8 +110,8 @@ export default function ExamsTab() {
         option_d: normalizeQuestionText(q.option_d),
         comment: normalizeQuestionText(q.comment) || null,
       })));
-    } catch (error: any) {
-      toast({ title: "Erro ao carregar", description: error.message, variant: "destructive" });
+    } catch (error: unknown) {
+      toast({ title: "Erro ao carregar", description: getErrorMessage(error), variant: "destructive" });
     } finally {
       setManageLoading(false);
     }
@@ -180,8 +189,8 @@ export default function ExamsTab() {
       fetchQuestions();
       fetchExams();
       toast({ title: "Nova questão adicionada — edite abaixo" });
-    } catch (error: any) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } catch (error: unknown) {
+      toast({ title: "Erro", description: getErrorMessage(error), variant: "destructive" });
     } finally {
       setManageLoading(false);
     }
@@ -242,8 +251,8 @@ export default function ExamsTab() {
       setEditingQuestionsExam(null);
       setEditSelectedQuestions([]);
       fetchExams();
-    } catch (error: any) {
-      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+    } catch (error: unknown) {
+      toast({ title: "Erro ao salvar", description: getErrorMessage(error), variant: "destructive" });
     } finally {
       setEditQuestionsLoading(false);
     }
@@ -277,11 +286,26 @@ export default function ExamsTab() {
   };
 
   const fetchQuestions = async () => {
-    const { data } = await supabase
-      .from("questions")
-      .select("id, question_text")
-      .order("created_at", { ascending: false });
-    if (data) setQuestions(data);
+    const pageSize = 1000;
+    const allQuestions: Question[] = [];
+
+    for (let from = 0; ; from += pageSize) {
+      const { data, error } = await supabase
+        .from("questions")
+        .select("id, question_text, option_a, option_b, option_c, option_d")
+        .order("created_at", { ascending: false })
+        .range(from, from + pageSize - 1);
+
+      if (error) {
+        toast({ title: "Erro ao carregar perguntas", description: error.message, variant: "destructive" });
+        return;
+      }
+
+      allQuestions.push(...(data ?? []));
+      if (!data || data.length < pageSize) break;
+    }
+
+    setQuestions(allQuestions);
   };
 
   useEffect(() => {
@@ -318,8 +342,8 @@ export default function ExamsTab() {
       setSelectedQuestions([]);
       setCreateSearch("");
       fetchExams();
-    } catch (error: any) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } catch (error: unknown) {
+      toast({ title: "Erro", description: getErrorMessage(error), variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -383,7 +407,7 @@ export default function ExamsTab() {
               <div className="border rounded-lg max-h-64 overflow-y-auto">
                 {(() => {
                   const term = normalizeQuestionText(createSearch).toLowerCase();
-                  const matches = (q: any) => {
+                  const matches = (q: Question) => {
                     if (!term) return true;
                     return [q.question_text, q.option_a, q.option_b, q.option_c, q.option_d]
                       .some((t) => normalizeQuestionText(t).toLowerCase().includes(term));
@@ -531,7 +555,7 @@ export default function ExamsTab() {
               <div className="mt-2 border rounded-lg max-h-[50vh] overflow-y-auto">
                 {(() => {
                   const term = normalizeQuestionText(editQuestionsSearch).toLowerCase();
-                  const matches = (q: any) => {
+                  const matches = (q: Question) => {
                     if (!term) return true;
                     return [q.question_text, q.option_a, q.option_b, q.option_c, q.option_d]
                       .some((t) => normalizeQuestionText(t).toLowerCase().includes(term));
@@ -632,13 +656,13 @@ export default function ExamsTab() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {(["A", "B", "C", "D"] as const).map((letter) => {
-                      const field = `option_${letter.toLowerCase()}` as keyof FullQuestion;
+                    {optionFields.map((field, index) => {
+                      const letter = (["A", "B", "C", "D"] as const)[index];
                       return (
                         <div key={letter}>
                           <Label className="text-xs">Alternativa {letter}</Label>
                           <Textarea
-                            value={normalizeQuestionText((q as any)[field])}
+                            value={normalizeQuestionText(q[field])}
                             onChange={(e) => updateExamQuestionField(q.id, field, e.target.value)}
                             rows={2}
                           />
