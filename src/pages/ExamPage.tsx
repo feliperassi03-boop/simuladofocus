@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { normalizeQuestionText } from "@/lib/utils";
 import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock, User, MessageSquareText, Home, BookOpen, Eye, EyeOff } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
+import DoubtDialog from "@/components/DoubtDialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -441,9 +442,23 @@ export default function ExamPage() {
           {/* Question review */}
           <Card className="shadow-elevated mb-6">
             <CardHeader>
-              <CardTitle className="font-display text-xl leading-relaxed">
-                {normalizeQuestionText(currentQuestion.question_text)}
-              </CardTitle>
+              <div className="flex items-start justify-between gap-3 flex-wrap">
+                <CardTitle className="font-display text-xl leading-relaxed flex-1 min-w-0">
+                  {normalizeQuestionText(currentQuestion.question_text)}
+                </CardTitle>
+                <DoubtDialog
+                  questionId={currentQuestion.id}
+                  examId={exam?.id}
+                  attemptId={attemptId}
+                  examTitle={exam?.title || ""}
+                  questionNumber={currentIndex + 1}
+                  questionTextSnapshot={currentQuestion.question_text}
+                  defaultName={guestName}
+                  defaultEmail={guestEmail}
+                  variant="ghost"
+                  className="text-muted-foreground hover:text-primary shrink-0"
+                />
+              </div>
               {currentQuestion.image_url && (
                 <img
                   src={currentQuestion.image_url}
@@ -579,10 +594,24 @@ export default function ExamPage() {
               return (
                 <Card key={q.id} id={`gabarito-q-${i}`} className="shadow-elevated scroll-mt-32">
                   <CardHeader>
-                    <CardTitle className="font-display text-lg leading-relaxed">
-                      <span className="text-primary font-bold mr-2">{i + 1}.</span>
-                      {normalizeQuestionText(q.question_text)}
-                    </CardTitle>
+                    <div className="flex items-start justify-between gap-3 flex-wrap">
+                      <CardTitle className="font-display text-lg leading-relaxed flex-1 min-w-0">
+                        <span className="text-primary font-bold mr-2">{i + 1}.</span>
+                        {normalizeQuestionText(q.question_text)}
+                      </CardTitle>
+                      <DoubtDialog
+                        questionId={q.id}
+                        examId={exam?.id}
+                        attemptId={attemptId}
+                        examTitle={exam?.title || ""}
+                        questionNumber={i + 1}
+                        questionTextSnapshot={q.question_text}
+                        defaultName={guestName}
+                        defaultEmail={guestEmail}
+                        variant="ghost"
+                        className="text-muted-foreground hover:text-primary shrink-0"
+                      />
+                    </div>
                     {q.image_url && (
                       <img src={q.image_url} alt="Imagem da questão" className="mt-3 rounded-lg w-full max-h-64 object-contain bg-muted" />
                     )}
@@ -751,26 +780,41 @@ export default function ExamPage() {
 
         <Card className="shadow-elevated mb-6">
           <CardHeader>
-            <div className="flex items-start justify-between gap-3">
-              <CardTitle className="font-display text-xl leading-relaxed flex-1">
+            <div className="flex items-start justify-between gap-3 flex-wrap">
+              <CardTitle className="font-display text-xl leading-relaxed flex-1 min-w-0">
                 {normalizeQuestionText(currentQuestion?.question_text)}
               </CardTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="shrink-0 mt-0.5 text-muted-foreground hover:text-primary"
-                onClick={() => toggleRevealedAnswer(currentQuestion.id)}
-              >
-                {revealedAnswers[currentQuestion.id] ? (
-                  <>
-                    <EyeOff className="w-4 h-4 mr-1.5" /> <span className="hidden sm:inline text-xs">Ocultar gabarito</span>
-                  </>
-                ) : (
-                  <>
-                    <Eye className="w-4 h-4 mr-1.5" /> <span className="hidden sm:inline text-xs">Ver gabarito</span>
-                  </>
-                )}
-              </Button>
+              <div className="flex items-center gap-2 shrink-0">
+                <DoubtDialog
+                  questionId={currentQuestion.id}
+                  examId={exam?.id}
+                  attemptId={attemptId}
+                  examTitle={exam?.title || ""}
+                  questionNumber={currentIndex + 1}
+                  questionTextSnapshot={currentQuestion.question_text}
+                  defaultName={guestName}
+                  defaultEmail={guestEmail}
+                  variant="ghost"
+                  className="text-muted-foreground hover:text-primary"
+                  label=""
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="shrink-0 mt-0.5 text-muted-foreground hover:text-primary"
+                  onClick={() => toggleRevealedAnswer(currentQuestion.id)}
+                >
+                  {revealedAnswers[currentQuestion.id] ? (
+                    <>
+                      <EyeOff className="w-4 h-4 mr-1.5" /> <span className="hidden sm:inline text-xs">Ocultar gabarito</span>
+                    </>
+                  ) : (
+                    <>
+                      <Eye className="w-4 h-4 mr-1.5" /> <span className="hidden sm:inline text-xs">Ver gabarito</span>
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
             {revealedAnswers[currentQuestion.id] && (
               <div className="mt-3 space-y-3 animate-fade-in">

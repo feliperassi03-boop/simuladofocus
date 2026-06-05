@@ -116,6 +116,69 @@ export type Database = {
         }
         Relationships: []
       }
+      question_doubts: {
+        Row: {
+          admin_response: string | null
+          answered_at: string | null
+          answered_by: string | null
+          attempt_id: string | null
+          created_at: string
+          doubt_text: string
+          exam_id: string | null
+          exam_title: string
+          id: string
+          question_id: string
+          question_number: number | null
+          question_text_snapshot: string | null
+          read_by_student: boolean
+          status: Database["public"]["Enums"]["doubt_status"]
+          student_email: string | null
+          student_name: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_response?: string | null
+          answered_at?: string | null
+          answered_by?: string | null
+          attempt_id?: string | null
+          created_at?: string
+          doubt_text: string
+          exam_id?: string | null
+          exam_title?: string
+          id?: string
+          question_id: string
+          question_number?: number | null
+          question_text_snapshot?: string | null
+          read_by_student?: boolean
+          status?: Database["public"]["Enums"]["doubt_status"]
+          student_email?: string | null
+          student_name: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_response?: string | null
+          answered_at?: string | null
+          answered_by?: string | null
+          attempt_id?: string | null
+          created_at?: string
+          doubt_text?: string
+          exam_id?: string | null
+          exam_title?: string
+          id?: string
+          question_id?: string
+          question_number?: number | null
+          question_text_snapshot?: string | null
+          read_by_student?: boolean
+          status?: Database["public"]["Enums"]["doubt_status"]
+          student_email?: string | null
+          student_name?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       questions: {
         Row: {
           comment: string | null
@@ -302,6 +365,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "student"
+      doubt_status: "pending" | "answered" | "resolved" | "archived"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -430,6 +494,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "student"],
+      doubt_status: ["pending", "answered", "resolved", "archived"],
     },
   },
 } as const

@@ -12,6 +12,7 @@ import HistoryPage from "./pages/HistoryPage";
 import ProvasPage from "./pages/ProvasPage";
 import AppLayout from "./components/AppLayout";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import MyDoubtsPage from "./pages/MyDoubtsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -63,6 +64,7 @@ const App = () => (
             <Route path="/" element={<ProtectedRoute><HomeRedirect /></ProtectedRoute>} />
             <Route path="/provas" element={<StudentRoute><ProvasPage /></StudentRoute>} />
             <Route path="/historico" element={<ProtectedRoute><AppLayout><HistoryPage /></AppLayout></ProtectedRoute>} />
+            <Route path="/duvidas" element={<ProtectedRoute><AppLayout><MyDoubtsPage /></AppLayout></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><AdminRoute><AdminPage /></AdminRoute></ProtectedRoute>} />
             <Route path="/prova/:id" element={<ExamPage />} />
             <Route path="*" element={<NotFound />} />

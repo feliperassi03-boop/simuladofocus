@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2, Users, HelpCircle, BarChart3, ImagePlus, X, FileText, Video, MailCheck, Search } from "lucide-react";
 import ExamsTab from "@/components/admin/ExamsTab";
 import AllowedEmailsTab from "@/components/admin/AllowedEmailsTab";
+import DoubtsTab from "@/components/admin/DoubtsTab";
 import { useVideoConverter } from "@/hooks/useVideoConverter";
 import { normalizeQuestionText } from "@/lib/utils";
 
@@ -370,10 +371,11 @@ export default function AdminPage() {
       </div>
 
       <Tabs defaultValue="questions">
-        <TabsList>
+        <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="questions">Perguntas</TabsTrigger>
           <TabsTrigger value="exams">Provas</TabsTrigger>
           <TabsTrigger value="results">Resultados</TabsTrigger>
+          <TabsTrigger value="doubts">Dúvidas dos Alunos</TabsTrigger>
           <TabsTrigger value="allowed-emails">Emails Autorizados</TabsTrigger>
         </TabsList>
 
@@ -768,6 +770,10 @@ export default function AdminPage() {
               </TableBody>
             </Table>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="doubts">
+          <DoubtsTab />
         </TabsContent>
 
         <TabsContent value="allowed-emails">
