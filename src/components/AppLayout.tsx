@@ -1,11 +1,45 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { BookOpen, LogOut, Shield, GraduationCap, History, FileText } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { BookOpen, LogOut, Shield, History, FileText, MessageCircleQuestion } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, isAdmin, signOut } = useAuth();
   const location = useLocation();
+  const [unreadDoubts, setUnreadDoubts] = useState(0);
+  const [pendingDoubts, setPendingDoubts] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    const load = async () => {
+      if (isAdmin) {
+        const { count } = await supabase
+          .from("question_doubts")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "pending");
+        setPendingDoubts(count || 0);
+      } else {
+        const { count } = await supabase
+          .from("question_doubts")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .eq("read_by_student", false)
+          .not("admin_response", "is", null);
+        setUnreadDoubts(count || 0);
+      }
+    };
+    load();
+    const channel = supabase
+      .channel("doubts-nav")
+      .on("postgres_changes", { event: "*", schema: "public", table: "question_doubts" }, load)
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, isAdmin, location.pathname]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -18,16 +52,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <span className="font-display font-bold text-lg text-foreground">QuizMaster</span>
           </Link>
 
-          <nav className="flex items-center gap-2">
-            <Link to="/provas">
-              <Button
-                variant={location.pathname === "/provas" ? "default" : "ghost"}
-                size="sm"
-                className={location.pathname === "/provas" ? "gradient-primary text-primary-foreground" : ""}
-              >
-                <FileText className="w-4 h-4 mr-1" /> Provas
-              </Button>
-            </Link>
+          <nav className="flex items-center gap-2 flex-wrap">
+            {!isAdmin && (
+              <Link to="/provas">
+                <Button
+                  variant={location.pathname === "/provas" ? "default" : "ghost"}
+                  size="sm"
+                  className={location.pathname === "/provas" ? "gradient-primary text-primary-foreground" : ""}
+                >
+                  <FileText className="w-4 h-4 mr-1" /> Provas
+                </Button>
+              </Link>
+            )}
             <Link to="/historico">
               <Button
                 variant={location.pathname === "/historico" ? "default" : "ghost"}
@@ -37,14 +73,35 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <History className="w-4 h-4 mr-1" /> Histórico
               </Button>
             </Link>
+            {!isAdmin && (
+              <Link to="/duvidas">
+                <Button
+                  variant={location.pathname === "/duvidas" ? "default" : "ghost"}
+                  size="sm"
+                  className={`relative ${location.pathname === "/duvidas" ? "gradient-primary text-primary-foreground" : ""}`}
+                >
+                  <MessageCircleQuestion className="w-4 h-4 mr-1" /> Minhas Dúvidas
+                  {unreadDoubts > 0 && (
+                    <Badge className="ml-1.5 h-5 min-w-5 px-1 bg-destructive text-destructive-foreground">
+                      {unreadDoubts}
+                    </Badge>
+                  )}
+                </Button>
+              </Link>
+            )}
             {isAdmin && (
               <Link to="/admin">
                 <Button
                   variant={location.pathname === "/admin" ? "default" : "ghost"}
                   size="sm"
-                  className={location.pathname === "/admin" ? "gradient-primary text-primary-foreground" : ""}
+                  className={`relative ${location.pathname === "/admin" ? "gradient-primary text-primary-foreground" : ""}`}
                 >
                   <Shield className="w-4 h-4 mr-1" /> Admin
+                  {pendingDoubts > 0 && (
+                    <Badge className="ml-1.5 h-5 min-w-5 px-1 bg-destructive text-destructive-foreground">
+                      {pendingDoubts}
+                    </Badge>
+                  )}
                 </Button>
               </Link>
             )}
