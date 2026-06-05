@@ -442,9 +442,23 @@ export default function ExamPage() {
           {/* Question review */}
           <Card className="shadow-elevated mb-6">
             <CardHeader>
-              <CardTitle className="font-display text-xl leading-relaxed">
-                {normalizeQuestionText(currentQuestion.question_text)}
-              </CardTitle>
+              <div className="flex items-start justify-between gap-3 flex-wrap">
+                <CardTitle className="font-display text-xl leading-relaxed flex-1 min-w-0">
+                  {normalizeQuestionText(currentQuestion.question_text)}
+                </CardTitle>
+                <DoubtDialog
+                  questionId={currentQuestion.id}
+                  examId={exam?.id}
+                  attemptId={attemptId}
+                  examTitle={exam?.title || ""}
+                  questionNumber={currentIndex + 1}
+                  questionTextSnapshot={currentQuestion.question_text}
+                  defaultName={guestName}
+                  defaultEmail={guestEmail}
+                  variant="ghost"
+                  className="text-muted-foreground hover:text-primary shrink-0"
+                />
+              </div>
               {currentQuestion.image_url && (
                 <img
                   src={currentQuestion.image_url}
