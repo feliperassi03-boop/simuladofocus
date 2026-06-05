@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { normalizeQuestionText } from "@/lib/utils";
 import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock, User, MessageSquareText, Home, BookOpen, Eye, EyeOff } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
+import DoubtDialog from "@/components/DoubtDialog";
 import {
   AlertDialog,
   AlertDialogAction,
