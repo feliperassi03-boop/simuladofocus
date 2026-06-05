@@ -752,26 +752,41 @@ export default function ExamPage() {
 
         <Card className="shadow-elevated mb-6">
           <CardHeader>
-            <div className="flex items-start justify-between gap-3">
-              <CardTitle className="font-display text-xl leading-relaxed flex-1">
+            <div className="flex items-start justify-between gap-3 flex-wrap">
+              <CardTitle className="font-display text-xl leading-relaxed flex-1 min-w-0">
                 {normalizeQuestionText(currentQuestion?.question_text)}
               </CardTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="shrink-0 mt-0.5 text-muted-foreground hover:text-primary"
-                onClick={() => toggleRevealedAnswer(currentQuestion.id)}
-              >
-                {revealedAnswers[currentQuestion.id] ? (
-                  <>
-                    <EyeOff className="w-4 h-4 mr-1.5" /> <span className="hidden sm:inline text-xs">Ocultar gabarito</span>
-                  </>
-                ) : (
-                  <>
-                    <Eye className="w-4 h-4 mr-1.5" /> <span className="hidden sm:inline text-xs">Ver gabarito</span>
-                  </>
-                )}
-              </Button>
+              <div className="flex items-center gap-2 shrink-0">
+                <DoubtDialog
+                  questionId={currentQuestion.id}
+                  examId={exam?.id}
+                  attemptId={attemptId}
+                  examTitle={exam?.title || ""}
+                  questionNumber={currentIndex + 1}
+                  questionTextSnapshot={currentQuestion.question_text}
+                  defaultName={guestName}
+                  defaultEmail={guestEmail}
+                  variant="ghost"
+                  className="text-muted-foreground hover:text-primary"
+                  label=""
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="shrink-0 mt-0.5 text-muted-foreground hover:text-primary"
+                  onClick={() => toggleRevealedAnswer(currentQuestion.id)}
+                >
+                  {revealedAnswers[currentQuestion.id] ? (
+                    <>
+                      <EyeOff className="w-4 h-4 mr-1.5" /> <span className="hidden sm:inline text-xs">Ocultar gabarito</span>
+                    </>
+                  ) : (
+                    <>
+                      <Eye className="w-4 h-4 mr-1.5" /> <span className="hidden sm:inline text-xs">Ver gabarito</span>
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
             {revealedAnswers[currentQuestion.id] && (
               <div className="mt-3 space-y-3 animate-fade-in">
