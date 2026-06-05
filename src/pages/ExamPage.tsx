@@ -580,10 +580,24 @@ export default function ExamPage() {
               return (
                 <Card key={q.id} id={`gabarito-q-${i}`} className="shadow-elevated scroll-mt-32">
                   <CardHeader>
-                    <CardTitle className="font-display text-lg leading-relaxed">
-                      <span className="text-primary font-bold mr-2">{i + 1}.</span>
-                      {normalizeQuestionText(q.question_text)}
-                    </CardTitle>
+                    <div className="flex items-start justify-between gap-3 flex-wrap">
+                      <CardTitle className="font-display text-lg leading-relaxed flex-1 min-w-0">
+                        <span className="text-primary font-bold mr-2">{i + 1}.</span>
+                        {normalizeQuestionText(q.question_text)}
+                      </CardTitle>
+                      <DoubtDialog
+                        questionId={q.id}
+                        examId={exam?.id}
+                        attemptId={attemptId}
+                        examTitle={exam?.title || ""}
+                        questionNumber={i + 1}
+                        questionTextSnapshot={q.question_text}
+                        defaultName={guestName}
+                        defaultEmail={guestEmail}
+                        variant="ghost"
+                        className="text-muted-foreground hover:text-primary shrink-0"
+                      />
+                    </div>
                     {q.image_url && (
                       <img src={q.image_url} alt="Imagem da questão" className="mt-3 rounded-lg w-full max-h-64 object-contain bg-muted" />
                     )}
