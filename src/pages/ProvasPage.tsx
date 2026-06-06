@@ -21,9 +21,11 @@ interface ExamItem {
 function getCategory(title: string): string {
   const trimmed = title.trim();
   if (!trimmed) return "Outros";
-  // Pega o primeiro grupo alfabético
-  const match = trimmed.match(/^[A-Za-zÀ-ÿ]+/);
-  return match ? match[0] : trimmed.split(/\s+/)[0];
+  // Remove números/romanos finais (ex.: "SISTEMA NERVOSO AUTÔNOMO 1" -> "SISTEMA NERVOSO AUTÔNOMO")
+  const withoutTrailingNum = trimmed
+    .replace(/\s+([0-9]+|[IVXLCDM]+)\s*$/i, "")
+    .trim();
+  return withoutTrailingNum || trimmed;
 }
 
 export default function ProvasPage() {
