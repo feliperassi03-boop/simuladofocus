@@ -73,6 +73,7 @@ export default function ExamsTab() {
   const [examQuestions, setExamQuestions] = useState<FullQuestion[]>([]);
   const [manageLoading, setManageLoading] = useState(false);
   const [savingQuestionId, setSavingQuestionId] = useState<string | null>(null);
+  const [manageSearch, setManageSearch] = useState("");
 
   const openManageExam = async (exam: Exam) => {
     setManagingExam(exam);
