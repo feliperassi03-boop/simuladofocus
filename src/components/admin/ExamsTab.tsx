@@ -77,6 +77,7 @@ export default function ExamsTab() {
 
   const openManageExam = async (exam: Exam) => {
     setManagingExam(exam);
+    setManageSearch("");
     setManageLoading(true);
     try {
       const { data: eqData, error: eqError } = await supabase
