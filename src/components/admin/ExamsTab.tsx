@@ -73,9 +73,11 @@ export default function ExamsTab() {
   const [examQuestions, setExamQuestions] = useState<FullQuestion[]>([]);
   const [manageLoading, setManageLoading] = useState(false);
   const [savingQuestionId, setSavingQuestionId] = useState<string | null>(null);
+  const [manageSearch, setManageSearch] = useState("");
 
   const openManageExam = async (exam: Exam) => {
     setManagingExam(exam);
+    setManageSearch("");
     setManageLoading(true);
     try {
       const { data: eqData, error: eqError } = await supabase
@@ -616,87 +618,116 @@ export default function ExamsTab() {
               </Button>
             </div>
 
+            {examQuestions.length > 0 && (
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  value={manageSearch}
+                  onChange={(e) => setManageSearch(e.target.value)}
+                  placeholder="Buscar questão no enunciado ou alternativas..."
+                  className="pl-9"
+                />
+              </div>
+            )}
+
             {manageLoading && examQuestions.length === 0 && (
               <p className="text-sm text-muted-foreground text-center py-6">Carregando...</p>
             )}
 
             <div className="space-y-4">
-              {examQuestions.map((q, idx) => (
-                <Card key={q.id} className="p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-semibold text-primary">Questão {idx + 1}</span>
-                    <div className="flex gap-1">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => saveQuestion(q)}
-                        disabled={savingQuestionId === q.id}
-                      >
-                        <Save className="w-3 h-3 mr-1" />
-                        {savingQuestionId === q.id ? "Salvando..." : "Salvar"}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => removeQuestionFromExam(q.id)}
-                        title="Remover da prova"
-                      >
-                        <X className="w-4 h-4 text-destructive" />
-                      </Button>
-                    </div>
-                  </div>
+              {(() => {
+                const term = normalizeQuestionText(manageSearch).toLowerCase();
+                const filtered = examQuestions.filter((q) => {
+                  if (!term) return true;
+                  return [q.question_text, q.option_a, q.option_b, q.option_c, q.option_d, q.comment]
+                    .some((t) => normalizeQuestionText(t || "").toLowerCase().includes(term));
+                });
+                return (
+                  <>
+                    {filtered.map((q) => (
+                      <Card key={q.id} className="p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-semibold text-primary">Questão {examQuestions.indexOf(q) + 1}</span>
+                          <div className="flex gap-1">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => saveQuestion(q)}
+                              disabled={savingQuestionId === q.id}
+                            >
+                              <Save className="w-3 h-3 mr-1" />
+                              {savingQuestionId === q.id ? "Salvando..." : "Salvar"}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => removeQuestionFromExam(q.id)}
+                              title="Remover da prova"
+                            >
+                              <X className="w-4 h-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </div>
 
-                  <div>
-                    <Label className="text-xs">Enunciado</Label>
-                    <Textarea
-                      value={normalizeQuestionText(q.question_text)}
-                      onChange={(e) => updateExamQuestionField(q.id, "question_text", e.target.value)}
-                      rows={3}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {optionFields.map((field, index) => {
-                      const letter = (["A", "B", "C", "D"] as const)[index];
-                      return (
-                        <div key={letter}>
-                          <Label className="text-xs">Alternativa {letter}</Label>
+                        <div>
+                          <Label className="text-xs">Enunciado</Label>
                           <Textarea
-                            value={normalizeQuestionText(q[field])}
-                            onChange={(e) => updateExamQuestionField(q.id, field, e.target.value)}
-                            rows={2}
+                            value={normalizeQuestionText(q.question_text)}
+                            onChange={(e) => updateExamQuestionField(q.id, "question_text", e.target.value)}
+                            rows={3}
                           />
                         </div>
-                      );
-                    })}
-                  </div>
 
-                  <div>
-                    <Label className="text-xs">Gabarito (resposta correta)</Label>
-                    <RadioGroup
-                      value={q.correct_option}
-                      onValueChange={(v) => updateExamQuestionField(q.id, "correct_option", v)}
-                      className="flex gap-4 mt-1"
-                    >
-                      {(["A", "B", "C", "D"] as const).map((letter) => (
-                        <div key={letter} className="flex items-center gap-1">
-                          <RadioGroupItem value={letter} id={`r-${q.id}-${letter}`} />
-                          <Label htmlFor={`r-${q.id}-${letter}`} className="cursor-pointer">{letter}</Label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {optionFields.map((field, index) => {
+                            const letter = (["A", "B", "C", "D"] as const)[index];
+                            return (
+                              <div key={letter}>
+                                <Label className="text-xs">Alternativa {letter}</Label>
+                                <Textarea
+                                  value={normalizeQuestionText(q[field])}
+                                  onChange={(e) => updateExamQuestionField(q.id, field, e.target.value)}
+                                  rows={2}
+                                />
+                              </div>
+                            );
+                          })}
                         </div>
-                      ))}
-                    </RadioGroup>
-                  </div>
 
-                  <div>
-                    <Label className="text-xs">Comentário / Gabarito comentado</Label>
-                    <Textarea
-                      value={normalizeQuestionText(q.comment)}
-                      onChange={(e) => updateExamQuestionField(q.id, "comment", e.target.value)}
-                      rows={3}
-                    />
-                  </div>
-                </Card>
-              ))}
+                        <div>
+                          <Label className="text-xs">Gabarito (resposta correta)</Label>
+                          <RadioGroup
+                            value={q.correct_option}
+                            onValueChange={(v) => updateExamQuestionField(q.id, "correct_option", v)}
+                            className="flex gap-4 mt-1"
+                          >
+                            {(["A", "B", "C", "D"] as const).map((letter) => (
+                              <div key={letter} className="flex items-center gap-1">
+                                <RadioGroupItem value={letter} id={`r-${q.id}-${letter}`} />
+                                <Label htmlFor={`r-${q.id}-${letter}`} className="cursor-pointer">{letter}</Label>
+                              </div>
+                            ))}
+                          </RadioGroup>
+                        </div>
+
+                        <div>
+                          <Label className="text-xs">Comentário / Gabarito comentado</Label>
+                          <Textarea
+                            value={normalizeQuestionText(q.comment)}
+                            onChange={(e) => updateExamQuestionField(q.id, "comment", e.target.value)}
+                            rows={3}
+                          />
+                        </div>
+                      </Card>
+                    ))}
+                    {filtered.length === 0 && manageSearch.trim() && (
+                      <p className="text-sm text-muted-foreground text-center py-6">
+                        Nenhuma questão encontrada para esta busca.
+                      </p>
+                    )}
+                  </>
+                );
+              })()}
 
               {!manageLoading && examQuestions.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-6">
