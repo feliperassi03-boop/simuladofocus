@@ -17,8 +17,37 @@ export default function ResetPasswordPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const hash = window.location.hash;
-    if (hash.includes("type=recovery")) {
+    // Com HashRouter o link do Supabase fica: .../#/reset-password#access_token=...&type=recovery
+    // Precisamos extrair os tokens manualmente e criar a sessão.
+    const rawHash = window.location.hash || "";
+    const search = window.location.search || "";
+
+    // Junta tudo o que houver depois de qualquer '#' ou '?'
+    const combined = (rawHash + "&" + search).replace(/^#/, "");
+    const params = new URLSearchParams(combined.replace(/#/g, "&").replace(/\?/g, "&"));
+
+    const access_token = params.get("access_token");
+    const refresh_token = params.get("refresh_token");
+    const type = params.get("type");
+    const error_description = params.get("error_description");
+
+    if (error_description) {
+      toast({ title: "Link inválido", description: error_description, variant: "destructive" });
+    }
+
+    if (type === "recovery" && access_token && refresh_token) {
+      supabase.auth
+        .setSession({ access_token, refresh_token })
+        .then(({ error }) => {
+          if (error) {
+            toast({ title: "Erro", description: error.message, variant: "destructive" });
+          } else {
+            setIsRecovery(true);
+            // limpa a URL para evitar reprocessamento
+            window.history.replaceState(null, "", "#/reset-password");
+          }
+        });
+    } else if (rawHash.includes("type=recovery")) {
       setIsRecovery(true);
     }
 
