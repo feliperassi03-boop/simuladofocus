@@ -78,6 +78,23 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </Button>
             </Link>
             {!isAdmin && (
+              <Link to="/duvidas" aria-label="Notificações de dúvidas">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="relative"
+                  title={unreadDoubts > 0 ? `${unreadDoubts} resposta(s) nova(s)` : "Sem novas respostas"}
+                >
+                  <Bell className={`w-4 h-4 ${unreadDoubts > 0 ? "text-destructive animate-pulse" : ""}`} />
+                  {unreadDoubts > 0 && (
+                    <span className="absolute -top-1 -right-1 h-4 min-w-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
+                      {unreadDoubts}
+                    </span>
+                  )}
+                </Button>
+              </Link>
+            )}
+            {!isAdmin && (
               <Link to="/duvidas">
                 <Button
                   variant={location.pathname === "/duvidas" ? "default" : "ghost"}
