@@ -24,7 +24,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-const getDurationByQuestionCount = (_count: number) => 7200; // 120 min para todas as provas
+const getDurationByQuestionCount = (_count: number) => 14400; // 240 min para todas as provas
 
 interface Question {
   id: string;
