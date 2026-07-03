@@ -1,7 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, LogOut, Shield, History, FileText, MessageCircleQuestion } from "lucide-react";
+import { BookOpen, LogOut, Shield, History, FileText, MessageCircleQuestion, Bell } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
