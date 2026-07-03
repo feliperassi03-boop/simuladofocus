@@ -22,10 +22,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           .eq("status", "pending");
         setPendingDoubts(count || 0);
       } else {
+        const email = user.email?.toLowerCase();
+        const orFilter = email
+          ? `user_id.eq.${user.id},student_email.ilike.${email}`
+          : `user_id.eq.${user.id}`;
         const { count } = await supabase
           .from("question_doubts")
           .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id)
+          .or(orFilter)
           .eq("read_by_student", false)
           .not("admin_response", "is", null);
         setUnreadDoubts(count || 0);
