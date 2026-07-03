@@ -1,7 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, LogOut, Shield, History, FileText, MessageCircleQuestion } from "lucide-react";
+import { BookOpen, LogOut, Shield, History, FileText, MessageCircleQuestion, Bell } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,10 +22,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           .eq("status", "pending");
         setPendingDoubts(count || 0);
       } else {
+        const email = user.email?.toLowerCase();
+        const orFilter = email
+          ? `user_id.eq.${user.id},student_email.ilike.${email}`
+          : `user_id.eq.${user.id}`;
         const { count } = await supabase
           .from("question_doubts")
           .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id)
+          .or(orFilter)
           .eq("read_by_student", false)
           .not("admin_response", "is", null);
         setUnreadDoubts(count || 0);
@@ -73,6 +77,23 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <History className="w-4 h-4 mr-1" /> Histórico
               </Button>
             </Link>
+            {!isAdmin && (
+              <Link to="/duvidas" aria-label="Notificações de dúvidas">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="relative"
+                  title={unreadDoubts > 0 ? `${unreadDoubts} resposta(s) nova(s)` : "Sem novas respostas"}
+                >
+                  <Bell className={`w-4 h-4 ${unreadDoubts > 0 ? "text-destructive animate-pulse" : ""}`} />
+                  {unreadDoubts > 0 && (
+                    <span className="absolute -top-1 -right-1 h-4 min-w-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
+                      {unreadDoubts}
+                    </span>
+                  )}
+                </Button>
+              </Link>
+            )}
             {!isAdmin && (
               <Link to="/duvidas">
                 <Button

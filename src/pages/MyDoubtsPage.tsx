@@ -43,10 +43,14 @@ export default function MyDoubtsPage() {
   const fetchDoubts = async () => {
     if (!user) return;
     setLoading(true);
+    const email = user.email?.toLowerCase();
+    const orFilter = email
+      ? `user_id.eq.${user.id},student_email.ilike.${email}`
+      : `user_id.eq.${user.id}`;
     const { data } = await supabase
       .from("question_doubts")
       .select("*")
-      .eq("user_id", user.id)
+      .or(orFilter)
       .order("created_at", { ascending: false });
     setDoubts((data || []) as Doubt[]);
     setLoading(false);
