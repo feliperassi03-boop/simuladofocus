@@ -4,9 +4,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { BookOpen, LogIn, UserPlus } from "lucide-react";
+import { LogIn, UserPlus } from "lucide-react";
+import logoAsset from "@/assets/aumakua-logo.jpeg.asset.json";
+
+const BRAND = {
+  cream: "#F5EFE0",
+  navy: "#14294A",
+  navyDeep: "#0E1D36",
+  orange: "#E8823A",
+};
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -51,41 +58,121 @@ export default function AuthPage() {
         toast({ title: "Conta criada com sucesso!" });
       }
     } catch (error: any) {
-      toast({
-        title: "Erro",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md animate-fade-in">
+    <div
+      className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+      style={{ backgroundColor: BRAND.cream }}
+    >
+      {/* Decorative accent shapes */}
+      <div
+        className="pointer-events-none absolute -top-32 -right-32 w-96 h-96 rounded-full opacity-20 blur-3xl"
+        style={{ backgroundColor: BRAND.orange }}
+      />
+      <div
+        className="pointer-events-none absolute -bottom-40 -left-40 w-[28rem] h-[28rem] rounded-full opacity-15 blur-3xl"
+        style={{ backgroundColor: BRAND.navy }}
+      />
+
+      <div className="w-full max-w-md animate-fade-in relative">
+        {/* Logo + brand */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl gradient-primary mb-4 shadow-glow">
-            <BookOpen className="w-8 h-8 text-primary-foreground" />
+          <div className="inline-flex items-center justify-center mb-4">
+            <img
+              src={logoAsset.url}
+              alt="Aumakua"
+              className="h-32 w-auto object-contain mix-blend-multiply"
+            />
           </div>
-          <h1 className="text-3xl font-bold font-display text-foreground">QuizMaster</h1>
-          <p className="text-muted-foreground mt-2">Teste seus conhecimentos</p>
+          <p
+            className="mt-1 text-sm tracking-[0.35em] uppercase font-medium"
+            style={{ color: BRAND.navy, opacity: 0.7 }}
+          >
+            Plataforma de Simulados
+          </p>
         </div>
 
-        <Card className="shadow-elevated border-border/50">
-          <CardHeader className="text-center">
-            <CardTitle className="font-display text-xl">
+        {/* Card */}
+        <div
+          className="rounded-2xl p-8 shadow-2xl border"
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderColor: `${BRAND.navy}20`,
+            boxShadow: `0 20px 60px -20px ${BRAND.navy}40`,
+          }}
+        >
+          <div className="text-center mb-6">
+            <h2
+              className="text-2xl font-bold tracking-tight"
+              style={{ color: BRAND.navyDeep }}
+            >
               {forgotPassword ? "Redefinir Senha" : isLogin ? "Entrar" : "Criar Conta"}
-            </CardTitle>
-            <CardDescription>
-              {forgotPassword ? "Digite seu e-mail para receber o link de redefinição" : isLogin ? "Acesse sua conta para começar" : "Registre-se para participar dos quizzes"}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {forgotPassword ? (
-              <form onSubmit={handleForgotPassword} className="space-y-4">
+            </h2>
+            <p className="text-sm mt-1" style={{ color: `${BRAND.navy}99` }}>
+              {forgotPassword
+                ? "Digite seu e-mail para receber o link"
+                : isLogin
+                ? "Acesse sua conta para começar"
+                : "Registre-se para participar dos simulados"}
+            </p>
+          </div>
+
+          {forgotPassword ? (
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email" style={{ color: BRAND.navyDeep }}>E-mail</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="seu@email.com"
+                  required
+                  style={{ borderColor: `${BRAND.navy}30` }}
+                />
+              </div>
+              <Button
+                type="submit"
+                className="w-full font-semibold text-white hover:opacity-90 transition-opacity"
+                disabled={loading}
+                style={{ backgroundColor: BRAND.orange }}
+              >
+                {loading ? "Enviando..." : "Enviar link de redefinição"}
+              </Button>
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => setForgotPassword(false)}
+                  className="text-sm hover:underline"
+                  style={{ color: BRAND.orange }}
+                >
+                  Voltar ao login
+                </button>
+              </div>
+            </form>
+          ) : (
+            <>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {!isLogin && (
+                  <div className="space-y-2">
+                    <Label htmlFor="name" style={{ color: BRAND.navyDeep }}>Nome completo</Label>
+                    <Input
+                      id="name"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Seu nome"
+                      required={!isLogin}
+                      style={{ borderColor: `${BRAND.navy}30` }}
+                    />
+                  </div>
+                )}
                 <div className="space-y-2">
-                  <Label htmlFor="email">E-mail</Label>
+                  <Label htmlFor="email" style={{ color: BRAND.navyDeep }}>E-mail</Label>
                   <Input
                     id="email"
                     type="email"
@@ -93,89 +180,69 @@ export default function AuthPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="seu@email.com"
                     required
+                    style={{ borderColor: `${BRAND.navy}30` }}
                   />
                 </div>
-                <Button type="submit" className="w-full gradient-primary text-primary-foreground" disabled={loading}>
-                  {loading ? "Enviando..." : "Enviar link de redefinição"}
-                </Button>
-                <div className="text-center">
-                  <button type="button" onClick={() => setForgotPassword(false)} className="text-sm text-primary hover:underline">
-                    Voltar ao login
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  {!isLogin && (
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Nome completo</Label>
-                      <Input
-                        id="name"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        placeholder="Seu nome"
-                        required={!isLogin}
-                      />
-                    </div>
-                  )}
-                  <div className="space-y-2">
-                    <Label htmlFor="email">E-mail</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="seu@email.com"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="password">Senha</Label>
-                      {isLogin && (
-                        <button
-                          type="button"
-                          onClick={() => setForgotPassword(true)}
-                          className="text-xs text-primary hover:underline"
-                        >
-                          Esqueci minha senha
-                        </button>
-                      )}
-                    </div>
-                    <Input
-                      id="password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="••••••••"
-                      required
-                      minLength={6}
-                    />
-                  </div>
-                  <Button type="submit" className="w-full gradient-primary text-primary-foreground" disabled={loading}>
-                    {loading ? (
-                      "Carregando..."
-                    ) : isLogin ? (
-                      <><LogIn className="w-4 h-4 mr-2" /> Entrar</>
-                    ) : (
-                      <><UserPlus className="w-4 h-4 mr-2" /> Criar Conta</>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password" style={{ color: BRAND.navyDeep }}>Senha</Label>
+                    {isLogin && (
+                      <button
+                        type="button"
+                        onClick={() => setForgotPassword(true)}
+                        className="text-xs hover:underline"
+                        style={{ color: BRAND.orange }}
+                      >
+                        Esqueci minha senha
+                      </button>
                     )}
-                  </Button>
-                </form>
-                <div className="mt-4 text-center">
-                  <button
-                    type="button"
-                    onClick={() => setIsLogin(!isLogin)}
-                    className="text-sm text-primary hover:underline"
-                  >
-                    {isLogin ? "Não tem conta? Cadastre-se" : "Já tem conta? Faça login"}
-                  </button>
+                  </div>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    minLength={6}
+                    style={{ borderColor: `${BRAND.navy}30` }}
+                  />
                 </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
+                <Button
+                  type="submit"
+                  className="w-full font-semibold text-white hover:opacity-90 transition-opacity h-11"
+                  disabled={loading}
+                  style={{ backgroundColor: BRAND.orange }}
+                >
+                  {loading ? (
+                    "Carregando..."
+                  ) : isLogin ? (
+                    <><LogIn className="w-4 h-4 mr-2" /> Entrar</>
+                  ) : (
+                    <><UserPlus className="w-4 h-4 mr-2" /> Criar Conta</>
+                  )}
+                </Button>
+              </form>
+              <div className="mt-5 text-center">
+                <button
+                  type="button"
+                  onClick={() => setIsLogin(!isLogin)}
+                  className="text-sm hover:underline"
+                  style={{ color: BRAND.navy }}
+                >
+                  {isLogin ? "Não tem conta? Cadastre-se" : "Já tem conta? Faça login"}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+
+        <p
+          className="text-center text-xs mt-6"
+          style={{ color: `${BRAND.navy}80` }}
+        >
+          © {new Date().getFullYear()} Aumakua
+        </p>
       </div>
     </div>
   );
