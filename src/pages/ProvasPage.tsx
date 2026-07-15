@@ -143,9 +143,24 @@ export default function ProvasPage() {
       className="space-y-6 -mx-4 -my-8 px-4 py-8 min-h-[calc(100vh-4rem)] bg-cover bg-center bg-no-repeat bg-fixed"
       style={{ backgroundImage: `linear-gradient(to bottom, hsl(var(--background)/0.85), hsl(var(--background)/0.92)), url(${provasBg})` }}
     >
-      <div>
-        <h1 className="text-2xl font-display font-bold text-foreground">Provas Disponíveis</h1>
-        <p className="text-muted-foreground mt-1">Escolha uma categoria e selecione a prova</p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-display font-bold text-foreground">Provas Disponíveis</h1>
+          <p className="text-muted-foreground mt-1">Escolha uma categoria e selecione a prova</p>
+        </div>
+        <Link
+          to="/duvidas"
+          aria-label="Respostas às suas dúvidas"
+          title={unreadDoubts > 0 ? `${unreadDoubts} resposta(s) nova(s)` : "Sem novas respostas"}
+          className="relative shrink-0 inline-flex items-center justify-center w-11 h-11 rounded-full border border-border bg-card shadow-card hover:bg-accent/40 transition-colors"
+        >
+          <Bell className={`w-5 h-5 ${unreadDoubts > 0 ? "text-destructive animate-pulse" : "text-foreground"}`} />
+          {unreadDoubts > 0 && (
+            <Badge className="absolute -top-1 -right-1 h-5 min-w-5 px-1 bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center rounded-full">
+              {unreadDoubts}
+            </Badge>
+          )}
+        </Link>
       </div>
 
       {grouped.length === 0 ? (
