@@ -8,7 +8,30 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/
 import { Play, FileText, Loader2, FolderOpen, Bell } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 import provasBg from "@/assets/provas-bg.jpeg";
+
+function LaryngoscopeIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M3 5h2" />
+      <path d="M5 5c1.5 0 2.5.5 3 2 0 0 1 3 2 5s2 3 4 4" />
+      <path d="M14 16c1 .5 2 1 3 1h2" />
+      <path d="M7 5l4 4" />
+      <path d="M13 11l-2 2" />
+      <path d="M17 16c2 0 3 1 3 3" />
+    </svg>
+  );
+}
 
 interface ExamItem {
   id: string;
@@ -32,6 +55,7 @@ function getCategory(title: string): string {
 
 export default function ProvasPage() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { user, loading: authLoading } = useAuth();
   const [exams, setExams] = useState<ExamItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -148,19 +172,35 @@ export default function ProvasPage() {
           <h1 className="text-2xl font-display font-bold text-foreground">Provas Disponíveis</h1>
           <p className="text-muted-foreground mt-1">Escolha uma categoria e selecione a prova</p>
         </div>
-        <Link
-          to="/duvidas"
-          aria-label="Respostas às suas dúvidas"
-          title={unreadDoubts > 0 ? `${unreadDoubts} resposta(s) nova(s)` : "Sem novas respostas"}
-          className="relative shrink-0 inline-flex items-center justify-center w-11 h-11 rounded-full border border-border bg-card shadow-card hover:bg-accent/40 transition-colors"
-        >
-          <Bell className={`w-5 h-5 ${unreadDoubts > 0 ? "text-destructive animate-pulse" : "text-foreground"}`} />
-          {unreadDoubts > 0 && (
-            <Badge className="absolute -top-1 -right-1 h-5 min-w-5 px-1 bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center rounded-full">
-              {unreadDoubts}
-            </Badge>
-          )}
-        </Link>
+        <div className="flex items-center gap-2 shrink-0">
+          <Link
+            to="/duvidas"
+            aria-label="Respostas às suas dúvidas"
+            title={unreadDoubts > 0 ? `${unreadDoubts} resposta(s) nova(s)` : "Sem novas respostas"}
+            className="relative inline-flex items-center justify-center w-11 h-11 rounded-full border border-border bg-card shadow-card hover:bg-accent/40 transition-colors"
+          >
+            <Bell className={`w-5 h-5 ${unreadDoubts > 0 ? "text-destructive animate-pulse" : "text-foreground"}`} />
+            {unreadDoubts > 0 && (
+              <Badge className="absolute -top-1 -right-1 h-5 min-w-5 px-1 bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center rounded-full">
+                {unreadDoubts}
+              </Badge>
+            )}
+          </Link>
+          <button
+            type="button"
+            aria-label="Ranking BUD5"
+            title="Ranking BUD5"
+            className="relative inline-flex items-center justify-center w-11 h-11 rounded-full border border-border bg-card shadow-card hover:bg-accent/40 transition-colors"
+            onClick={() =>
+              toast({
+                title: "Ranking BUD5 em breve!",
+                description: "A divulgação do ranking do Simulado BUD5 acontece na semana que vem. Fique de olho! 👀",
+              })
+            }
+          >
+            <LaryngoscopeIcon className="w-5 h-5 text-foreground" />
+          </button>
+        </div>
       </div>
 
       {grouped.length === 0 ? (
