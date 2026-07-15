@@ -5,7 +5,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { Play, FileText, Loader2, FolderOpen } from "lucide-react";
+import { Play, FileText, Loader2, FolderOpen, Bell } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
 import provasBg from "@/assets/provas-bg.jpeg";
 
 interface ExamItem {
