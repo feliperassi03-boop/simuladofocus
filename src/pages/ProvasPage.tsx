@@ -55,6 +55,7 @@ function getCategory(title: string): string {
 
 export default function ProvasPage() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { user, loading: authLoading } = useAuth();
   const [exams, setExams] = useState<ExamItem[]>([]);
   const [loading, setLoading] = useState(true);
