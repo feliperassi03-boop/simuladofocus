@@ -5,7 +5,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { Play, FileText, Loader2, FolderOpen } from "lucide-react";
+import { Play, FileText, Loader2, FolderOpen, Bell } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
 import provasBg from "@/assets/provas-bg.jpeg";
 
 interface ExamItem {
@@ -33,6 +35,32 @@ export default function ProvasPage() {
   const { user, loading: authLoading } = useAuth();
   const [exams, setExams] = useState<ExamItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [unreadDoubts, setUnreadDoubts] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    const loadUnread = async () => {
+      const email = user.email?.toLowerCase();
+      const orFilter = email
+        ? `user_id.eq.${user.id},student_email.ilike.${email}`
+        : `user_id.eq.${user.id}`;
+      const { count } = await supabase
+        .from("question_doubts")
+        .select("id", { count: "exact", head: true })
+        .or(orFilter)
+        .eq("read_by_student", false)
+        .not("admin_response", "is", null);
+      setUnreadDoubts(count || 0);
+    };
+    loadUnread();
+    const channel = supabase
+      .channel("provas-doubts-bell")
+      .on("postgres_changes", { event: "*", schema: "public", table: "question_doubts" }, loadUnread)
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id]);
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
@@ -115,9 +143,24 @@ export default function ProvasPage() {
       className="space-y-6 -mx-4 -my-8 px-4 py-8 min-h-[calc(100vh-4rem)] bg-cover bg-center bg-no-repeat bg-fixed"
       style={{ backgroundImage: `linear-gradient(to bottom, hsl(var(--background)/0.85), hsl(var(--background)/0.92)), url(${provasBg})` }}
     >
-      <div>
-        <h1 className="text-2xl font-display font-bold text-foreground">Provas Disponíveis</h1>
-        <p className="text-muted-foreground mt-1">Escolha uma categoria e selecione a prova</p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-display font-bold text-foreground">Provas Disponíveis</h1>
+          <p className="text-muted-foreground mt-1">Escolha uma categoria e selecione a prova</p>
+        </div>
+        <Link
+          to="/duvidas"
+          aria-label="Respostas às suas dúvidas"
+          title={unreadDoubts > 0 ? `${unreadDoubts} resposta(s) nova(s)` : "Sem novas respostas"}
+          className="relative shrink-0 inline-flex items-center justify-center w-11 h-11 rounded-full border border-border bg-card shadow-card hover:bg-accent/40 transition-colors"
+        >
+          <Bell className={`w-5 h-5 ${unreadDoubts > 0 ? "text-destructive animate-pulse" : "text-foreground"}`} />
+          {unreadDoubts > 0 && (
+            <Badge className="absolute -top-1 -right-1 h-5 min-w-5 px-1 bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center rounded-full">
+              {unreadDoubts}
+            </Badge>
+          )}
+        </Link>
       </div>
 
       {grouped.length === 0 ? (
