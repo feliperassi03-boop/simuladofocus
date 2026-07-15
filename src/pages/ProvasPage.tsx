@@ -172,19 +172,35 @@ export default function ProvasPage() {
           <h1 className="text-2xl font-display font-bold text-foreground">Provas Disponíveis</h1>
           <p className="text-muted-foreground mt-1">Escolha uma categoria e selecione a prova</p>
         </div>
-        <Link
-          to="/duvidas"
-          aria-label="Respostas às suas dúvidas"
-          title={unreadDoubts > 0 ? `${unreadDoubts} resposta(s) nova(s)` : "Sem novas respostas"}
-          className="relative shrink-0 inline-flex items-center justify-center w-11 h-11 rounded-full border border-border bg-card shadow-card hover:bg-accent/40 transition-colors"
-        >
-          <Bell className={`w-5 h-5 ${unreadDoubts > 0 ? "text-destructive animate-pulse" : "text-foreground"}`} />
-          {unreadDoubts > 0 && (
-            <Badge className="absolute -top-1 -right-1 h-5 min-w-5 px-1 bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center rounded-full">
-              {unreadDoubts}
-            </Badge>
-          )}
-        </Link>
+        <div className="flex items-center gap-2 shrink-0">
+          <Link
+            to="/duvidas"
+            aria-label="Respostas às suas dúvidas"
+            title={unreadDoubts > 0 ? `${unreadDoubts} resposta(s) nova(s)` : "Sem novas respostas"}
+            className="relative inline-flex items-center justify-center w-11 h-11 rounded-full border border-border bg-card shadow-card hover:bg-accent/40 transition-colors"
+          >
+            <Bell className={`w-5 h-5 ${unreadDoubts > 0 ? "text-destructive animate-pulse" : "text-foreground"}`} />
+            {unreadDoubts > 0 && (
+              <Badge className="absolute -top-1 -right-1 h-5 min-w-5 px-1 bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center rounded-full">
+                {unreadDoubts}
+              </Badge>
+            )}
+          </Link>
+          <button
+            type="button"
+            aria-label="Ranking BUD5"
+            title="Ranking BUD5"
+            className="relative inline-flex items-center justify-center w-11 h-11 rounded-full border border-border bg-card shadow-card hover:bg-accent/40 transition-colors"
+            onClick={() =>
+              toast({
+                title: "Ranking BUD5 em breve!",
+                description: "A divulgação do ranking do Simulado BUD5 acontece na semana que vem. Fique de olho! 👀",
+              })
+            }
+          >
+            <LaryngoscopeIcon className="w-5 h-5 text-foreground" />
+          </button>
+        </div>
       </div>
 
       {grouped.length === 0 ? (
