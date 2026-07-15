@@ -35,6 +35,32 @@ export default function ProvasPage() {
   const { user, loading: authLoading } = useAuth();
   const [exams, setExams] = useState<ExamItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [unreadDoubts, setUnreadDoubts] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    const loadUnread = async () => {
+      const email = user.email?.toLowerCase();
+      const orFilter = email
+        ? `user_id.eq.${user.id},student_email.ilike.${email}`
+        : `user_id.eq.${user.id}`;
+      const { count } = await supabase
+        .from("question_doubts")
+        .select("id", { count: "exact", head: true })
+        .or(orFilter)
+        .eq("read_by_student", false)
+        .not("admin_response", "is", null);
+      setUnreadDoubts(count || 0);
+    };
+    loadUnread();
+    const channel = supabase
+      .channel("provas-doubts-bell")
+      .on("postgres_changes", { event: "*", schema: "public", table: "question_doubts" }, loadUnread)
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id]);
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
