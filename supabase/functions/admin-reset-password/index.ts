@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
     const user = list.users.find((u) => (u.email || "").toLowerCase() === email.toLowerCase());
     if (!user) return new Response(JSON.stringify({ error: "user not found" }), { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
-    const { error: updErr } = await admin.auth.admin.updateUserById(user.id, { password: newPassword });
+    const { error: updErr } = await admin.auth.admin.updateUserById(user.id, { password: newPassword, email_confirm: true });
     if (updErr) throw updErr;
 
     return new Response(JSON.stringify({ ok: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
