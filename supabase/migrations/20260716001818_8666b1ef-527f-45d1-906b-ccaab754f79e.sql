@@ -1,0 +1,1 @@
+DELETE FROM public.user_sessions WHERE user_id = 'cd03328c-f1e8-4631-93cd-8b14bda5b71b';
