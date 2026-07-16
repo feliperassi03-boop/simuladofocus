@@ -177,7 +177,7 @@ export default function ProvasPage() {
               })
             }
           >
-            <LaryngoscopeIcon className="w-5 h-5 text-foreground" />
+            <img src={laryngoscopeIcon.url} alt="Laringoscópio" className="w-6 h-6 object-contain" />
           </button>
         </div>
       </div>
