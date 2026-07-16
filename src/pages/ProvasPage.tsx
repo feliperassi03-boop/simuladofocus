@@ -10,28 +10,7 @@ import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import provasBg from "@/assets/provas-bg.jpeg";
-
-function LaryngoscopeIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <path d="M3 5h2" />
-      <path d="M5 5c1.5 0 2.5.5 3 2 0 0 1 3 2 5s2 3 4 4" />
-      <path d="M14 16c1 .5 2 1 3 1h2" />
-      <path d="M7 5l4 4" />
-      <path d="M13 11l-2 2" />
-      <path d="M17 16c2 0 3 1 3 3" />
-    </svg>
-  );
-}
+import laryngoscopeIcon from "@/assets/laryngoscope-icon.jpeg.asset.json";
 
 interface ExamItem {
   id: string;
@@ -198,7 +177,7 @@ export default function ProvasPage() {
               })
             }
           >
-            <LaryngoscopeIcon className="w-5 h-5 text-foreground" />
+            <img src={laryngoscopeIcon.url} alt="Laringoscópio" className="w-6 h-6 object-contain" />
           </button>
         </div>
       </div>
