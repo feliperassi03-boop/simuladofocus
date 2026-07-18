@@ -40,6 +40,7 @@ export default function ProvasPage() {
   const [exams, setExams] = useState<ExamItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [unreadDoubts, setUnreadDoubts] = useState(0);
+  const [viewMode, setViewMode] = useState<"standard" | "tea">("standard");
 
   useEffect(() => {
     if (!user) return;
