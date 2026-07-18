@@ -8,6 +8,7 @@ import AuthPage from "./pages/AuthPage";
 import QuizPage from "./pages/QuizPage";
 import AdminPage from "./pages/AdminPage";
 import ExamPage from "./pages/ExamPage";
+import TeaExamPage from "./pages/TeaExamPage";
 import HistoryPage from "./pages/HistoryPage";
 import ProvasPage from "./pages/ProvasPage";
 import AppLayout from "./components/AppLayout";
@@ -67,6 +68,7 @@ const App = () => (
             <Route path="/duvidas" element={<ProtectedRoute><AppLayout><MyDoubtsPage /></AppLayout></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><AdminRoute><AdminPage /></AdminRoute></ProtectedRoute>} />
             <Route path="/prova/:id" element={<ExamPage />} />
+            <Route path="/prova-tea/:id" element={<TeaExamPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
