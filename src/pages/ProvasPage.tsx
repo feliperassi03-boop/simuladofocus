@@ -140,7 +140,7 @@ export default function ProvasPage() {
       }))
       .sort((a, b) => collator.compare(a.category, b.category));
     return categories;
-  }, [exams]);
+  }, [exams, viewMode]);
 
   if (authLoading || loading) {
     return (
