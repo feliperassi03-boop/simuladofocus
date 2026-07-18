@@ -679,6 +679,11 @@ export default function AdminPage() {
           <ExamsTab />
         </TabsContent>
 
+        <TabsContent value="tea">
+          <TeaTab />
+        </TabsContent>
+
+
         <TabsContent value="results">
           <div className="flex justify-end mb-4">
             {attempts.length > 0 && (
