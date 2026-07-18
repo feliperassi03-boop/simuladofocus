@@ -73,6 +73,83 @@ export default function TeaTab() {
   const [qDialogOpen, setQDialogOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [qSearch, setQSearch] = useState("");
+  const [quickImport, setQuickImport] = useState("");
+  const [parsedPreview, setParsedPreview] = useState<null | { enunciado: string; p1: string; g1: string; p2: string; g2: string; p3: string; g3: string; comentario: string }>(null);
+
+  const handleQuickImport = () => {
+    const raw = quickImport.replace(/\r\n/g, "\n").trim();
+    if (!raw) return;
+
+    // Markers for sub-questions (Pergunta 1, P1, 1), 1.) and answers (Gabarito, Resposta, R:)
+    const subRegex = /^\s*(?:pergunta\s*|p\s*)?([123])[\)\.\-:]\s*/i;
+    const gabRegex = /^\s*(?:gabarito|resposta|r)\s*[123]?\s*[:\-\)]\s*/i;
+    const comRegex = /^\s*(?:coment[áa]rio|comment)\s*[:\-]?\s*/i;
+
+    const lines = raw.split("\n");
+    const enunciadoLines: string[] = [];
+    const subs: Record<1 | 2 | 3, string[]> = { 1: [], 2: [], 3: [] };
+    const gabs: Record<1 | 2 | 3, string[]> = { 1: [], 2: [], 3: [] };
+    let comentario = "";
+
+    let mode: "enunciado" | "sub" | "gab" | "com" = "enunciado";
+    let currentIdx: 1 | 2 | 3 = 1;
+
+    for (const line of lines) {
+      const subM = line.match(subRegex);
+      const isGab = gabRegex.test(line);
+      const isCom = comRegex.test(line);
+
+      if (isCom) {
+        mode = "com";
+        comentario += (comentario ? "\n" : "") + line.replace(comRegex, "");
+        continue;
+      }
+      if (subM) {
+        currentIdx = parseInt(subM[1], 10) as 1 | 2 | 3;
+        mode = "sub";
+        subs[currentIdx].push(line.replace(subRegex, ""));
+        continue;
+      }
+      if (isGab) {
+        mode = "gab";
+        gabs[currentIdx].push(line.replace(gabRegex, ""));
+        continue;
+      }
+      if (mode === "enunciado") enunciadoLines.push(line);
+      else if (mode === "sub") subs[currentIdx].push(line);
+      else if (mode === "gab") gabs[currentIdx].push(line);
+      else if (mode === "com") comentario += "\n" + line;
+    }
+
+    setParsedPreview({
+      enunciado: enunciadoLines.join("\n").trim(),
+      p1: subs[1].join("\n").trim(),
+      g1: gabs[1].join("\n").trim(),
+      p2: subs[2].join("\n").trim(),
+      g2: gabs[2].join("\n").trim(),
+      p3: subs[3].join("\n").trim(),
+      g3: gabs[3].join("\n").trim(),
+      comentario: comentario.trim(),
+    });
+  };
+
+  const applyPreviewToForm = () => {
+    if (!parsedPreview) return;
+    setForm({
+      ...form,
+      question_text: parsedPreview.enunciado,
+      sub1_text: parsedPreview.p1,
+      sub1_answer_key: parsedPreview.g1,
+      sub2_text: parsedPreview.p2,
+      sub2_answer_key: parsedPreview.g2,
+      sub3_text: parsedPreview.p3,
+      sub3_answer_key: parsedPreview.g3,
+      comment: parsedPreview.comentario || form.comment,
+    });
+    setParsedPreview(null);
+    setQuickImport("");
+    toast({ title: "Aplicado!", description: "Revise os campos e clique em Criar/Salvar." });
+  };
 
   const [examDialogOpen, setExamDialogOpen] = useState(false);
   const [examTitle, setExamTitle] = useState("");
@@ -247,6 +324,36 @@ export default function TeaTab() {
             <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
               <DialogHeader><DialogTitle>{editingId ? "Editar" : "Nova"} Questão TEA 2 Fase</DialogTitle></DialogHeader>
               <div className="space-y-4">
+                <div className="rounded-lg border border-dashed p-3 bg-muted/30">
+                  <Label className="text-xs uppercase tracking-wide text-muted-foreground">Importação rápida (colar texto)</Label>
+                  <Textarea
+                    value={quickImport}
+                    onChange={(e) => setQuickImport(e.target.value)}
+                    placeholder={"Cole aqui:\nEnunciado / caso clínico...\n1) Pergunta 1\nGabarito: resposta 1\n2) Pergunta 2\nGabarito: resposta 2\n3) Pergunta 3\nGabarito: resposta 3\nComentário: ..."}
+                    rows={6}
+                    className="mt-2 font-mono text-xs"
+                  />
+                  <Button type="button" size="sm" variant="secondary" className="mt-2" onClick={handleQuickImport} disabled={!quickImport.trim()}>
+                    Processar
+                  </Button>
+                  {parsedPreview && (
+                    <div className="mt-3 space-y-2 rounded-md border bg-background p-3 text-xs">
+                      <div className="font-semibold text-foreground">Prévia do parsing</div>
+                      <div><span className="font-medium text-muted-foreground">Enunciado:</span> <span className="whitespace-pre-wrap break-words">{parsedPreview.enunciado || <em className="text-destructive">vazio</em>}</span></div>
+                      {[1, 2, 3].map((n) => (
+                        <div key={n} className="border-t pt-1">
+                          <div><span className="font-medium text-muted-foreground">Pergunta {n}:</span> <span className="whitespace-pre-wrap break-words">{parsedPreview[`p${n}` as "p1"] || <em className="text-destructive">vazio</em>}</span></div>
+                          <div><span className="font-medium text-muted-foreground">Gabarito {n}:</span> <span className="whitespace-pre-wrap break-words">{parsedPreview[`g${n}` as "g1"] || <em className="text-destructive">vazio</em>}</span></div>
+                        </div>
+                      ))}
+                      <div><span className="font-medium text-muted-foreground">Comentário:</span> <span className="whitespace-pre-wrap break-words">{parsedPreview.comentario || <em className="text-muted-foreground">(nenhum)</em>}</span></div>
+                      <div className="flex gap-2 pt-2">
+                        <Button type="button" size="sm" onClick={applyPreviewToForm}>Aplicar ao formulário</Button>
+                        <Button type="button" size="sm" variant="ghost" onClick={() => setParsedPreview(null)}>Cancelar</Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <div>
                   <Label>Enunciado (contexto/caso clínico) *</Label>
                   <Textarea rows={5} value={form.question_text} onChange={(e) => setForm({ ...form, question_text: e.target.value })} />
