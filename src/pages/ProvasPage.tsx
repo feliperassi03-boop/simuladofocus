@@ -40,6 +40,7 @@ export default function ProvasPage() {
   const [exams, setExams] = useState<ExamItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [unreadDoubts, setUnreadDoubts] = useState(0);
+  const [viewMode, setViewMode] = useState<"standard" | "tea">("standard");
 
   useEffect(() => {
     if (!user) return;
@@ -122,8 +123,11 @@ export default function ProvasPage() {
   }, [user]);
 
   const grouped = useMemo(() => {
+    const filtered = exams.filter((e) =>
+      viewMode === "tea" ? e.exam_type === "tea" : e.exam_type !== "tea"
+    );
     const map = new Map<string, ExamItem[]>();
-    for (const exam of exams) {
+    for (const exam of filtered) {
       const cat = getCategory(exam.title);
       if (!map.has(cat)) map.set(cat, []);
       map.get(cat)!.push(exam);
@@ -136,7 +140,7 @@ export default function ProvasPage() {
       }))
       .sort((a, b) => collator.compare(a.category, b.category));
     return categories;
-  }, [exams]);
+  }, [exams, viewMode]);
 
   if (authLoading || loading) {
     return (
@@ -157,6 +161,30 @@ export default function ProvasPage() {
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground">Provas Disponíveis</h1>
           <p className="text-muted-foreground mt-1">Escolha uma categoria e selecione a prova</p>
+          <div className="mt-3 inline-flex rounded-lg border border-border bg-card p-1 shadow-card">
+            <button
+              type="button"
+              onClick={() => setViewMode("standard")}
+              className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                viewMode === "standard"
+                  ? "gradient-primary text-primary-foreground shadow"
+                  : "text-foreground hover:bg-accent/40"
+              }`}
+            >
+              Provas Padrão
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("tea")}
+              className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                viewMode === "tea"
+                  ? "gradient-primary text-primary-foreground shadow"
+                  : "text-foreground hover:bg-accent/40"
+              }`}
+            >
+              TEA 2 Fase
+            </button>
+          </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <Link
