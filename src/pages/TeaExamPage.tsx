@@ -49,6 +49,7 @@ export default function TeaExamPage() {
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<Record<string, AnsState>>({});
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
+  const [commentShown, setCommentShown] = useState<Record<string, boolean>>({});
   const [selfCheck, setSelfCheck] = useState<Record<string, CheckState>>({});
   const [finalScore, setFinalScore] = useState(0);
 
