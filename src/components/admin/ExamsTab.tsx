@@ -264,6 +264,7 @@ export default function ExamsTab() {
     const { data } = await supabase
       .from("exams")
       .select("*")
+      .or("exam_type.is.null,exam_type.eq.standard")
       .order("created_at", { ascending: false });
     if (!data) return;
 
