@@ -118,19 +118,8 @@ export default function TeaExamPage() {
     </div>
   );
 
-  if (state === "password") return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader><CardTitle className="font-display flex items-center gap-2"><Lock className="w-5 h-5" /> {exam?.title}</CardTitle></CardHeader>
-        <CardContent className="space-y-3">
-          <p className="text-sm text-muted-foreground">Prova TEA 2ª Fase — cada item vale {POINTS_PER_ITEM.toFixed(2)} pontos.</p>
-          <Label>Senha de acesso</Label>
-          <Input type="password" value={pw} onChange={(e) => setPw(e.target.value)} onKeyDown={(e) => e.key === "Enter" && startAfterPassword()} />
-          <Button onClick={startAfterPassword} className="w-full gradient-primary text-primary-foreground">Iniciar</Button>
-        </CardContent>
-      </Card>
-    </div>
-  );
+  if (state === "password") return null;
+
 
   if (state === "finished") {
     const maxScore = +(questions.length * 3 * POINTS_PER_ITEM).toFixed(2);
