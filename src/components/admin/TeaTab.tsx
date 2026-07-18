@@ -73,6 +73,83 @@ export default function TeaTab() {
   const [qDialogOpen, setQDialogOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [qSearch, setQSearch] = useState("");
+  const [quickImport, setQuickImport] = useState("");
+  const [parsedPreview, setParsedPreview] = useState<null | { enunciado: string; p1: string; g1: string; p2: string; g2: string; p3: string; g3: string; comentario: string }>(null);
+
+  const handleQuickImport = () => {
+    const raw = quickImport.replace(/\r\n/g, "\n").trim();
+    if (!raw) return;
+
+    // Markers for sub-questions (Pergunta 1, P1, 1), 1.) and answers (Gabarito, Resposta, R:)
+    const subRegex = /^\s*(?:pergunta\s*|p\s*)?([123])[\)\.\-:]\s*/i;
+    const gabRegex = /^\s*(?:gabarito|resposta|r)\s*[123]?\s*[:\-\)]\s*/i;
+    const comRegex = /^\s*(?:coment[áa]rio|comment)\s*[:\-]?\s*/i;
+
+    const lines = raw.split("\n");
+    const enunciadoLines: string[] = [];
+    const subs: Record<1 | 2 | 3, string[]> = { 1: [], 2: [], 3: [] };
+    const gabs: Record<1 | 2 | 3, string[]> = { 1: [], 2: [], 3: [] };
+    let comentario = "";
+
+    let mode: "enunciado" | "sub" | "gab" | "com" = "enunciado";
+    let currentIdx: 1 | 2 | 3 = 1;
+
+    for (const line of lines) {
+      const subM = line.match(subRegex);
+      const isGab = gabRegex.test(line);
+      const isCom = comRegex.test(line);
+
+      if (isCom) {
+        mode = "com";
+        comentario += (comentario ? "\n" : "") + line.replace(comRegex, "");
+        continue;
+      }
+      if (subM) {
+        currentIdx = parseInt(subM[1], 10) as 1 | 2 | 3;
+        mode = "sub";
+        subs[currentIdx].push(line.replace(subRegex, ""));
+        continue;
+      }
+      if (isGab) {
+        mode = "gab";
+        gabs[currentIdx].push(line.replace(gabRegex, ""));
+        continue;
+      }
+      if (mode === "enunciado") enunciadoLines.push(line);
+      else if (mode === "sub") subs[currentIdx].push(line);
+      else if (mode === "gab") gabs[currentIdx].push(line);
+      else if (mode === "com") comentario += "\n" + line;
+    }
+
+    setParsedPreview({
+      enunciado: enunciadoLines.join("\n").trim(),
+      p1: subs[1].join("\n").trim(),
+      g1: gabs[1].join("\n").trim(),
+      p2: subs[2].join("\n").trim(),
+      g2: gabs[2].join("\n").trim(),
+      p3: subs[3].join("\n").trim(),
+      g3: gabs[3].join("\n").trim(),
+      comentario: comentario.trim(),
+    });
+  };
+
+  const applyPreviewToForm = () => {
+    if (!parsedPreview) return;
+    setForm({
+      ...form,
+      question_text: parsedPreview.enunciado,
+      sub1_text: parsedPreview.p1,
+      sub1_answer_key: parsedPreview.g1,
+      sub2_text: parsedPreview.p2,
+      sub2_answer_key: parsedPreview.g2,
+      sub3_text: parsedPreview.p3,
+      sub3_answer_key: parsedPreview.g3,
+      comment: parsedPreview.comentario || form.comment,
+    });
+    setParsedPreview(null);
+    setQuickImport("");
+    toast({ title: "Aplicado!", description: "Revise os campos e clique em Criar/Salvar." });
+  };
 
   const [examDialogOpen, setExamDialogOpen] = useState(false);
   const [examTitle, setExamTitle] = useState("");
