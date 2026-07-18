@@ -145,7 +145,7 @@ export default function TeaTab() {
     fetchQuestions();
   };
 
-  const upload = async (kind: "image" | "video", field: keyof typeof form) => async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const upload = (kind: "image" | "video", field: keyof typeof form) => async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
