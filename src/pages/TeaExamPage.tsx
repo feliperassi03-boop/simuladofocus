@@ -12,7 +12,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ArrowRight, ArrowLeft, Trophy, Eye, EyeOff, CheckCircle, XCircle, Home, RotateCcw } from "lucide-react";
+import { ArrowRight, ArrowLeft, Trophy, Eye, EyeOff, CheckCircle, XCircle, Home, RotateCcw, MessageSquareText } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
 
 const POINTS_PER_ITEM = 0.52;
@@ -49,6 +49,7 @@ export default function TeaExamPage() {
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<Record<string, AnsState>>({});
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
+  const [commentShown, setCommentShown] = useState<Record<string, boolean>>({});
   const [selfCheck, setSelfCheck] = useState<Record<string, CheckState>>({});
   const [finalScore, setFinalScore] = useState(0);
 
@@ -278,18 +279,42 @@ export default function TeaExamPage() {
           );
         })}
 
-        <div className="flex items-center justify-between gap-2">
-          <Button variant="outline" onClick={toggleReveal}>
-            {isRevealed ? <><EyeOff className="w-4 h-4 mr-1" /> Ocultar gabarito</> : <><Eye className="w-4 h-4 mr-1" /> Ver gabarito</>}
-          </Button>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="outline" onClick={toggleReveal}>
+              {isRevealed ? <><EyeOff className="w-4 h-4 mr-1" /> Ocultar gabarito</> : <><Eye className="w-4 h-4 mr-1" /> Ver gabarito</>}
+            </Button>
+            {(q.comment || q.comment_image_url) && (
+              <Button
+                variant="outline"
+                onClick={() => setCommentShown((p) => ({ ...p, [q.id]: !p[q.id] }))}
+              >
+                <MessageSquareText className="w-4 h-4 mr-1" />
+                {commentShown[q.id] ? "Ocultar comentário" : "Ver comentário"}
+              </Button>
+            )}
+          </div>
           <span className="text-xs text-muted-foreground">
             Nesta questão: {currentEarned} de 3 · {(currentEarned * POINTS_PER_ITEM).toFixed(2)} pt
           </span>
         </div>
-        {isRevealed && q.comment && (
-          <p className="text-xs text-muted-foreground italic">💡 {normalizeQuestionText(q.comment)}</p>
+
+        {commentShown[q.id] && (q.comment || q.comment_image_url) && (
+          <div className="p-4 rounded-lg bg-muted/50 border border-border space-y-3">
+            <div className="flex items-center gap-2">
+              <MessageSquareText className="w-5 h-5 text-primary" />
+              <span className="font-display font-semibold text-foreground">Comentário</span>
+            </div>
+            {q.comment && (
+              <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap break-words">
+                {normalizeQuestionText(q.comment)}
+              </p>
+            )}
+            {q.comment_image_url && (
+              <img src={q.comment_image_url} alt="" className="rounded max-h-80 object-contain bg-muted" />
+            )}
+          </div>
         )}
-        {isRevealed && q.comment_image_url && <img src={q.comment_image_url} alt="" className="rounded max-h-80 object-contain bg-muted" />}
 
         <div className="flex items-center justify-between pt-2">
           <Button variant="ghost" disabled={current === 0} onClick={() => setCurrent((c) => c - 1)}>
