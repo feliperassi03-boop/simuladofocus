@@ -16,6 +16,7 @@ interface ExamItem {
   id: string;
   title: string;
   question_count: number;
+  exam_type: string;
 }
 
 // Deriva a categoria a partir do título da prova.
@@ -75,7 +76,7 @@ export default function ProvasPage() {
       setLoading(true);
       const { data: examsData } = await supabase
         .from("exams")
-        .select("id, title")
+        .select("id, title, exam_type")
         .eq("is_active", true);
 
       if (!examsData) {
@@ -83,29 +84,35 @@ export default function ProvasPage() {
         return;
       }
 
-      const examIds = examsData.map((e) => e.id);
-      // Busca em páginas para evitar o limite padrão de 1000 linhas do Supabase
+      const standardIds = examsData.filter((e) => e.exam_type !== "tea").map((e) => e.id);
+      const teaIds = examsData.filter((e) => e.exam_type === "tea").map((e) => e.id);
       const counts: Record<string, number> = {};
+
       const pageSize = 1000;
-      let from = 0;
-      while (true) {
-        const { data: eqData, error } = await supabase
-          .from("exam_questions")
-          .select("exam_id")
-          .in("exam_id", examIds)
-          .range(from, from + pageSize - 1);
-        if (error || !eqData || eqData.length === 0) break;
-        eqData.forEach((eq) => {
-          counts[eq.exam_id] = (counts[eq.exam_id] || 0) + 1;
-        });
-        if (eqData.length < pageSize) break;
-        from += pageSize;
+      if (standardIds.length) {
+        let from = 0;
+        while (true) {
+          const { data: eqData, error } = await supabase
+            .from("exam_questions")
+            .select("exam_id")
+            .in("exam_id", standardIds)
+            .range(from, from + pageSize - 1);
+          if (error || !eqData || eqData.length === 0) break;
+          eqData.forEach((eq) => { counts[eq.exam_id] = (counts[eq.exam_id] || 0) + 1; });
+          if (eqData.length < pageSize) break;
+          from += pageSize;
+        }
+      }
+      if (teaIds.length) {
+        const { data: teq } = await supabase.from("tea_exam_questions").select("exam_id").in("exam_id", teaIds);
+        teq?.forEach((r) => { counts[r.exam_id] = (counts[r.exam_id] || 0) + 1; });
       }
 
       setExams(
         examsData.map((e) => ({
           id: e.id,
           title: e.title,
+          exam_type: e.exam_type ?? "standard",
           question_count: counts[e.id] || 0,
         }))
       );
@@ -214,7 +221,12 @@ export default function ProvasPage() {
                           className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 rounded-lg border bg-card hover:bg-accent/30 transition-colors"
                         >
                           <div className="min-w-0">
-                            <p className="font-medium break-words">{exam.title}</p>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="font-medium break-words">{exam.title}</p>
+                              {exam.exam_type === "tea" && (
+                                <Badge variant="secondary" className="text-[10px] uppercase">TEA 2 Fase</Badge>
+                              )}
+                            </div>
                             <p className="text-xs text-muted-foreground">
                               {exam.question_count}{" "}
                               {exam.question_count === 1 ? "questão" : "questões"}
@@ -223,7 +235,7 @@ export default function ProvasPage() {
                           <Button
                             size="sm"
                             className="gradient-primary text-primary-foreground shrink-0"
-                            onClick={() => navigate(`/prova/${exam.id}`)}
+                            onClick={() => navigate(exam.exam_type === "tea" ? `/prova-tea/${exam.id}` : `/prova/${exam.id}`)}
                           >
                             <Play className="w-4 h-4 mr-2" /> Iniciar
                           </Button>
