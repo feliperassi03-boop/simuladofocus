@@ -54,12 +54,13 @@ export default function TeaExamPage() {
       if (!data || !data.is_active) { setState("error"); setLoading(false); return; }
       setExam(data as Exam);
       setLoading(false);
+      // Auto-start sem exigir senha
+      await startExam(data as Exam);
     })();
   }, [examId, user]);
 
-  const startAfterPassword = async () => {
-    if (!exam || pw !== exam.password) { toast({ title: "Senha incorreta", variant: "destructive" }); return; }
-    const { data: eq } = await supabase.from("tea_exam_questions").select("tea_question_id, question_order").eq("exam_id", exam.id).order("question_order");
+  const startExam = async (ex: Exam) => {
+    const { data: eq } = await supabase.from("tea_exam_questions").select("tea_question_id, question_order").eq("exam_id", ex.id).order("question_order");
     const ids = (eq ?? []).map((r) => r.tea_question_id);
     if (ids.length === 0) { toast({ title: "Prova sem questões", variant: "destructive" }); return; }
     const { data: qs } = await supabase.from("tea_questions").select("*").in("id", ids);
@@ -67,11 +68,12 @@ export default function TeaExamPage() {
     const ordered = ids.map((i) => map.get(i)).filter(Boolean) as TeaQ[];
     setQuestions(ordered);
     const { data: attempt } = await supabase.from("tea_attempts").insert({
-      user_id: user!.id, exam_id: exam.id, total_items: ordered.length * 3,
+      user_id: user!.id, exam_id: ex.id, total_items: ordered.length * 3,
     }).select().single();
     setAttemptId(attempt?.id ?? null);
     setState("playing");
   };
+
 
   const q = questions[current];
   const ans = q ? (answers[q.id] ?? { s1: "", s2: "", s3: "" }) : { s1: "", s2: "", s3: "" };
