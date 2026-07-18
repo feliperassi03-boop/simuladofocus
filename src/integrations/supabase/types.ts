@@ -72,6 +72,7 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string
+          exam_type: string
           id: string
           is_active: boolean
           password: string
@@ -80,6 +81,7 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by: string
+          exam_type?: string
           id?: string
           is_active?: boolean
           password: string
@@ -88,6 +90,7 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string
+          exam_type?: string
           id?: string
           is_active?: boolean
           password?: string
@@ -312,6 +315,191 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tea_answers: {
+        Row: {
+          attempt_id: string
+          created_at: string
+          id: string
+          is_correct: boolean
+          student_answer: string | null
+          sub_index: number
+          tea_question_id: string
+        }
+        Insert: {
+          attempt_id: string
+          created_at?: string
+          id?: string
+          is_correct?: boolean
+          student_answer?: string | null
+          sub_index: number
+          tea_question_id: string
+        }
+        Update: {
+          attempt_id?: string
+          created_at?: string
+          id?: string
+          is_correct?: boolean
+          student_answer?: string | null
+          sub_index?: number
+          tea_question_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tea_answers_attempt_id_fkey"
+            columns: ["attempt_id"]
+            isOneToOne: false
+            referencedRelation: "tea_attempts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tea_answers_tea_question_id_fkey"
+            columns: ["tea_question_id"]
+            isOneToOne: false
+            referencedRelation: "tea_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tea_attempts: {
+        Row: {
+          completed_at: string | null
+          correct_items: number
+          created_at: string
+          exam_id: string
+          id: string
+          score: number
+          total_items: number
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          correct_items?: number
+          created_at?: string
+          exam_id: string
+          id?: string
+          score?: number
+          total_items?: number
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          correct_items?: number
+          created_at?: string
+          exam_id?: string
+          id?: string
+          score?: number
+          total_items?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tea_attempts_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "exams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tea_exam_questions: {
+        Row: {
+          created_at: string
+          exam_id: string
+          id: string
+          question_order: number
+          tea_question_id: string
+        }
+        Insert: {
+          created_at?: string
+          exam_id: string
+          id?: string
+          question_order?: number
+          tea_question_id: string
+        }
+        Update: {
+          created_at?: string
+          exam_id?: string
+          id?: string
+          question_order?: number
+          tea_question_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tea_exam_questions_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "exams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tea_exam_questions_tea_question_id_fkey"
+            columns: ["tea_question_id"]
+            isOneToOne: false
+            referencedRelation: "tea_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tea_questions: {
+        Row: {
+          comment: string | null
+          comment_image_url: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          question_text: string
+          sub1_answer_key: string
+          sub1_image_url: string | null
+          sub1_text: string
+          sub2_answer_key: string
+          sub2_image_url: string | null
+          sub2_text: string
+          sub3_answer_key: string
+          sub3_image_url: string | null
+          sub3_text: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          comment?: string | null
+          comment_image_url?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          question_text: string
+          sub1_answer_key: string
+          sub1_image_url?: string | null
+          sub1_text: string
+          sub2_answer_key: string
+          sub2_image_url?: string | null
+          sub2_text: string
+          sub3_answer_key: string
+          sub3_image_url?: string | null
+          sub3_text: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          comment?: string | null
+          comment_image_url?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          question_text?: string
+          sub1_answer_key?: string
+          sub1_image_url?: string | null
+          sub1_text?: string
+          sub2_answer_key?: string
+          sub2_image_url?: string | null
+          sub2_text?: string
+          sub3_answer_key?: string
+          sub3_image_url?: string | null
+          sub3_text?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
