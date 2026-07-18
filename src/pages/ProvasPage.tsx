@@ -123,8 +123,11 @@ export default function ProvasPage() {
   }, [user]);
 
   const grouped = useMemo(() => {
+    const filtered = exams.filter((e) =>
+      viewMode === "tea" ? e.exam_type === "tea" : e.exam_type !== "tea"
+    );
     const map = new Map<string, ExamItem[]>();
-    for (const exam of exams) {
+    for (const exam of filtered) {
       const cat = getCategory(exam.title);
       if (!map.has(cat)) map.set(cat, []);
       map.get(cat)!.push(exam);
