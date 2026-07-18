@@ -15,6 +15,7 @@ import { Plus, Pencil, Trash2, Users, HelpCircle, BarChart3, ImagePlus, X, FileT
 import ExamsTab from "@/components/admin/ExamsTab";
 import AllowedEmailsTab from "@/components/admin/AllowedEmailsTab";
 import DoubtsTab from "@/components/admin/DoubtsTab";
+import TeaTab from "@/components/admin/TeaTab";
 import { useVideoConverter } from "@/hooks/useVideoConverter";
 import { normalizeQuestionText } from "@/lib/utils";
 
@@ -374,6 +375,7 @@ export default function AdminPage() {
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="questions">Perguntas</TabsTrigger>
           <TabsTrigger value="exams">Provas</TabsTrigger>
+          <TabsTrigger value="tea">TEA 2 Fase</TabsTrigger>
           <TabsTrigger value="results">Resultados</TabsTrigger>
           <TabsTrigger value="doubts">Dúvidas dos Alunos</TabsTrigger>
           <TabsTrigger value="allowed-emails">Emails Autorizados</TabsTrigger>
