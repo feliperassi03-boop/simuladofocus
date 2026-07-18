@@ -12,7 +12,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ArrowRight, ArrowLeft, Trophy, Eye, EyeOff, CheckCircle, XCircle, Home, RotateCcw } from "lucide-react";
+import { ArrowRight, ArrowLeft, Trophy, Eye, EyeOff, CheckCircle, XCircle, Home, RotateCcw, MessageSquareText } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
 
 const POINTS_PER_ITEM = 0.52;
