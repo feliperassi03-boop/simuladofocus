@@ -171,7 +171,7 @@ export default function ProvasPage() {
                   : "text-foreground hover:bg-accent/40"
               }`}
             >
-              Provas Padrão
+              TSA 1 FASE
             </button>
             <button
               type="button"
