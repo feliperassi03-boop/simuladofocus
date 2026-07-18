@@ -324,6 +324,36 @@ export default function TeaTab() {
             <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
               <DialogHeader><DialogTitle>{editingId ? "Editar" : "Nova"} Questão TEA 2 Fase</DialogTitle></DialogHeader>
               <div className="space-y-4">
+                <div className="rounded-lg border border-dashed p-3 bg-muted/30">
+                  <Label className="text-xs uppercase tracking-wide text-muted-foreground">Importação rápida (colar texto)</Label>
+                  <Textarea
+                    value={quickImport}
+                    onChange={(e) => setQuickImport(e.target.value)}
+                    placeholder={"Cole aqui:\nEnunciado / caso clínico...\n1) Pergunta 1\nGabarito: resposta 1\n2) Pergunta 2\nGabarito: resposta 2\n3) Pergunta 3\nGabarito: resposta 3\nComentário: ..."}
+                    rows={6}
+                    className="mt-2 font-mono text-xs"
+                  />
+                  <Button type="button" size="sm" variant="secondary" className="mt-2" onClick={handleQuickImport} disabled={!quickImport.trim()}>
+                    Processar
+                  </Button>
+                  {parsedPreview && (
+                    <div className="mt-3 space-y-2 rounded-md border bg-background p-3 text-xs">
+                      <div className="font-semibold text-foreground">Prévia do parsing</div>
+                      <div><span className="font-medium text-muted-foreground">Enunciado:</span> <span className="whitespace-pre-wrap break-words">{parsedPreview.enunciado || <em className="text-destructive">vazio</em>}</span></div>
+                      {[1, 2, 3].map((n) => (
+                        <div key={n} className="border-t pt-1">
+                          <div><span className="font-medium text-muted-foreground">Pergunta {n}:</span> <span className="whitespace-pre-wrap break-words">{parsedPreview[`p${n}` as "p1"] || <em className="text-destructive">vazio</em>}</span></div>
+                          <div><span className="font-medium text-muted-foreground">Gabarito {n}:</span> <span className="whitespace-pre-wrap break-words">{parsedPreview[`g${n}` as "g1"] || <em className="text-destructive">vazio</em>}</span></div>
+                        </div>
+                      ))}
+                      <div><span className="font-medium text-muted-foreground">Comentário:</span> <span className="whitespace-pre-wrap break-words">{parsedPreview.comentario || <em className="text-muted-foreground">(nenhum)</em>}</span></div>
+                      <div className="flex gap-2 pt-2">
+                        <Button type="button" size="sm" onClick={applyPreviewToForm}>Aplicar ao formulário</Button>
+                        <Button type="button" size="sm" variant="ghost" onClick={() => setParsedPreview(null)}>Cancelar</Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <div>
                   <Label>Enunciado (contexto/caso clínico) *</Label>
                   <Textarea rows={5} value={form.question_text} onChange={(e) => setForm({ ...form, question_text: e.target.value })} />
