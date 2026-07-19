@@ -222,6 +222,34 @@ export default function TeaExamPage() {
         </div>
         <Progress value={progress} className="h-2" />
 
+        {/* Navegador de questões */}
+        <div className="flex flex-wrap gap-2">
+          {questions.map((_, i) => {
+            const qq = questions[i];
+            const c = selfCheck[qq.id] ?? emptyCheck;
+            const answered = c.s1 !== null || c.s2 !== null || c.s3 !== null;
+            const allMarked = c.s1 !== null && c.s2 !== null && c.s3 !== null;
+            return (
+              <button
+                key={qq.id}
+                onClick={() => setCurrent(i)}
+                title={`Ir para questão ${i + 1}`}
+                className={`w-9 h-9 rounded-lg text-sm font-bold transition-all ${
+                  i === current
+                    ? "gradient-primary text-primary-foreground shadow-glow"
+                    : allMarked
+                    ? "bg-success/20 text-success"
+                    : answered
+                    ? "bg-primary/20 text-primary"
+                    : "bg-secondary text-secondary-foreground"
+                }`}
+              >
+                {i + 1}
+              </button>
+            );
+          })}
+        </div>
+
         <Card>
           <CardHeader>
             <CardTitle className="text-lg leading-relaxed whitespace-pre-wrap break-words">
