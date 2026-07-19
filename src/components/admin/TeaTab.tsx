@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, ImagePlus, X, Search, Copy } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Search, Copy, Play, Wrench, Save } from "lucide-react";
 
 interface TeaQuestion {
   id: string;
@@ -36,6 +37,10 @@ interface TeaExam {
   password: string;
   is_active: boolean;
   question_count?: number;
+}
+
+interface FullTeaQuestion extends TeaQuestion {
+  sort_order?: number;
 }
 
 const emptyForm: Omit<TeaQuestion, "id"> = {
@@ -66,6 +71,7 @@ async function uploadFile(file: File, bucket: "question-images" | "question-vide
 export default function TeaTab() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [questions, setQuestions] = useState<TeaQuestion[]>([]);
   const [exams, setExams] = useState<TeaExam[]>([]);
   const [form, setForm] = useState<Omit<TeaQuestion, "id">>(emptyForm);
@@ -76,11 +82,17 @@ export default function TeaTab() {
   const [quickImport, setQuickImport] = useState("");
   const [parsedPreview, setParsedPreview] = useState<null | { enunciado: string; p1: string; g1: string; p2: string; g2: string; p3: string; g3: string; comentario: string }>(null);
 
+  // Manage exam content state
+  const [managingExam, setManagingExam] = useState<TeaExam | null>(null);
+  const [examQuestions, setExamQuestions] = useState<FullTeaQuestion[]>([]);
+  const [manageLoading, setManageLoading] = useState(false);
+  const [savingQuestionId, setSavingQuestionId] = useState<string | null>(null);
+  const [manageSearch, setManageSearch] = useState("");
+
   const handleQuickImport = () => {
     const raw = quickImport.replace(/\r\n/g, "\n").trim();
     if (!raw) return;
 
-    // Markers for sub-questions (Pergunta 1, P1, 1), 1.) and answers (Gabarito, Resposta, R:)
     const subRegex = /^\s*(?:pergunta\s*|p\s*)?([123])[\)\.\-:]\s*/i;
     const gabRegex = /^\s*(?:gabarito|resposta|r)\s*[123]?\s*[:\-\)]\s*/i;
     const comRegex = /^\s*(?:coment[áa]rio|comment)\s*[:\-]?\s*/i;
@@ -272,6 +284,117 @@ export default function TeaTab() {
     toast({ title: "Link copiado!" });
   };
 
+  // ========= Manage exam content (inline edit) =========
+  const openManageExam = async (exam: TeaExam) => {
+    setManagingExam(exam);
+    setManageSearch("");
+    setManageLoading(true);
+    try {
+      const { data: eqData, error: eqError } = await supabase
+        .from("tea_exam_questions")
+        .select("tea_question_id, question_order")
+        .eq("exam_id", exam.id)
+        .order("question_order");
+      if (eqError) throw eqError;
+      const ids = (eqData ?? []).map((e) => e.tea_question_id);
+      if (ids.length === 0) {
+        setExamQuestions([]);
+        return;
+      }
+      const { data: qData, error: qError } = await supabase
+        .from("tea_questions")
+        .select("*")
+        .in("id", ids);
+      if (qError) throw qError;
+      const map = new Map((qData ?? []).map((q: any) => [q.id, q]));
+      const ordered: FullTeaQuestion[] = (eqData ?? [])
+        .map((e) => {
+          const q = map.get(e.tea_question_id);
+          return q ? { ...(q as TeaQuestion), sort_order: e.question_order } : null;
+        })
+        .filter(Boolean) as FullTeaQuestion[];
+      setExamQuestions(ordered);
+    } catch (err: any) {
+      toast({ title: "Erro ao carregar", description: err.message, variant: "destructive" });
+    } finally {
+      setManageLoading(false);
+    }
+  };
+
+  const updateExamQField = (id: string, field: keyof FullTeaQuestion, value: string) => {
+    setExamQuestions((prev) => prev.map((q) => (q.id === id ? { ...q, [field]: value } : q)));
+  };
+
+  const saveExamQuestion = async (q: FullTeaQuestion) => {
+    setSavingQuestionId(q.id);
+    const payload: any = {
+      question_text: q.question_text,
+      comment: q.comment || null,
+      sub1_text: q.sub1_text,
+      sub1_answer_key: q.sub1_answer_key,
+      sub2_text: q.sub2_text,
+      sub2_answer_key: q.sub2_answer_key,
+      sub3_text: q.sub3_text,
+      sub3_answer_key: q.sub3_answer_key,
+    };
+    const { error } = await supabase.from("tea_questions").update(payload).eq("id", q.id);
+    setSavingQuestionId(null);
+    if (error) toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+    else toast({ title: "Questão atualizada!" });
+    fetchQuestions();
+  };
+
+  const removeQuestionFromExam = async (questionId: string) => {
+    if (!managingExam) return;
+    if (!confirm("Remover esta questão da prova? (a questão continuará no banco)")) return;
+    const { error } = await supabase
+      .from("tea_exam_questions")
+      .delete()
+      .eq("exam_id", managingExam.id)
+      .eq("tea_question_id", questionId);
+    if (error) return toast({ title: "Erro", description: error.message, variant: "destructive" });
+    setExamQuestions((prev) => prev.filter((q) => q.id !== questionId));
+    toast({ title: "Questão removida da prova" });
+    fetchExams();
+  };
+
+  const addNewQuestionToExam = async () => {
+    if (!managingExam) return;
+    setManageLoading(true);
+    try {
+      const { data: newQ, error: qError } = await supabase
+        .from("tea_questions")
+        .insert({
+          question_text: "Nova questão TEA",
+          sub1_text: "Pergunta 1",
+          sub1_answer_key: "",
+          sub2_text: "Pergunta 2",
+          sub2_answer_key: "",
+          sub3_text: "Pergunta 3",
+          sub3_answer_key: "",
+        })
+        .select()
+        .single();
+      if (qError) throw qError;
+
+      const nextOrder = examQuestions.length;
+      const { error: eqError } = await supabase
+        .from("tea_exam_questions")
+        .insert({ exam_id: managingExam.id, tea_question_id: newQ.id, question_order: nextOrder });
+      if (eqError) throw eqError;
+
+      setExamQuestions((prev) => [...prev, { ...(newQ as TeaQuestion), sort_order: nextOrder }]);
+      fetchQuestions();
+      fetchExams();
+      toast({ title: "Nova questão adicionada — edite abaixo" });
+    } catch (err: any) {
+      toast({ title: "Erro", description: err.message, variant: "destructive" });
+    } finally {
+      setManageLoading(false);
+    }
+  };
+  // ======================================================
+
   const filteredQuestions = questions.filter((q) =>
     !qSearch.trim() ? true : (q.question_text + " " + q.sub1_text + " " + q.sub2_text + " " + q.sub3_text).toLowerCase().includes(qSearch.toLowerCase())
   );
@@ -443,8 +566,18 @@ export default function TeaTab() {
                   <p className="text-xs text-muted-foreground">{e.question_count} questões · senha: {e.password}</p>
                 </div>
                 <div className="flex gap-1">
-                  <Button variant="ghost" size="sm" onClick={() => copyLink(e.id)}><Copy className="w-4 h-4" /></Button>
-                  <Button variant="ghost" size="sm" onClick={() => deleteExam(e.id)}><Trash2 className="w-4 h-4" /></Button>
+                  <Button variant="ghost" size="icon" onClick={() => navigate(`/prova-tea/${e.id}`)} title="Iniciar prova">
+                    <Play className="w-4 h-4 text-primary" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => openManageExam(e)} title="Gerenciar conteúdo da prova">
+                    <Wrench className="w-4 h-4 text-primary" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => copyLink(e.id)} title="Copiar link">
+                    <Copy className="w-4 h-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => deleteExam(e.id)}>
+                    <Trash2 className="w-4 h-4 text-destructive" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -452,6 +585,110 @@ export default function TeaTab() {
           {exams.length === 0 && <p className="text-center text-sm text-muted-foreground py-8">Nenhuma prova TEA criada.</p>}
         </div>
       </TabsContent>
+
+      {/* Manage exam content dialog */}
+      <Dialog open={!!managingExam} onOpenChange={(o) => { if (!o) { setManagingExam(null); setExamQuestions([]); } }}>
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Gerenciar conteúdo — {managingExam?.title}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-muted-foreground">{examQuestions.length} questão(ões) nesta prova</p>
+              <Button onClick={addNewQuestionToExam} disabled={manageLoading} size="sm" className="gradient-primary text-primary-foreground">
+                <Plus className="w-4 h-4 mr-1" /> Nova questão
+              </Button>
+            </div>
+
+            {examQuestions.length > 0 && (
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  value={manageSearch}
+                  onChange={(e) => setManageSearch(e.target.value)}
+                  placeholder="Buscar questão..."
+                  className="pl-9"
+                />
+              </div>
+            )}
+
+            {manageLoading && examQuestions.length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-6">Carregando...</p>
+            )}
+
+            <div className="space-y-4">
+              {(() => {
+                const term = manageSearch.toLowerCase().trim();
+                const filtered = examQuestions.filter((q) => {
+                  if (!term) return true;
+                  return [q.question_text, q.sub1_text, q.sub2_text, q.sub3_text, q.comment]
+                    .some((t) => (t || "").toLowerCase().includes(term));
+                });
+                return (
+                  <>
+                    {filtered.map((q) => (
+                      <Card key={q.id} className="p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-semibold text-primary">Questão {examQuestions.indexOf(q) + 1}</span>
+                          <div className="flex gap-1">
+                            <Button size="sm" variant="outline" onClick={() => saveExamQuestion(q)} disabled={savingQuestionId === q.id}>
+                              <Save className="w-3 h-3 mr-1" />
+                              {savingQuestionId === q.id ? "Salvando..." : "Salvar"}
+                            </Button>
+                            <Button size="sm" variant="ghost" onClick={() => removeQuestionFromExam(q.id)} title="Remover da prova">
+                              <X className="w-4 h-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <Label className="text-xs">Enunciado / caso clínico</Label>
+                          <Textarea rows={4} value={q.question_text} onChange={(e) => updateExamQField(q.id, "question_text", e.target.value)} />
+                        </div>
+
+                        {[1, 2, 3].map((n) => {
+                          const tKey = `sub${n}_text` as keyof FullTeaQuestion;
+                          const aKey = `sub${n}_answer_key` as keyof FullTeaQuestion;
+                          return (
+                            <div key={n} className="grid grid-cols-1 md:grid-cols-2 gap-2 border-t pt-2">
+                              <div>
+                                <Label className="text-xs">Pergunta {n}</Label>
+                                <Textarea rows={2} value={(q[tKey] as string) || ""} onChange={(e) => updateExamQField(q.id, tKey, e.target.value)} />
+                              </div>
+                              <div>
+                                <Label className="text-xs">Gabarito {n}</Label>
+                                <Textarea rows={2} value={(q[aKey] as string) || ""} onChange={(e) => updateExamQField(q.id, aKey, e.target.value)} />
+                              </div>
+                            </div>
+                          );
+                        })}
+
+                        <div>
+                          <Label className="text-xs">Comentário geral</Label>
+                          <Textarea rows={3} value={q.comment || ""} onChange={(e) => updateExamQField(q.id, "comment", e.target.value)} />
+                        </div>
+                      </Card>
+                    ))}
+                    {filtered.length === 0 && manageSearch.trim() && (
+                      <p className="text-sm text-muted-foreground text-center py-6">Nenhuma questão encontrada.</p>
+                    )}
+                  </>
+                );
+              })()}
+
+              {!manageLoading && examQuestions.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-6">
+                  Nenhuma questão nesta prova. Clique em "Nova questão" para adicionar.
+                </p>
+              )}
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <Button variant="outline" onClick={() => setManagingExam(null)}>Fechar</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Tabs>
   );
 }
