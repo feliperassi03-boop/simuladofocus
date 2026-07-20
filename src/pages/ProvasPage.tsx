@@ -5,10 +5,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { Play, FileText, Loader2, FolderOpen, Bell } from "lucide-react";
+import { Play, FileText, Loader2, FolderOpen, Bell, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import provasBg from "@/assets/provas-bg.jpeg";
 import laryngoscopeIcon from "@/assets/laryngoscope-icon.jpeg.asset.json";
 
@@ -41,6 +42,39 @@ export default function ProvasPage() {
   const [loading, setLoading] = useState(true);
   const [unreadDoubts, setUnreadDoubts] = useState(0);
   const [viewMode, setViewMode] = useState<"standard" | "tea">("standard");
+  const [rankingOpen, setRankingOpen] = useState(false);
+  const [rankingLoading, setRankingLoading] = useState(false);
+  const [rankingScores, setRankingScores] = useState<{ score: number; total: number }[]>([]);
+
+  const openRanking = async () => {
+    setRankingOpen(true);
+    if (rankingScores.length > 0) return;
+    setRankingLoading(true);
+    try {
+      const { data: examRows } = await supabase
+        .from("exams")
+        .select("id")
+        .or("title.ilike.%BUD 5%,title.ilike.%BUD5%");
+      const ids = (examRows || []).map((e) => e.id);
+      if (ids.length === 0) {
+        setRankingScores([]);
+        return;
+      }
+      const { data: attempts } = await supabase
+        .from("quiz_attempts")
+        .select("score,total_questions,completed_at")
+        .in("exam_id", ids)
+        .not("completed_at", "is", null)
+        .not("score", "is", null);
+      const scores = (attempts || [])
+        .map((a) => ({ score: Number(a.score) || 0, total: Number(a.total_questions) || 0 }))
+        .filter((a) => a.total > 0)
+        .sort((a, b) => b.score - a.score || b.total - a.total);
+      setRankingScores(scores);
+    } finally {
+      setRankingLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -205,17 +239,50 @@ export default function ProvasPage() {
             aria-label="Ranking BUD5"
             title="Ranking BUD5"
             className="relative inline-flex items-center justify-center w-11 h-11 rounded-full border border-border bg-card shadow-card hover:bg-accent/40 transition-colors"
-            onClick={() =>
-              toast({
-                title: "Ranking BUD5 em breve!",
-                description: "A divulgação do ranking do Simulado BUD5 acontece na semana que vem. Fique de olho! 👀",
-              })
-            }
+            onClick={openRanking}
           >
             <img src={laryngoscopeIcon.url} alt="Laringoscópio" className="w-6 h-6 object-contain" />
           </button>
         </div>
       </div>
+
+      <Dialog open={rankingOpen} onOpenChange={setRankingOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Trophy className="w-5 h-5 text-primary" />
+              Ranking Simulado BUD5
+            </DialogTitle>
+            <DialogDescription>
+              Notas de todos os participantes (anônimo), da maior para a menor.
+            </DialogDescription>
+          </DialogHeader>
+          {rankingLoading ? (
+            <div className="py-8 flex items-center justify-center text-muted-foreground">
+              <Loader2 className="w-5 h-5 animate-spin mr-2" /> Carregando...
+            </div>
+          ) : rankingScores.length === 0 ? (
+            <p className="py-6 text-center text-muted-foreground text-sm">
+              Nenhuma nota disponível ainda.
+            </p>
+          ) : (
+            <div className="max-h-[60vh] overflow-y-auto divide-y divide-border rounded-md border border-border">
+              {rankingScores.map((s, i) => (
+                <div key={i} className="flex items-center justify-between px-4 py-2 text-sm">
+                  <span className="font-medium text-muted-foreground w-8">{i + 1}º</span>
+                  <span className="font-display font-semibold text-foreground">
+                    {s.score}/{s.total}
+                  </span>
+                  <span className="text-xs text-muted-foreground w-14 text-right">
+                    {Math.round((s.score / s.total) * 100)}%
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
 
       {grouped.length === 0 ? (
         <Card className="shadow-card">
