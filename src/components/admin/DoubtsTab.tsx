@@ -22,7 +22,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { MessageCircleQuestion, Trash2, Send, Archive, CheckCircle2, Clock } from "lucide-react";
+import { MessageCircleQuestion, Trash2, Send, Archive, CheckCircle2, Clock, ImagePlus, X } from "lucide-react";
 
 type DoubtStatus = "pending" | "answered" | "resolved" | "archived";
 
