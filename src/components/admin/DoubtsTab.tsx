@@ -122,12 +122,38 @@ export default function DoubtsTab() {
   const openRespond = (d: Doubt) => {
     setResponding(d);
     setResponseText(d.admin_response || "");
+    setResponseImageUrl(d.admin_response_image_url || null);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "Imagem muito grande", description: "Máximo de 5MB.", variant: "destructive" });
+      return;
+    }
+    setUploadingImage(true);
+    const ext = file.name.split(".").pop() || "png";
+    const path = `doubt-responses/${crypto.randomUUID()}.${ext}`;
+    const { error: upErr } = await supabase.storage.from("question-images").upload(path, file, {
+      cacheControl: "3600",
+      upsert: false,
+    });
+    if (upErr) {
+      setUploadingImage(false);
+      toast({ title: "Erro ao enviar imagem", description: upErr.message, variant: "destructive" });
+      return;
+    }
+    const { data } = supabase.storage.from("question-images").getPublicUrl(path);
+    setResponseImageUrl(data.publicUrl);
+    setUploadingImage(false);
+    e.target.value = "";
   };
 
   const saveResponse = async () => {
     if (!responding) return;
-    if (!responseText.trim()) {
-      toast({ title: "Escreva uma resposta.", variant: "destructive" });
+    if (!responseText.trim() && !responseImageUrl) {
+      toast({ title: "Escreva uma resposta ou anexe uma imagem.", variant: "destructive" });
       return;
     }
     setSaving(true);
@@ -135,6 +161,7 @@ export default function DoubtsTab() {
       .from("question_doubts")
       .update({
         admin_response: responseText.trim(),
+        admin_response_image_url: responseImageUrl,
         status: "answered",
         answered_at: new Date().toISOString(),
         answered_by: user?.id || null,
@@ -149,6 +176,7 @@ export default function DoubtsTab() {
     toast({ title: "Resposta enviada!" });
     setResponding(null);
     setResponseText("");
+    setResponseImageUrl(null);
     fetchDoubts();
   };
 
