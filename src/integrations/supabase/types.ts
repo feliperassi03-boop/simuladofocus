@@ -542,6 +542,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_bud5_ranking: {
+        Args: never
+        Returns: {
+          score: number
+          total_questions: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
