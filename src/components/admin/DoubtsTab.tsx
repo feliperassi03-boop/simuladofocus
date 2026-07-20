@@ -337,8 +337,6 @@ export default function DoubtsTab() {
               </div>
               <div>
                 <Label htmlFor="resp">Sua resposta</Label>
-              <div>
-                <Label htmlFor="resp">Sua resposta</Label>
                 <Textarea
                   id="resp"
                   rows={6}
