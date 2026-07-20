@@ -337,6 +337,8 @@ export default function DoubtsTab() {
               </div>
               <div>
                 <Label htmlFor="resp">Sua resposta</Label>
+              <div>
+                <Label htmlFor="resp">Sua resposta</Label>
                 <Textarea
                   id="resp"
                   rows={6}
@@ -344,6 +346,44 @@ export default function DoubtsTab() {
                   onChange={(e) => setResponseText(e.target.value)}
                   placeholder="Digite a resposta para o aluno..."
                 />
+              </div>
+              <div>
+                <Label className="text-xs text-muted-foreground">Imagem (opcional)</Label>
+                {responseImageUrl ? (
+                  <div className="relative inline-block mt-1">
+                    <img src={responseImageUrl} alt="Anexo" className="max-h-40 rounded border border-border" />
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="destructive"
+                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                      onClick={() => setResponseImageUrl(null)}
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="mt-1">
+                    <input
+                      id="resp-image"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      disabled={uploadingImage}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => document.getElementById("resp-image")?.click()}
+                      disabled={uploadingImage}
+                    >
+                      <ImagePlus className="w-4 h-4 mr-1.5" />
+                      {uploadingImage ? "Enviando..." : "Anexar imagem"}
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           )}
