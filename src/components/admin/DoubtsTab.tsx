@@ -22,7 +22,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { MessageCircleQuestion, Trash2, Send, Archive, CheckCircle2, Clock } from "lucide-react";
+import { MessageCircleQuestion, Trash2, Send, Archive, CheckCircle2, Clock, ImagePlus, X } from "lucide-react";
 
 type DoubtStatus = "pending" | "answered" | "resolved" | "archived";
 
@@ -39,6 +39,7 @@ interface Doubt {
   doubt_text: string;
   status: DoubtStatus;
   admin_response: string | null;
+  admin_response_image_url: string | null;
   answered_at: string | null;
   created_at: string;
 }
@@ -68,6 +69,8 @@ export default function DoubtsTab() {
   const [dateFilter, setDateFilter] = useState("");
   const [responding, setResponding] = useState<Doubt | null>(null);
   const [responseText, setResponseText] = useState("");
+  const [responseImageUrl, setResponseImageUrl] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const fetchDoubts = async () => {
@@ -119,12 +122,38 @@ export default function DoubtsTab() {
   const openRespond = (d: Doubt) => {
     setResponding(d);
     setResponseText(d.admin_response || "");
+    setResponseImageUrl(d.admin_response_image_url || null);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "Imagem muito grande", description: "Máximo de 5MB.", variant: "destructive" });
+      return;
+    }
+    setUploadingImage(true);
+    const ext = file.name.split(".").pop() || "png";
+    const path = `doubt-responses/${crypto.randomUUID()}.${ext}`;
+    const { error: upErr } = await supabase.storage.from("question-images").upload(path, file, {
+      cacheControl: "3600",
+      upsert: false,
+    });
+    if (upErr) {
+      setUploadingImage(false);
+      toast({ title: "Erro ao enviar imagem", description: upErr.message, variant: "destructive" });
+      return;
+    }
+    const { data } = supabase.storage.from("question-images").getPublicUrl(path);
+    setResponseImageUrl(data.publicUrl);
+    setUploadingImage(false);
+    e.target.value = "";
   };
 
   const saveResponse = async () => {
     if (!responding) return;
-    if (!responseText.trim()) {
-      toast({ title: "Escreva uma resposta.", variant: "destructive" });
+    if (!responseText.trim() && !responseImageUrl) {
+      toast({ title: "Escreva uma resposta ou anexe uma imagem.", variant: "destructive" });
       return;
     }
     setSaving(true);
@@ -132,6 +161,7 @@ export default function DoubtsTab() {
       .from("question_doubts")
       .update({
         admin_response: responseText.trim(),
+        admin_response_image_url: responseImageUrl,
         status: "answered",
         answered_at: new Date().toISOString(),
         answered_by: user?.id || null,
@@ -146,6 +176,7 @@ export default function DoubtsTab() {
     toast({ title: "Resposta enviada!" });
     setResponding(null);
     setResponseText("");
+    setResponseImageUrl(null);
     fetchDoubts();
   };
 
@@ -253,6 +284,11 @@ export default function DoubtsTab() {
                 {d.admin_response && (
                   <div className="text-sm bg-primary/5 border border-primary/20 rounded p-3 break-words whitespace-normal">
                     <strong className="font-display text-primary">Resposta:</strong> {d.admin_response}
+                    {d.admin_response_image_url && (
+                      <a href={d.admin_response_image_url} target="_blank" rel="noopener noreferrer" className="block mt-2">
+                        <img src={d.admin_response_image_url} alt="Anexo da resposta" className="max-h-48 rounded border border-border" />
+                      </a>
+                    )}
                   </div>
                 )}
 
@@ -308,6 +344,44 @@ export default function DoubtsTab() {
                   onChange={(e) => setResponseText(e.target.value)}
                   placeholder="Digite a resposta para o aluno..."
                 />
+              </div>
+              <div>
+                <Label className="text-xs text-muted-foreground">Imagem (opcional)</Label>
+                {responseImageUrl ? (
+                  <div className="relative inline-block mt-1">
+                    <img src={responseImageUrl} alt="Anexo" className="max-h-40 rounded border border-border" />
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="destructive"
+                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                      onClick={() => setResponseImageUrl(null)}
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="mt-1">
+                    <input
+                      id="resp-image"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      disabled={uploadingImage}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => document.getElementById("resp-image")?.click()}
+                      disabled={uploadingImage}
+                    >
+                      <ImagePlus className="w-4 h-4 mr-1.5" />
+                      {uploadingImage ? "Enviando..." : "Anexar imagem"}
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           )}
