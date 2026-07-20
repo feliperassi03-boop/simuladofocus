@@ -16,6 +16,7 @@ interface Doubt {
   doubt_text: string;
   status: DoubtStatus;
   admin_response: string | null;
+  admin_response_image_url: string | null;
   answered_at: string | null;
   created_at: string;
   read_by_student: boolean;
