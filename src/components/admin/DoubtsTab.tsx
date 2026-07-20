@@ -69,6 +69,8 @@ export default function DoubtsTab() {
   const [dateFilter, setDateFilter] = useState("");
   const [responding, setResponding] = useState<Doubt | null>(null);
   const [responseText, setResponseText] = useState("");
+  const [responseImageUrl, setResponseImageUrl] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const fetchDoubts = async () => {
