@@ -51,26 +51,16 @@ export default function ProvasPage() {
     if (rankingScores.length > 0) return;
     setRankingLoading(true);
     try {
-      const { data: examRows } = await supabase
-        .from("exams")
-        .select("id")
-        .or("title.ilike.%BUD 5%,title.ilike.%BUD5%");
-      const ids = (examRows || []).map((e) => e.id);
-      if (ids.length === 0) {
-        setRankingScores([]);
-        return;
-      }
-      const { data: attempts } = await supabase
-        .from("quiz_attempts")
-        .select("score,total_questions,completed_at")
-        .in("exam_id", ids)
-        .not("completed_at", "is", null)
-        .not("score", "is", null);
-      const scores = (attempts || [])
-        .map((a) => ({ score: Number(a.score) || 0, total: Number(a.total_questions) || 0 }))
+      const { data, error } = await supabase.rpc("get_bud5_ranking");
+      if (error) throw error;
+      const scores = (data || [])
+        .map((a: any) => ({ score: Number(a.score) || 0, total: Number(a.total_questions) || 0 }))
         .filter((a) => a.total > 0)
         .sort((a, b) => b.score - a.score || b.total - a.total);
       setRankingScores(scores);
+    } catch (e) {
+      console.error("Erro ao buscar ranking BUD5:", e);
+      setRankingScores([]);
     } finally {
       setRankingLoading(false);
     }
