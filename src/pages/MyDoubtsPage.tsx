@@ -124,6 +124,11 @@ export default function MyDoubtsPage() {
                 {d.admin_response ? (
                   <div className="text-sm bg-primary/5 border border-primary/20 rounded p-3 break-words whitespace-normal">
                     <strong className="font-display text-primary">Resposta:</strong> {d.admin_response}
+                    {d.admin_response_image_url && (
+                      <a href={d.admin_response_image_url} target="_blank" rel="noopener noreferrer" className="block mt-2">
+                        <img src={d.admin_response_image_url} alt="Anexo da resposta" className="max-h-64 rounded border border-border" />
+                      </a>
+                    )}
                     {d.answered_at && (
                       <p className="text-xs text-muted-foreground mt-1">
                         Respondida em {new Date(d.answered_at).toLocaleString("pt-BR")}
