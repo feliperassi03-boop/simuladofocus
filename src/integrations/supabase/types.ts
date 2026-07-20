@@ -122,6 +122,7 @@ export type Database = {
       question_doubts: {
         Row: {
           admin_response: string | null
+          admin_response_image_url: string | null
           answered_at: string | null
           answered_by: string | null
           attempt_id: string | null
@@ -142,6 +143,7 @@ export type Database = {
         }
         Insert: {
           admin_response?: string | null
+          admin_response_image_url?: string | null
           answered_at?: string | null
           answered_by?: string | null
           attempt_id?: string | null
@@ -162,6 +164,7 @@ export type Database = {
         }
         Update: {
           admin_response?: string | null
+          admin_response_image_url?: string | null
           answered_at?: string | null
           answered_by?: string | null
           attempt_id?: string | null

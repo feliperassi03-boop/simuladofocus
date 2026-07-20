@@ -1,0 +1,1 @@
+ALTER TABLE public.question_doubts ADD COLUMN IF NOT EXISTS admin_response_image_url TEXT;
