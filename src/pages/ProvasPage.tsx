@@ -42,6 +42,39 @@ export default function ProvasPage() {
   const [loading, setLoading] = useState(true);
   const [unreadDoubts, setUnreadDoubts] = useState(0);
   const [viewMode, setViewMode] = useState<"standard" | "tea">("standard");
+  const [rankingOpen, setRankingOpen] = useState(false);
+  const [rankingLoading, setRankingLoading] = useState(false);
+  const [rankingScores, setRankingScores] = useState<{ score: number; total: number }[]>([]);
+
+  const openRanking = async () => {
+    setRankingOpen(true);
+    if (rankingScores.length > 0) return;
+    setRankingLoading(true);
+    try {
+      const { data: examRows } = await supabase
+        .from("exams")
+        .select("id")
+        .or("title.ilike.%BUD 5%,title.ilike.%BUD5%");
+      const ids = (examRows || []).map((e) => e.id);
+      if (ids.length === 0) {
+        setRankingScores([]);
+        return;
+      }
+      const { data: attempts } = await supabase
+        .from("quiz_attempts")
+        .select("score,total_questions,completed_at")
+        .in("exam_id", ids)
+        .not("completed_at", "is", null)
+        .not("score", "is", null);
+      const scores = (attempts || [])
+        .map((a) => ({ score: Number(a.score) || 0, total: Number(a.total_questions) || 0 }))
+        .filter((a) => a.total > 0)
+        .sort((a, b) => b.score - a.score || b.total - a.total);
+      setRankingScores(scores);
+    } finally {
+      setRankingLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
