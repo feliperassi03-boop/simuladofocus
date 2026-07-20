@@ -5,10 +5,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { Play, FileText, Loader2, FolderOpen, Bell } from "lucide-react";
+import { Play, FileText, Loader2, FolderOpen, Bell, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import provasBg from "@/assets/provas-bg.jpeg";
 import laryngoscopeIcon from "@/assets/laryngoscope-icon.jpeg.asset.json";
 
