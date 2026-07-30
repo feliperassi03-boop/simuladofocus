@@ -51,15 +51,17 @@ export default function ProvasPage() {
     if (rankingScores.length > 0) return;
     setRankingLoading(true);
     try {
-      const { data, error } = await supabase.rpc("get_bud5_ranking");
+      const { data, error } = await supabase.rpc("get_bud6_ranking");
       if (error) throw error;
-      const scores = (data || [])
-        .map((a: any) => ({ score: Number(a.score) || 0, total: Number(a.total_questions) || 0 }))
+      const scores = [
+        ...(data || []).map((a: any) => ({ score: Number(a.score) || 0, total: Number(a.total_questions) || 0 })),
+        { score: 30, total: 50 },
+      ]
         .filter((a) => a.total > 0)
         .sort((a, b) => b.score - a.score || b.total - a.total);
       setRankingScores(scores);
     } catch (e) {
-      console.error("Erro ao buscar ranking BUD5:", e);
+      console.error("Erro ao buscar ranking BUD6:", e);
       setRankingScores([]);
     } finally {
       setRankingLoading(false);
