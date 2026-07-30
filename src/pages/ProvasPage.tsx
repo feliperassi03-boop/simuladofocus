@@ -243,7 +243,7 @@ export default function ProvasPage() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Trophy className="w-5 h-5 text-primary" />
-              Ranking Simulado BUD5
+              Ranking Simulado BUD 6
             </DialogTitle>
             <DialogDescription>
               Notas de todos os participantes (anônimo), da maior para a menor.
