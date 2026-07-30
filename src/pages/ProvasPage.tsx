@@ -228,8 +228,8 @@ export default function ProvasPage() {
           </Link>
           <button
             type="button"
-            aria-label="Ranking BUD5"
-            title="Ranking BUD5"
+            aria-label="Ranking Simulado BUD 6"
+            title="Ranking Simulado BUD 6"
             className="relative inline-flex items-center justify-center w-11 h-11 rounded-full border border-border bg-card shadow-card hover:bg-accent/40 transition-colors"
             onClick={openRanking}
           >
