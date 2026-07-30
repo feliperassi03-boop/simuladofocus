@@ -552,6 +552,13 @@ export type Database = {
           total_questions: number
         }[]
       }
+      get_bud6_ranking: {
+        Args: never
+        Returns: {
+          score: number
+          total_questions: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

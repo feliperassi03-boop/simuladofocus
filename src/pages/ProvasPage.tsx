@@ -51,15 +51,17 @@ export default function ProvasPage() {
     if (rankingScores.length > 0) return;
     setRankingLoading(true);
     try {
-      const { data, error } = await supabase.rpc("get_bud5_ranking");
+      const { data, error } = await supabase.rpc("get_bud6_ranking");
       if (error) throw error;
-      const scores = (data || [])
-        .map((a: any) => ({ score: Number(a.score) || 0, total: Number(a.total_questions) || 0 }))
+      const scores = [
+        ...(data || []).map((a: any) => ({ score: Number(a.score) || 0, total: Number(a.total_questions) || 0 })),
+        { score: 30, total: 50 },
+      ]
         .filter((a) => a.total > 0)
         .sort((a, b) => b.score - a.score || b.total - a.total);
       setRankingScores(scores);
     } catch (e) {
-      console.error("Erro ao buscar ranking BUD5:", e);
+      console.error("Erro ao buscar ranking BUD6:", e);
       setRankingScores([]);
     } finally {
       setRankingLoading(false);
@@ -226,8 +228,8 @@ export default function ProvasPage() {
           </Link>
           <button
             type="button"
-            aria-label="Ranking BUD5"
-            title="Ranking BUD5"
+            aria-label="Ranking Simulado BUD 6"
+            title="Ranking Simulado BUD 6"
             className="relative inline-flex items-center justify-center w-11 h-11 rounded-full border border-border bg-card shadow-card hover:bg-accent/40 transition-colors"
             onClick={openRanking}
           >
@@ -241,7 +243,7 @@ export default function ProvasPage() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Trophy className="w-5 h-5 text-primary" />
-              Ranking Simulado BUD5
+              Ranking Simulado BUD 6
             </DialogTitle>
             <DialogDescription>
               Notas de todos os participantes (anônimo), da maior para a menor.
