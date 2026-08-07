@@ -93,8 +93,9 @@ export default function TeaTab() {
     const raw = quickImport.replace(/\r\n/g, "\n").trim();
     if (!raw) return;
 
-    const subRegex = /^\s*(?:pergunta\s*|p\s*)?([123])[\)\.\-:]\s*/i;
-    const gabRegex = /^\s*(?:gabarito|resposta|r)\s*[123]?\s*[:\-\)]\s*/i;
+    // Aceita tópicos numerados (1, 2, 3) ou por letras (A, B, C).
+    const subRegex = /^\s*(?:pergunta\s*|p\s*)?([123abc])[\)\.\-:]\s*/i;
+    const gabRegex = /^\s*(?:gabarito|resposta(?:\s+esperada)?|r)\s*[123abc]?\s*[:\-\)]\s*/i;
     const comRegex = /^\s*(?:coment[áa]rio|comment)\s*[:\-]?\s*/i;
 
     const lines = raw.split("\n");
@@ -117,7 +118,10 @@ export default function TeaTab() {
         continue;
       }
       if (subM) {
-        currentIdx = parseInt(subM[1], 10) as 1 | 2 | 3;
+        const marker = subM[1].toUpperCase();
+        currentIdx = (/^[123]$/.test(marker)
+          ? Number(marker)
+          : marker.charCodeAt(0) - "A".charCodeAt(0) + 1) as 1 | 2 | 3;
         mode = "sub";
         subs[currentIdx].push(line.replace(subRegex, ""));
         continue;
