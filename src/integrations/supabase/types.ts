@@ -319,6 +319,30 @@ export type Database = {
           },
         ]
       }
+      simulado_signups: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          participant_type: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          participant_type: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          participant_type?: string
+        }
+        Relationships: []
+      }
       tea_answers: {
         Row: {
           attempt_id: string

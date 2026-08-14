@@ -14,6 +14,7 @@ import ProvasPage from "./pages/ProvasPage";
 import AppLayout from "./components/AppLayout";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import MyDoubtsPage from "./pages/MyDoubtsPage";
+import SignupSimuladoPage from "./pages/SignupSimuladoPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -62,6 +63,7 @@ const App = () => (
           <Routes>
             <Route path="/auth" element={<AuthRoute />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/inscricao-simulado" element={<SignupSimuladoPage />} />
             <Route path="/" element={<ProtectedRoute><HomeRedirect /></ProtectedRoute>} />
             <Route path="/provas" element={<StudentRoute><ProvasPage /></StudentRoute>} />
             <Route path="/historico" element={<ProtectedRoute><AppLayout><HistoryPage /></AppLayout></ProtectedRoute>} />

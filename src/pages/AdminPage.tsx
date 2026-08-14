@@ -16,6 +16,7 @@ import ExamsTab from "@/components/admin/ExamsTab";
 import AllowedEmailsTab from "@/components/admin/AllowedEmailsTab";
 import DoubtsTab from "@/components/admin/DoubtsTab";
 import TeaTab from "@/components/admin/TeaTab";
+import SignupsTab from "@/components/admin/SignupsTab";
 import { useVideoConverter } from "@/hooks/useVideoConverter";
 import { normalizeQuestionText } from "@/lib/utils";
 
@@ -379,6 +380,7 @@ export default function AdminPage() {
           <TabsTrigger value="results">Resultados</TabsTrigger>
           <TabsTrigger value="doubts">Dúvidas dos Alunos</TabsTrigger>
           <TabsTrigger value="allowed-emails">Emails Autorizados</TabsTrigger>
+          <TabsTrigger value="signups">Inscrições Simulado</TabsTrigger>
         </TabsList>
 
         <TabsContent value="questions" className="space-y-4">
@@ -785,6 +787,10 @@ export default function AdminPage() {
 
         <TabsContent value="allowed-emails">
           <AllowedEmailsTab />
+        </TabsContent>
+
+        <TabsContent value="signups">
+          <SignupsTab />
         </TabsContent>
       </Tabs>
     </div>
