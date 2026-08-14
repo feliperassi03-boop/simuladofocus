@@ -787,6 +787,10 @@ export default function AdminPage() {
         <TabsContent value="allowed-emails">
           <AllowedEmailsTab />
         </TabsContent>
+
+        <TabsContent value="signups">
+          <SignupsTab />
+        </TabsContent>
       </Tabs>
     </div>
   );
