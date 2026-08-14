@@ -16,6 +16,7 @@ import ExamsTab from "@/components/admin/ExamsTab";
 import AllowedEmailsTab from "@/components/admin/AllowedEmailsTab";
 import DoubtsTab from "@/components/admin/DoubtsTab";
 import TeaTab from "@/components/admin/TeaTab";
+import SignupsTab from "@/components/admin/SignupsTab";
 import { useVideoConverter } from "@/hooks/useVideoConverter";
 import { normalizeQuestionText } from "@/lib/utils";
 
