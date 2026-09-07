@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, Users, HelpCircle, BarChart3, ImagePlus, X, FileText, Video, MailCheck, Search } from "lucide-react";
+import { Plus, Pencil, Trash2, Users, HelpCircle, BarChart3, ImagePlus, X, FileText, Video, MailCheck, Search, Copy } from "lucide-react";
 import ExamsTab from "@/components/admin/ExamsTab";
 import AllowedEmailsTab from "@/components/admin/AllowedEmailsTab";
 import DoubtsTab from "@/components/admin/DoubtsTab";
@@ -381,6 +381,7 @@ export default function AdminPage() {
           <TabsTrigger value="doubts">Dúvidas dos Alunos</TabsTrigger>
           <TabsTrigger value="allowed-emails">Emails Autorizados</TabsTrigger>
           <TabsTrigger value="signups">Inscrições Simulado</TabsTrigger>
+          <TabsTrigger value="atf">Simulado ATF</TabsTrigger>
         </TabsList>
 
         <TabsContent value="questions" className="space-y-4">
@@ -791,6 +792,41 @@ export default function AdminPage() {
 
         <TabsContent value="signups">
           <SignupsTab />
+        </TabsContent>
+
+        <TabsContent value="atf" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Link do Simulado ATF — 13/09 às 08:00 (4h)</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                Este link é exclusivo para a prova ATF I. Ele só libera o início no dia 13/09 às 08:00
+                (horário de Brasília). Compartilhe com os participantes.
+              </p>
+              <div className="flex gap-2">
+                <Input
+                  readOnly
+                  value={`${window.location.origin}/#/simulado-atf`}
+                  className="text-sm"
+                />
+                <Button
+                  variant="outline"
+                  onClick={async () => {
+                    await navigator.clipboard.writeText(`${window.location.origin}/#/simulado-atf`);
+                    toast({ title: "Link copiado!" });
+                  }}
+                >
+                  <Copy className="w-4 h-4" />
+                </Button>
+                <Button asChild>
+                  <a href="/#/simulado-atf" target="_blank" rel="noopener noreferrer">
+                    Abrir
+                  </a>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
