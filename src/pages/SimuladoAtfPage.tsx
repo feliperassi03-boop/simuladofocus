@@ -10,7 +10,7 @@ import { normalizeQuestionText } from "@/lib/utils";
 import { Clock, Trophy, Lock, ArrowLeft, ArrowRight, Send } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
 import logoAsset from "@/assets/aumakua-logo.jpeg.asset.json";
-import coverBg from "@/assets/provas-bg.jpeg";
+import coverBg from "@/assets/simulado-atf-cover.jpeg.asset.json";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -230,7 +230,7 @@ export default function SimuladoAtfPage() {
     return (
       <div
         className="min-h-screen flex items-center justify-center p-4 bg-cover bg-center bg-fixed"
-        style={{ backgroundImage: `url(${coverBg})` }}
+        style={{ backgroundImage: `url(${coverBg.url})` }}
       >
         <div className="absolute inset-0 bg-background/85" />
         <Card className="relative w-full max-w-lg shadow-elevated animate-fade-in">
