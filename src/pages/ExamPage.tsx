@@ -102,7 +102,7 @@ export default function ExamPage() {
       setLoading(false);
     };
     fetchExam();
-  }, [examId, isAdmin]);
+  }, [examId, isAdmin, authLoading]);
 
   const handlePasswordSubmit = async () => {
     if (!exam) return;
