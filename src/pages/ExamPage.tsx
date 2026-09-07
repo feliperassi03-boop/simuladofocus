@@ -52,7 +52,7 @@ type ExamState = "password" | "identify" | "ready" | "playing" | "reviewing" | "
 export default function ExamPage() {
   const { id: examId } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const handleExit = () => {
     navigate(user ? "/" : "/auth");
@@ -87,7 +87,7 @@ export default function ExamPage() {
 
   useEffect(() => {
     const fetchExam = async () => {
-      if (!examId) return;
+      if (!examId || authLoading) return;
       const { data, error } = await supabase
         .from("exams")
         .select("*")
