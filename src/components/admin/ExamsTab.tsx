@@ -512,6 +512,14 @@ export default function ExamsTab() {
                     <Button variant="ghost" size="icon" onClick={() => openManageExam(exam)} title="Gerenciar conteúdo da prova">
                       <Wrench className="w-4 h-4 text-primary" />
                     </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleToggleActive(exam)}
+                      title={exam.is_active ? "Ocultar dos alunos" : "Mostrar aos alunos"}
+                    >
+                      {exam.is_active ? <Eye className="w-4 h-4 text-success" /> : <EyeOff className="w-4 h-4 text-muted-foreground" />}
+                    </Button>
                     <Button variant="ghost" size="icon" onClick={() => copyLink(exam.id)} title="Copiar link">
                       <Copy className="w-4 h-4" />
                     </Button>

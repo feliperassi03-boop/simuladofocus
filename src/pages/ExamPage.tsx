@@ -94,7 +94,7 @@ export default function ExamPage() {
         .eq("id", examId)
         .maybeSingle();
 
-      if (error || !data || !data.is_active) {
+      if (error || !data || (!data.is_active && !isAdmin)) {
         setState("error");
       } else {
         setExam(data);
@@ -102,7 +102,7 @@ export default function ExamPage() {
       setLoading(false);
     };
     fetchExam();
-  }, [examId]);
+  }, [examId, isAdmin]);
 
   const handlePasswordSubmit = async () => {
     if (!exam) return;
