@@ -135,6 +135,8 @@ export default function SimuladoAtfPage() {
   };
 
   const start = async () => {
+    audioRef.current?.pause();
+    setMusicOn(false);
     if (!released) return;
     if (!name.trim()) {
       toast({ title: "Digite seu nome completo.", variant: "destructive" });
