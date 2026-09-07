@@ -11,7 +11,7 @@ import { Clock, Trophy, Lock, ArrowLeft, ArrowRight, Send, Volume2, VolumeX } fr
 import QuestionVideo from "@/components/QuestionVideo";
 import logoAsset from "@/assets/aumakua-logo.jpeg.asset.json";
 import coverBg from "@/assets/simulado-atf-cover.jpeg.asset.json";
-import ambientMusic from "@/assets/simulado-atf-music.mp3.asset.json";
+import ambientMusic from "@/assets/simulado-atf-rock.mp3.asset.json";
 import {
   AlertDialog,
   AlertDialogAction,
