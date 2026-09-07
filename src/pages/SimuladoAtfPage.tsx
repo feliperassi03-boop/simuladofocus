@@ -7,11 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { normalizeQuestionText } from "@/lib/utils";
-import { Clock, Trophy, Lock, ArrowLeft, ArrowRight, Send, Volume2, VolumeX } from "lucide-react";
+import { Clock, Trophy, Lock, ArrowLeft, ArrowRight, Send } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
 import logoAsset from "@/assets/aumakua-logo.jpeg.asset.json";
 import coverBg from "@/assets/simulado-atf-cover.jpeg.asset.json";
-import ambientMusic from "@/assets/simulado-atf-rock.mp3.asset.json";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -59,24 +58,6 @@ export default function SimuladoAtfPage() {
   const [score, setScore] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const autoSubmitRef = useRef(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [musicOn, setMusicOn] = useState(false);
-
-  const toggleMusic = () => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio(ambientMusic.url);
-      audioRef.current.loop = true;
-      audioRef.current.volume = 0.5;
-    }
-    if (musicOn) {
-      audioRef.current.pause();
-      setMusicOn(false);
-    } else {
-      audioRef.current.play().then(() => setMusicOn(true)).catch(() => {
-        toast({ title: "Toque novamente para ativar o som", variant: "destructive" });
-      });
-    }
-  };
 
 
   // Relógio para liberar automaticamente no horário
@@ -135,8 +116,6 @@ export default function SimuladoAtfPage() {
   };
 
   const start = async () => {
-    audioRef.current?.pause();
-    setMusicOn(false);
     if (!released) return;
     if (!name.trim()) {
       toast({ title: "Digite seu nome completo.", variant: "destructive" });
@@ -255,15 +234,6 @@ export default function SimuladoAtfPage() {
         style={{ backgroundImage: `url(${coverBg.url})` }}
       >
         <div className="absolute inset-0 bg-background/85" />
-        <Button
-          variant="secondary"
-          size="icon"
-          onClick={toggleMusic}
-          title={musicOn ? "Desligar música" : "Ligar música"}
-          className="absolute top-4 right-4 z-10 rounded-full shadow-elevated"
-        >
-          {musicOn ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
-        </Button>
         <Card className="relative w-full max-w-lg shadow-elevated animate-fade-in">
           <CardHeader className="text-center">
             <img
