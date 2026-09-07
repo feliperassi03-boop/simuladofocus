@@ -15,6 +15,7 @@ import AppLayout from "./components/AppLayout";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import MyDoubtsPage from "./pages/MyDoubtsPage";
 import SignupSimuladoPage from "./pages/SignupSimuladoPage";
+import SimuladoAtfPage from "./pages/SimuladoAtfPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -64,7 +65,9 @@ const App = () => (
             <Route path="/auth" element={<AuthRoute />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/inscricao-simulado" element={<SignupSimuladoPage />} />
+            <Route path="/simulado-atf" element={<SimuladoAtfPage />} />
             <Route path="/" element={<ProtectedRoute><HomeRedirect /></ProtectedRoute>} />
+
             <Route path="/provas" element={<StudentRoute><ProvasPage /></StudentRoute>} />
             <Route path="/historico" element={<ProtectedRoute><AppLayout><HistoryPage /></AppLayout></ProtectedRoute>} />
             <Route path="/duvidas" element={<ProtectedRoute><AppLayout><MyDoubtsPage /></AppLayout></ProtectedRoute>} />

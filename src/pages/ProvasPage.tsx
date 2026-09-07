@@ -101,15 +101,19 @@ export default function ProvasPage() {
     if (!user) return;
     const fetchExams = async () => {
       setLoading(true);
-      const { data: examsData } = await supabase
+      const { data: allExams } = await supabase
         .from("exams")
         .select("id, title, exam_type")
         .eq("is_active", true);
+
+      // Simulado ATF I é acessado apenas pelo link exclusivo
+      const examsData = allExams?.filter((e) => e.title.trim().toUpperCase() !== "ATF I");
 
       if (!examsData) {
         setLoading(false);
         return;
       }
+
 
       const standardIds = examsData.filter((e) => e.exam_type !== "tea").map((e) => e.id);
       const teaIds = examsData.filter((e) => e.exam_type === "tea").map((e) => e.id);
