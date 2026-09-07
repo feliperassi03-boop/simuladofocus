@@ -253,6 +253,15 @@ export default function SimuladoAtfPage() {
         style={{ backgroundImage: `url(${coverBg.url})` }}
       >
         <div className="absolute inset-0 bg-background/85" />
+        <Button
+          variant="secondary"
+          size="icon"
+          onClick={toggleMusic}
+          title={musicOn ? "Desligar música" : "Ligar música"}
+          className="absolute top-4 right-4 z-10 rounded-full shadow-elevated"
+        >
+          {musicOn ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+        </Button>
         <Card className="relative w-full max-w-lg shadow-elevated animate-fade-in">
           <CardHeader className="text-center">
             <img
