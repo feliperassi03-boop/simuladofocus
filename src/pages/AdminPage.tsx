@@ -793,6 +793,41 @@ export default function AdminPage() {
         <TabsContent value="signups">
           <SignupsTab />
         </TabsContent>
+
+        <TabsContent value="atf" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Link do Simulado ATF — 13/09 às 08:00 (4h)</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                Este link é exclusivo para a prova ATF I. Ele só libera o início no dia 13/09 às 08:00
+                (horário de Brasília). Compartilhe com os participantes.
+              </p>
+              <div className="flex gap-2">
+                <Input
+                  readOnly
+                  value={`${window.location.origin}/#/simulado-atf`}
+                  className="text-sm"
+                />
+                <Button
+                  variant="outline"
+                  onClick={async () => {
+                    await navigator.clipboard.writeText(`${window.location.origin}/#/simulado-atf`);
+                    toast({ title: "Link copiado!" });
+                  }}
+                >
+                  <Copy className="w-4 h-4" />
+                </Button>
+                <Button asChild>
+                  <a href="/#/simulado-atf" target="_blank" rel="noopener noreferrer">
+                    Abrir
+                  </a>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     </div>
   );
