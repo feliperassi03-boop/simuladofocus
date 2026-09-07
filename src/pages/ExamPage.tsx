@@ -52,7 +52,7 @@ type ExamState = "password" | "identify" | "ready" | "playing" | "reviewing" | "
 export default function ExamPage() {
   const { id: examId } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { toast } = useToast();
   const handleExit = () => {
     navigate(user ? "/" : "/auth");
