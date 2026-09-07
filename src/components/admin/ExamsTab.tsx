@@ -198,6 +198,20 @@ export default function ExamsTab() {
     }
   };
 
+  const handleToggleActive = async (exam: Exam) => {
+    const next = !exam.is_active;
+    const { error } = await supabase.from("exams").update({ is_active: next }).eq("id", exam.id);
+    if (error) {
+      toast({ title: "Erro ao atualizar visibilidade", description: getErrorMessage(error), variant: "destructive" });
+      return;
+    }
+    setExams((prev) => prev.map((e) => (e.id === exam.id ? { ...e, is_active: next } : e)));
+    toast({
+      title: next ? "Prova visível para os alunos" : "Prova ocultada dos alunos",
+      description: next ? undefined : "Você (admin) ainda consegue abri-la normalmente.",
+    });
+  };
+
   const handleRename = async () => {
     if (!editingExam || !editTitle.trim()) return;
     const { error } = await supabase.from("exams").update({ title: editTitle.trim() }).eq("id", editingExam.id);
@@ -497,6 +511,14 @@ export default function ExamsTab() {
                     </Button>
                     <Button variant="ghost" size="icon" onClick={() => openManageExam(exam)} title="Gerenciar conteúdo da prova">
                       <Wrench className="w-4 h-4 text-primary" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleToggleActive(exam)}
+                      title={exam.is_active ? "Ocultar dos alunos" : "Mostrar aos alunos"}
+                    >
+                      {exam.is_active ? <Eye className="w-4 h-4 text-success" /> : <EyeOff className="w-4 h-4 text-muted-foreground" />}
                     </Button>
                     <Button variant="ghost" size="icon" onClick={() => copyLink(exam.id)} title="Copiar link">
                       <Copy className="w-4 h-4" />
