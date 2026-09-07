@@ -827,6 +827,7 @@ export default function AdminPage() {
               </div>
             </CardContent>
           </Card>
+          <AtfResultsTab />
         </TabsContent>
       </Tabs>
     </div>
