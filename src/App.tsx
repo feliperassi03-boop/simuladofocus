@@ -15,6 +15,7 @@ import AppLayout from "./components/AppLayout";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import MyDoubtsPage from "./pages/MyDoubtsPage";
 import SignupSimuladoPage from "./pages/SignupSimuladoPage";
+import SimuladoAtfPage from "./pages/SimuladoAtfPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
