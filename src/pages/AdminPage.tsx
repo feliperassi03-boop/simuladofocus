@@ -381,6 +381,7 @@ export default function AdminPage() {
           <TabsTrigger value="doubts">Dúvidas dos Alunos</TabsTrigger>
           <TabsTrigger value="allowed-emails">Emails Autorizados</TabsTrigger>
           <TabsTrigger value="signups">Inscrições Simulado</TabsTrigger>
+          <TabsTrigger value="atf">Simulado ATF</TabsTrigger>
         </TabsList>
 
         <TabsContent value="questions" className="space-y-4">
