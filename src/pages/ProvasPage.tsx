@@ -170,9 +170,11 @@ export default function ProvasPage() {
       "URGÊNCIA E TRAUMA",
       "VENTILAÇÃO MECÂNICA",
     ];
+    const strip = (s: string) =>
+      s.normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toUpperCase();
     const pinIndex = (cat: string) => {
-      const norm = cat.trim().toUpperCase();
-      const idx = PINNED.indexOf(norm);
+      const norm = strip(cat);
+      const idx = PINNED.findIndex((p) => strip(p) === norm);
       return idx === -1 ? PINNED.length : idx;
     };
     const categories = Array.from(map.entries())
