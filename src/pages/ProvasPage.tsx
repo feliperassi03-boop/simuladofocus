@@ -163,12 +163,31 @@ export default function ProvasPage() {
       map.get(cat)!.push(exam);
     }
     const collator = new Intl.Collator("pt-BR", { sensitivity: "base", numeric: true });
+    // Categorias fixadas no topo, nesta ordem exata
+    const PINNED = [
+      "SISTEMA NERVOSO AUTÔNOMO",
+      "TRANSPLANTE HEPÁTICO",
+      "URGÊNCIA E TRAUMA",
+      "VENTILAÇÃO MECÂNICA",
+    ];
+    const strip = (s: string) =>
+      s.normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toUpperCase();
+    const pinIndex = (cat: string) => {
+      const norm = strip(cat);
+      const idx = PINNED.findIndex((p) => strip(p) === norm);
+      return idx === -1 ? PINNED.length : idx;
+    };
     const categories = Array.from(map.entries())
       .map(([cat, items]) => ({
         category: cat,
         items: items.slice().sort((a, b) => collator.compare(a.title, b.title)),
       }))
-      .sort((a, b) => collator.compare(a.category, b.category));
+      .sort((a, b) => {
+        const pa = pinIndex(a.category);
+        const pb = pinIndex(b.category);
+        if (pa !== pb) return pa - pb;
+        return collator.compare(a.category, b.category);
+      });
     return categories;
   }, [exams, viewMode]);
 
