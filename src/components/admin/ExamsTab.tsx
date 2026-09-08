@@ -282,25 +282,18 @@ export default function ExamsTab() {
       .order("created_at", { ascending: false });
     if (!data) return;
 
-    // Ordena alfabeticamente por título (pt-BR), com provas fixadas no topo
-    const PINNED = [
-      "SISTEMA NERVOSO AUTÔNOMO",
-      "TRANSPLANTE HEPÁTICO",
-      "URGÊNCIA E TRAUMA",
-      "VENTILAÇÃO MECÂNICA",
-    ];
+    // Ordena alfabeticamente por título (pt-BR), com BUD e SIMULADO ao final
     const strip = (s: string) =>
       s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toUpperCase();
-    const pinIndex = (title: string) => {
+    const isBottom = (title: string) => {
       const norm = strip(title);
-      const idx = PINNED.findIndex((p) => strip(p) === norm);
-      return idx === -1 ? PINNED.length : idx;
+      return norm.startsWith("BUD") || norm.startsWith("SIMULADO");
     };
     const collator = new Intl.Collator("pt-BR", { sensitivity: "base", numeric: true });
     const sorted = data.slice().sort((a, b) => {
-      const pa = pinIndex(a.title);
-      const pb = pinIndex(b.title);
-      if (pa !== pb) return pa - pb;
+      const ba = isBottom(a.title);
+      const bb = isBottom(b.title);
+      if (ba !== bb) return ba ? 1 : -1;
       return collator.compare(a.title, b.title);
     });
 
