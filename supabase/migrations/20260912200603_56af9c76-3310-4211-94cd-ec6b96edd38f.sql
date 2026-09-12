@@ -1,0 +1,1 @@
+GRANT SELECT ON public.quiz_attempts TO anon;
