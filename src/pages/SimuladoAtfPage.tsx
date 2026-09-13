@@ -68,7 +68,8 @@ export default function SimuladoAtfPage() {
     return () => clearInterval(i);
   }, []);
 
-  const released = now >= RELEASE_AT;
+  const isTester = TESTER_EMAILS.includes(email.trim().toLowerCase());
+  const released = now >= RELEASE_AT || isTester;
 
   useEffect(() => {
     if (state !== "playing") {
