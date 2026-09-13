@@ -27,6 +27,8 @@ const EXAM_ID = "3599ded6-c8da-4a34-837f-6a95a38b7e1a"; // ATF I
 const DURATION = 4 * 60 * 60; // 4 horas
 // 13/09 08:00 (horário de Brasília, UTC-3) = 11:00 UTC
 const RELEASE_AT = new Date("2026-09-13T11:00:00Z");
+// E-mails autorizados a testar antes da liberação oficial
+const TESTER_EMAILS = ["felipebrc@hotmail.com"];
 
 interface Question {
   id: string;
