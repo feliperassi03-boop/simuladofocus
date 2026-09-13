@@ -27,6 +27,8 @@ const EXAM_ID = "3599ded6-c8da-4a34-837f-6a95a38b7e1a"; // ATF I
 const DURATION = 4 * 60 * 60; // 4 horas
 // 13/09 08:00 (horário de Brasília, UTC-3) = 11:00 UTC
 const RELEASE_AT = new Date("2026-09-13T11:00:00Z");
+// E-mails autorizados a testar antes da liberação oficial
+const TESTER_EMAILS = ["felipebrc@hotmail.com"];
 
 interface Question {
   id: string;
@@ -66,7 +68,8 @@ export default function SimuladoAtfPage() {
     return () => clearInterval(i);
   }, []);
 
-  const released = now >= RELEASE_AT;
+  const isTester = TESTER_EMAILS.includes(email.trim().toLowerCase());
+  const released = now >= RELEASE_AT || isTester;
 
   useEffect(() => {
     if (state !== "playing") {
@@ -247,31 +250,32 @@ export default function SimuladoAtfPage() {
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
-            {!released ? (
+            {!released && (
               <div className="text-center rounded-xl border border-border bg-muted/40 p-6">
                 <Lock className="w-8 h-8 mx-auto mb-3 text-muted-foreground" />
                 <p className="font-medium">A prova ainda não está liberada</p>
                 <p className="text-sm text-muted-foreground mt-1">Abertura em</p>
                 <p className="font-display text-xl mt-1">{countdownToRelease()}</p>
               </div>
-            ) : (
-              <>
-                <div>
-                  <Label htmlFor="nome">Nome completo *</Label>
-                  <Input id="nome" value={name} onChange={(e) => setName(e.target.value)} placeholder="Seu nome completo" />
-                </div>
-                <div>
-                  <Label htmlFor="mail">E-mail *</Label>
-                  <Input id="mail" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" />
-                </div>
-                <Button onClick={start} disabled={starting} className="w-full gradient-primary text-primary-foreground">
-                  {starting ? "Iniciando..." : "Iniciar Prova"}
-                </Button>
-                <p className="text-xs text-muted-foreground text-center">
-                  Ao iniciar, o cronômetro de 4 horas começa a contar e não pode ser pausado.
-                </p>
-              </>
             )}
+            <div>
+              <Label htmlFor="nome">Nome completo *</Label>
+              <Input id="nome" value={name} onChange={(e) => setName(e.target.value)} placeholder="Seu nome completo" />
+            </div>
+            <div>
+              <Label htmlFor="mail">E-mail *</Label>
+              <Input id="mail" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" />
+            </div>
+            <Button
+              onClick={start}
+              disabled={starting || !released}
+              className="w-full gradient-primary text-primary-foreground"
+            >
+              {starting ? "Iniciando..." : "Iniciar Prova"}
+            </Button>
+            <p className="text-xs text-muted-foreground text-center">
+              Ao iniciar, o cronômetro de 4 horas começa a contar e não pode ser pausado.
+            </p>
           </CardContent>
         </Card>
       </div>
