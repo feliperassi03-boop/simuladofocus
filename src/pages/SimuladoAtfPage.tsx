@@ -250,31 +250,32 @@ export default function SimuladoAtfPage() {
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
-            {!released ? (
+            {!released && (
               <div className="text-center rounded-xl border border-border bg-muted/40 p-6">
                 <Lock className="w-8 h-8 mx-auto mb-3 text-muted-foreground" />
                 <p className="font-medium">A prova ainda não está liberada</p>
                 <p className="text-sm text-muted-foreground mt-1">Abertura em</p>
                 <p className="font-display text-xl mt-1">{countdownToRelease()}</p>
               </div>
-            ) : (
-              <>
-                <div>
-                  <Label htmlFor="nome">Nome completo *</Label>
-                  <Input id="nome" value={name} onChange={(e) => setName(e.target.value)} placeholder="Seu nome completo" />
-                </div>
-                <div>
-                  <Label htmlFor="mail">E-mail *</Label>
-                  <Input id="mail" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" />
-                </div>
-                <Button onClick={start} disabled={starting} className="w-full gradient-primary text-primary-foreground">
-                  {starting ? "Iniciando..." : "Iniciar Prova"}
-                </Button>
-                <p className="text-xs text-muted-foreground text-center">
-                  Ao iniciar, o cronômetro de 4 horas começa a contar e não pode ser pausado.
-                </p>
-              </>
             )}
+            <div>
+              <Label htmlFor="nome">Nome completo *</Label>
+              <Input id="nome" value={name} onChange={(e) => setName(e.target.value)} placeholder="Seu nome completo" />
+            </div>
+            <div>
+              <Label htmlFor="mail">E-mail *</Label>
+              <Input id="mail" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" />
+            </div>
+            <Button
+              onClick={start}
+              disabled={starting || !released}
+              className="w-full gradient-primary text-primary-foreground"
+            >
+              {starting ? "Iniciando..." : "Iniciar Prova"}
+            </Button>
+            <p className="text-xs text-muted-foreground text-center">
+              Ao iniciar, o cronômetro de 4 horas começa a contar e não pode ser pausado.
+            </p>
           </CardContent>
         </Card>
       </div>
