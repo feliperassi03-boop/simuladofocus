@@ -16,6 +16,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import MyDoubtsPage from "./pages/MyDoubtsPage";
 import SignupSimuladoPage from "./pages/SignupSimuladoPage";
 import SimuladoAtfPage from "./pages/SimuladoAtfPage";
+import VideoaulasPage from "./pages/VideoaulasPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -71,6 +72,7 @@ const App = () => (
             <Route path="/provas" element={<StudentRoute><ProvasPage /></StudentRoute>} />
             <Route path="/historico" element={<ProtectedRoute><AppLayout><HistoryPage /></AppLayout></ProtectedRoute>} />
             <Route path="/duvidas" element={<ProtectedRoute><AppLayout><MyDoubtsPage /></AppLayout></ProtectedRoute>} />
+            <Route path="/videoaulas" element={<ProtectedRoute><AppLayout><VideoaulasPage /></AppLayout></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><AdminRoute><AdminPage /></AdminRoute></ProtectedRoute>} />
             <Route path="/prova/:id" element={<ExamPage />} />
             <Route path="/prova-tea/:id" element={<TeaExamPage />} />
