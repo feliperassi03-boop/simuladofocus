@@ -564,6 +564,147 @@ export type Database = {
         }
         Relationships: []
       }
+      video_doubts: {
+        Row: {
+          admin_response: string | null
+          answered_at: string | null
+          created_at: string
+          doubt_text: string
+          id: string
+          lesson_id: string | null
+          lesson_title: string
+          student_email: string | null
+          student_name: string
+          user_id: string
+        }
+        Insert: {
+          admin_response?: string | null
+          answered_at?: string | null
+          created_at?: string
+          doubt_text: string
+          id?: string
+          lesson_id?: string | null
+          lesson_title?: string
+          student_email?: string | null
+          student_name?: string
+          user_id: string
+        }
+        Update: {
+          admin_response?: string | null
+          answered_at?: string | null
+          created_at?: string
+          doubt_text?: string
+          id?: string
+          lesson_id?: string | null
+          lesson_title?: string
+          student_email?: string | null
+          student_name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_doubts_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "video_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_lessons: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          module_id: string
+          pdf_name: string | null
+          pdf_path: string | null
+          sort_order: number
+          title: string
+          video_path: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          module_id: string
+          pdf_name?: string | null
+          pdf_path?: string | null
+          sort_order?: number
+          title: string
+          video_path: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          module_id?: string
+          pdf_name?: string | null
+          pdf_path?: string | null
+          sort_order?: number
+          title?: string
+          video_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_lessons_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "video_modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_modules: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          sort_order: number
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          sort_order?: number
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          sort_order?: number
+          title?: string
+        }
+        Relationships: []
+      }
+      video_progress: {
+        Row: {
+          lesson_id: string
+          user_id: string
+          watched_at: string
+        }
+        Insert: {
+          lesson_id: string
+          user_id: string
+          watched_at?: string
+        }
+        Update: {
+          lesson_id?: string
+          user_id?: string
+          watched_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_progress_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "video_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
