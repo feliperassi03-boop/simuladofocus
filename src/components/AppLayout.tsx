@@ -1,7 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, LogOut, Shield, History, FileText, MessageCircleQuestion, Bell } from "lucide-react";
+import { BookOpen, LogOut, Shield, History, FileText, MessageCircleQuestion, Bell , PlayCircle } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -68,6 +68,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 </Button>
               </Link>
             )}
+            <Link to="/videoaulas">
+              <Button
+                variant={location.pathname === "/videoaulas" ? "default" : "ghost"}
+                size="sm"
+                className={location.pathname === "/videoaulas" ? "gradient-primary text-primary-foreground" : ""}
+              >
+                <PlayCircle className="w-4 h-4 mr-1" /> VIDEOAULAS
+              </Button>
+            </Link>
             <Link to="/historico">
               <Button
                 variant={location.pathname === "/historico" ? "default" : "ghost"}

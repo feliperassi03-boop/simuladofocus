@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { Play, FileText, Loader2, FolderOpen, Bell, Trophy } from "lucide-react";
+import { Play, FileText, Loader2, FolderOpen, Bell, Trophy, PlayCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
@@ -227,6 +227,9 @@ export default function ProvasPage() {
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          <Link to="/videoaulas">
+            <Button variant="outline" className="h-11 bg-card shadow-card"><PlayCircle className="w-5 h-5 mr-1" /> VIDEOAULAS</Button>
+          </Link>
           <Link
             to="/duvidas"
             aria-label="Respostas às suas dúvidas"
