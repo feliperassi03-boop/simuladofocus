@@ -17,6 +17,7 @@ import AllowedEmailsTab from "@/components/admin/AllowedEmailsTab";
 import DoubtsTab from "@/components/admin/DoubtsTab";
 import TeaTab from "@/components/admin/TeaTab";
 import SignupsTab from "@/components/admin/SignupsTab";
+import AssinaturasTab from "@/components/admin/AssinaturasTab";
 import VideoaulasTab from "@/components/admin/VideoaulasTab";
 import AtfResultsTab from "@/components/admin/AtfResultsTab";
 import { useVideoConverter } from "@/hooks/useVideoConverter";
@@ -385,6 +386,7 @@ export default function AdminPage() {
           <TabsTrigger value="signups">Inscrições Simulado</TabsTrigger>
           <TabsTrigger value="atf">Simulado ATF</TabsTrigger>
           <TabsTrigger value="videoaulas">VIDEOAULAS</TabsTrigger>
+          <TabsTrigger value="assinaturas">Assinaturas</TabsTrigger>
         </TabsList>
 
         <TabsContent value="questions" className="space-y-4">
@@ -795,6 +797,10 @@ export default function AdminPage() {
 
         <TabsContent value="signups">
           <SignupsTab />
+        </TabsContent>
+
+        <TabsContent value="assinaturas">
+          <AssinaturasTab />
         </TabsContent>
 
         <TabsContent value="videoaulas">
