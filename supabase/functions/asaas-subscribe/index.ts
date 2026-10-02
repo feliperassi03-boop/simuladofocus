@@ -4,7 +4,9 @@ import { z } from "npm:zod@3";
 
 const ASAAS_URL = "https://api-sandbox.asaas.com/v3"; // SANDBOX
 const PLAN_NAME = "Mentoria AUMAKUA TSA 2027";
-const PLAN_VALUE = 6299.99;
+const CARD_VALUE = 6499.99; // cartão de crédito, até 3x
+const PIX_VALUE = 6000.0; // Pix à vista
+const MAX_INSTALLMENTS = 3;
 const ADMIN_ONLY = true; // fase de testes: só administradores podem assinar
 
 const json = (body: unknown, status = 200) =>
@@ -13,6 +15,7 @@ const json = (body: unknown, status = 200) =>
 const Body = z.object({
   name: z.string().trim().min(3).max(120).optional(),
   cpf: z.string().regex(/^\d{11}$/).optional(),
+  method: z.enum(["card", "pix"]).default("card"),
 });
 
 function validCpf(cpf: string) {
@@ -63,18 +66,19 @@ Deno.serve(async (req) => {
     const rows = existing || [];
 
     const active = rows.find((r) => r.status === "ativo");
-    if (active) return json({ error: "Você já possui uma assinatura ativa" }, 409);
-    const pending = rows.find((r) => r.status === "pendente" && r.payment_url);
-    if (pending) return json({ payment_url: pending.payment_url });
+    if (active) return json({ error: "Você já possui um acesso ativo" }, 409);
+    const pending = rows.find((r) => r.status === "pendente");
 
     const cpf = parsed.data.cpf || rows.find((r) => r.cpf)?.cpf;
     if (!cpf) return json({ need_cpf: true }, 200);
     if (!validCpf(cpf)) return json({ error: "CPF inválido" }, 400);
 
-    const name = parsed.data.name || user.user_metadata?.full_name || user.email!.split("@")[0];
+    const name = parsed.data.name || pending?.aluno_nome || user.user_metadata?.full_name || user.email!.split("@")[0];
     const email = user.email!;
+    const method = parsed.data.method;
+    const value = method === "pix" ? PIX_VALUE : CARD_VALUE;
 
-    // 1) Cliente: reutiliza se já existir
+    // Cliente: reutiliza se já existir
     let customerId: string | undefined = rows.find((r) => r.asaas_customer_id)?.asaas_customer_id;
     if (!customerId) {
       const found = await asaas(`/customers?cpfCnpj=${cpf}`);
@@ -88,40 +92,41 @@ Deno.serve(async (req) => {
       customerId = created.id;
     }
 
-    // 2) Assinatura anual (cliente escolhe Pix ou cartão na página do Asaas)
-    const today = new Date().toISOString().slice(0, 10);
-    const sub = await asaas("/subscriptions", {
+    // Linha "pendente" (reaproveita se já houver)
+    let rowId = pending?.id as string | undefined;
+    if (!rowId) {
+      const { data: ins, error: insErr } = await admin.from("assinaturas").insert({
+        user_id: user.id, aluno_nome: name, aluno_email: email, cpf, plano: PLAN_NAME,
+        valor: value, status: "pendente", asaas_customer_id: customerId,
+      }).select("id").single();
+      if (insErr) throw insErr;
+      rowId = ins.id;
+    }
+
+    // Asaas Checkout (pagamento único, não assinatura)
+    const origin = req.headers.get("origin") || "https://aumakua-app.lovable.app";
+    const back = `${origin.startsWith("https://") ? origin : "https://aumakua-app.lovable.app"}/#/planos`;
+    const checkout = await asaas("/checkouts", {
       method: "POST",
       body: JSON.stringify({
+        billingTypes: [method === "pix" ? "PIX" : "CREDIT_CARD"],
+        chargeTypes: method === "pix" ? ["DETACHED"] : ["DETACHED", "INSTALLMENT"],
+        ...(method === "card" ? { installment: { maxInstallmentCount: MAX_INSTALLMENTS } } : {}),
+        minutesToExpire: 1440,
         customer: customerId,
-        billingType: "UNDEFINED",
-        value: PLAN_VALUE,
-        nextDueDate: today,
-        cycle: "YEARLY",
-        description: PLAN_NAME,
-        externalReference: user.id,
+        externalReference: rowId,
+        callback: { successUrl: `${back}?pago=1`, cancelUrl: back, expiredUrl: back },
+        items: [{ name: PLAN_NAME, description: `${PLAN_NAME} — acesso por 12 meses`, quantity: 1, value }],
       }),
     });
+    const paymentUrl: string = checkout.link || `https://sandbox.asaas.com/checkoutSession/show?id=${checkout.id}`;
 
-    const payments = await asaas(`/subscriptions/${sub.id}/payments`);
-    const paymentUrl: string | null = payments?.data?.[0]?.invoiceUrl ?? null;
+    const { error: upErr } = await admin.from("assinaturas").update({
+      aluno_nome: name, cpf, valor: value, asaas_customer_id: customerId,
+      asaas_subscription_id: checkout.id, payment_url: paymentUrl,
+    }).eq("id", rowId);
+    if (upErr) throw upErr;
 
-    // 3) Salva como pendente
-    const { error: insErr } = await admin.from("assinaturas").insert({
-      user_id: user.id,
-      aluno_nome: name,
-      aluno_email: email,
-      cpf,
-      plano: PLAN_NAME,
-      valor: PLAN_VALUE,
-      status: "pendente",
-      asaas_customer_id: customerId,
-      asaas_subscription_id: sub.id,
-      payment_url: paymentUrl,
-    });
-    if (insErr) throw insErr;
-
-    // 4) Link de pagamento
     return json({ payment_url: paymentUrl });
   } catch (e) {
     console.error(e);
