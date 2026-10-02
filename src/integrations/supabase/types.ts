@@ -32,6 +32,48 @@ export type Database = {
         }
         Relationships: []
       }
+      assinaturas: {
+        Row: {
+          aluno_email: string | null
+          aluno_nome: string
+          asaas_customer_id: string | null
+          asaas_subscription_id: string | null
+          created_at: string
+          data_expiracao: string | null
+          id: string
+          plano: string
+          status: Database["public"]["Enums"]["subscription_status"]
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          aluno_email?: string | null
+          aluno_nome?: string
+          asaas_customer_id?: string | null
+          asaas_subscription_id?: string | null
+          created_at?: string
+          data_expiracao?: string | null
+          id?: string
+          plano: string
+          status?: Database["public"]["Enums"]["subscription_status"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          aluno_email?: string | null
+          aluno_nome?: string
+          asaas_customer_id?: string | null
+          asaas_subscription_id?: string | null
+          created_at?: string
+          data_expiracao?: string | null
+          id?: string
+          plano?: string
+          status?: Database["public"]["Enums"]["subscription_status"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       exam_questions: {
         Row: {
           exam_id: string
@@ -737,6 +779,12 @@ export type Database = {
     Enums: {
       app_role: "admin" | "student"
       doubt_status: "pending" | "answered" | "resolved" | "archived"
+      subscription_status:
+        | "pendente"
+        | "ativo"
+        | "atrasado"
+        | "cancelado"
+        | "estornado"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -866,6 +914,13 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "student"],
       doubt_status: ["pending", "answered", "resolved", "archived"],
+      subscription_status: [
+        "pendente",
+        "ativo",
+        "atrasado",
+        "cancelado",
+        "estornado",
+      ],
     },
   },
 } as const

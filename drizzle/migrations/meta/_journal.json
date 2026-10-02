@@ -8,6 +8,13 @@
       "when": 1790877067061,
       "tag": "0000_videoaulas",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790976387488,
+      "tag": "0001_assinaturas",
+      "breakpoints": true
     }
   ]
 }
