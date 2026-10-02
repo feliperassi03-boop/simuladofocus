@@ -17,15 +17,17 @@ const formatCpf = (v: string) => {
 export default function PlanosPage() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<null | "card" | "pix">(null);
+  const [method, setMethod] = useState<"card" | "pix">("card");
   const [askCpf, setAskCpf] = useState(false);
   const [cpf, setCpf] = useState("");
   const [name, setName] = useState<string>(user?.user_metadata?.full_name || "");
 
-  const subscribe = async (extra?: { cpf: string; name: string }) => {
-    setLoading(true);
-    const { data, error } = await supabase.functions.invoke("asaas-subscribe", { body: extra ?? {} });
-    setLoading(false);
+  const subscribe = async (m: "card" | "pix", extra?: { cpf: string; name: string }) => {
+    setMethod(m);
+    setLoading(m);
+    const { data, error } = await supabase.functions.invoke("asaas-subscribe", { body: { ...(extra ?? {}), method: m } });
+    setLoading(null);
     if (error || data?.error) {
       let msg = data?.error || error?.message;
       try { msg = (await (error as any)?.context?.json())?.error || msg; } catch { /* ignore */ }
@@ -44,7 +46,7 @@ export default function PlanosPage() {
     if (digits.length !== 11) return toast({ title: "Informe um CPF válido.", variant: "destructive" });
     if (name.trim().length < 3) return toast({ title: "Informe seu nome completo.", variant: "destructive" });
     setAskCpf(false);
-    subscribe({ cpf: digits, name: name.trim() });
+    subscribe(method, { cpf: digits, name: name.trim() });
   };
 
   return (
@@ -56,16 +58,20 @@ export default function PlanosPage() {
       <Card className="shadow-card">
         <CardHeader>
           <CardTitle className="font-display">Mentoria AUMAKUA TSA 2027</CardTitle>
-          <p className="text-3xl font-bold text-foreground">R$ 6.299,99<span className="text-base font-normal text-muted-foreground">/ano</span></p>
+          <p className="text-3xl font-bold text-foreground">R$ 6.499,99<span className="text-base font-normal text-muted-foreground"> em até 3x no cartão</span></p>
+          <p className="text-lg font-semibold text-primary">ou R$ 6.000,00 à vista no Pix</p>
         </CardHeader>
         <CardContent className="space-y-4">
           <ul className="space-y-2 text-sm text-foreground">
             <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-primary" /> Acesso a todas as provas e simulados</li>
             <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-primary" /> VIDEOAULAS</li>
-            <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-primary" /> Pagamento por Pix ou cartão</li>
+            <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-primary" /> Acesso por 12 meses após a confirmação do pagamento</li>
           </ul>
-          <Button className="w-full gradient-primary text-primary-foreground" size="lg" disabled={loading} onClick={() => subscribe()}>
-            {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null} Assinar
+          <Button className="w-full gradient-primary text-primary-foreground" size="lg" disabled={!!loading} onClick={() => subscribe("card")}>
+            {loading === "card" ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null} Cartão de crédito — até 3x de R$ 2.166,66
+          </Button>
+          <Button className="w-full" variant="outline" size="lg" disabled={!!loading} onClick={() => subscribe("pix")}>
+            {loading === "pix" ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null} Pix — R$ 6.000,00
           </Button>
         </CardContent>
       </Card>
