@@ -58,7 +58,7 @@ export default function AssinaturasTab() {
   return (
     <div className="space-y-6">
       <Card>
-        <CardHeader><CardTitle className="font-display">Nova assinatura</CardTitle></CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between gap-2"><CardTitle className="font-display">Nova assinatura</CardTitle><a href="#/planos"><Button variant="outline" size="sm">Abrir página de planos (teste)</Button></a></CardHeader>
         <CardContent className="grid gap-3 sm:grid-cols-2">
           <div><Label>Nome do aluno</Label><Input value={form.aluno_nome} onChange={f("aluno_nome")} /></div>
           <div><Label>E-mail do aluno</Label><Input type="email" value={form.aluno_email} onChange={f("aluno_email")} /></div>

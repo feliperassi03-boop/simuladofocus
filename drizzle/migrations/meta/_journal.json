@@ -15,6 +15,13 @@
       "when": 1790976387488,
       "tag": "0001_assinaturas",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790976867901,
+      "tag": "0002_assinaturas_cpf",
+      "breakpoints": true
     }
   ]
 }

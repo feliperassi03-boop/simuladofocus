@@ -38,39 +38,48 @@ export type Database = {
           aluno_nome: string
           asaas_customer_id: string | null
           asaas_subscription_id: string | null
+          cpf: string | null
           created_at: string
           data_expiracao: string | null
           id: string
+          payment_url: string | null
           plano: string
           status: Database["public"]["Enums"]["subscription_status"]
           updated_at: string
           user_id: string | null
+          valor: number | null
         }
         Insert: {
           aluno_email?: string | null
           aluno_nome?: string
           asaas_customer_id?: string | null
           asaas_subscription_id?: string | null
+          cpf?: string | null
           created_at?: string
           data_expiracao?: string | null
           id?: string
+          payment_url?: string | null
           plano: string
           status?: Database["public"]["Enums"]["subscription_status"]
           updated_at?: string
           user_id?: string | null
+          valor?: number | null
         }
         Update: {
           aluno_email?: string | null
           aluno_nome?: string
           asaas_customer_id?: string | null
           asaas_subscription_id?: string | null
+          cpf?: string | null
           created_at?: string
           data_expiracao?: string | null
           id?: string
+          payment_url?: string | null
           plano?: string
           status?: Database["public"]["Enums"]["subscription_status"]
           updated_at?: string
           user_id?: string | null
+          valor?: number | null
         }
         Relationships: []
       }
