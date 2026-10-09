@@ -16,6 +16,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import MyDoubtsPage from "./pages/MyDoubtsPage";
 import SignupSimuladoPage from "./pages/SignupSimuladoPage";
 import SimuladoAtfPage from "./pages/SimuladoAtfPage";
+import TsaMentoriaPage from "./pages/TsaMentoriaPage";
 import VideoaulasPage from "./pages/VideoaulasPage";
 import PlanosPage from "./pages/PlanosPage";
 import NotFound from "./pages/NotFound";
@@ -68,6 +69,7 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/inscricao-simulado" element={<SignupSimuladoPage />} />
             <Route path="/simulado-atf" element={<SimuladoAtfPage />} />
+            <Route path="/tsa-mentoria" element={<TsaMentoriaPage />} />
             <Route path="/" element={<ProtectedRoute><HomeRedirect /></ProtectedRoute>} />
 
             <Route path="/provas" element={<StudentRoute><ProvasPage /></StudentRoute>} />
