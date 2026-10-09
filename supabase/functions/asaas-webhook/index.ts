@@ -39,6 +39,12 @@ Deno.serve(async (req) => {
     const exp = new Date();
     exp.setFullYear(exp.getFullYear() + 1);
     await admin.from("assinaturas").update({ status: "ativo", data_expiracao: exp.toISOString().slice(0, 10) }).eq("id", row.id);
+    // Libera o e-mail para criar conta na plataforma
+    if (row.aluno_email) {
+      const email = String(row.aluno_email).toLowerCase();
+      const { data: exists } = await admin.from("allowed_emails").select("id").ilike("email", email).maybeSingle();
+      if (!exists) await admin.from("allowed_emails").insert({ email });
+    }
   } else {
     await admin.from("assinaturas").update({ status: "estornado" }).eq("id", row.id);
   }
