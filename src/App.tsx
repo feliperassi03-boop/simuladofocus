@@ -19,6 +19,7 @@ import SimuladoAtfPage from "./pages/SimuladoAtfPage";
 import TsaMentoriaPage from "./pages/TsaMentoriaPage";
 import VideoaulasPage from "./pages/VideoaulasPage";
 import PlanosPage from "./pages/PlanosPage";
+import AssinaturasTab from "@/components/admin/AssinaturasTab";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -77,6 +78,7 @@ const App = () => (
             <Route path="/duvidas" element={<ProtectedRoute><AppLayout><MyDoubtsPage /></AppLayout></ProtectedRoute>} />
             <Route path="/videoaulas" element={<ProtectedRoute><AppLayout><VideoaulasPage /></AppLayout></ProtectedRoute>} />
             <Route path="/planos" element={<ProtectedRoute><AdminRoute><PlanosPage /></AdminRoute></ProtectedRoute>} />
+            <Route path="/assinaturas" element={<ProtectedRoute><AdminRoute><AssinaturasTab /></AdminRoute></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><AdminRoute><AdminPage /></AdminRoute></ProtectedRoute>} />
             <Route path="/prova/:id" element={<ExamPage />} />
             <Route path="/prova-tea/:id" element={<TeaExamPage />} />
