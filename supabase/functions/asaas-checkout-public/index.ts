@@ -18,7 +18,25 @@ const Body = z.object({
   email: z.string().trim().toLowerCase().email().max(255),
   cpf: z.string().regex(/^\d{11}$/),
   phone: z.string().regex(/^\d{10,11}$/),
+  address: z.object({
+    postalCode: z.string().regex(/^\d{8}$/),
+    street: z.string().trim().min(1).max(120),
+    number: z.string().trim().min(1).max(20),
+    district: z.string().trim().min(1).max(80),
+    city: z.string().trim().min(1).max(80),
+    uf: z.string().trim().regex(/^[A-Za-z]{2}$/),
+  }),
   method: z.enum(["card", "pix"]),
+});
+
+const customerAddress = (a: z.infer<typeof Body>["address"]) => ({
+  postalCode: a.postalCode,
+  address: a.street,
+  addressNumber: a.number,
+  district: a.district,
+  city: a.city,
+  state: a.uf.toUpperCase(),
+  country: "Brasil",
 });
 
 function validCpf(cpf: string) {
@@ -48,7 +66,7 @@ Deno.serve(async (req) => {
   try {
     const parsed = Body.safeParse(await req.json().catch(() => ({})));
     if (!parsed.success) return json({ error: "Preencha nome, e-mail e CPF corretamente" }, 400);
-    const { name, email, cpf, phone, method } = parsed.data;
+    const { name, email, cpf, phone, address, method } = parsed.data;
     if (!validCpf(cpf)) return json({ error: "CPF inválido" }, 400);
 
     const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
@@ -64,14 +82,20 @@ Deno.serve(async (req) => {
     let customerId: string | undefined = list.find((r) => r.asaas_customer_id)?.asaas_customer_id;
     if (!customerId) customerId = (await asaas(`/customers?cpfCnpj=${cpf}`))?.data?.[0]?.id;
     if (customerId) {
-      // Asaas exige telefone no cliente; atualiza se estiver faltando
+      // Asaas exige telefone e endereço no cliente; atualiza se estiver faltando
       const cur = await asaas(`/customers/${customerId}`).catch(() => null);
-      if (!cur?.phone) {
-        await asaas(`/customers/${customerId}`, { method: "POST", body: JSON.stringify({ phone }) });
+      if (!cur?.phone || !cur?.address) {
+        await asaas(`/customers/${customerId}`, {
+          method: "POST",
+          body: JSON.stringify({ phone, mobilePhone: phone, ...(customerAddress(address) as any) }),
+        });
       }
     }
     if (!customerId) {
-      customerId = (await asaas("/customers", { method: "POST", body: JSON.stringify({ name, cpfCnpj: cpf, email, phone, mobilePhone: phone }) })).id;
+      customerId = (await asaas("/customers", {
+        method: "POST",
+        body: JSON.stringify({ name, cpfCnpj: cpf, email, phone, mobilePhone: phone, ...customerAddress(address) }),
+      })).id;
     }
 
     const { data: ins, error: insErr } = await admin.from("assinaturas").insert({
