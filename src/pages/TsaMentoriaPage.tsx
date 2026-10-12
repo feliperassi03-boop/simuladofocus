@@ -14,6 +14,7 @@ const fmtCpf = (d: string) =>
   d.replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d{1,2})$/, "$1-$2");
 const fmtPhone = (d: string) =>
   d.replace(/(\d{2})(\d)/, "($1) $2").replace(/(\d{5})(\d{1,4})$/, "$1-$2");
+const fmtCep = (d: string) => d.replace(/(\d{5})(\d{1,3})$/, "$1-$2");
 
 export default function TsaMentoriaPage() {
   const [params] = useSearchParams();
@@ -92,6 +93,30 @@ export default function TsaMentoriaPage() {
                 <p className="text-xs text-muted-foreground">Use este mesmo e-mail depois para criar sua conta.</p></div>
               <div className="space-y-1"><Label>CPF</Label><Input inputMode="numeric" value={fmtCpf(cpf)} onChange={(e) => setCpf(onlyDigits(e.target.value).slice(0, 11))} /></div>
               <div className="space-y-1"><Label>Celular (WhatsApp)</Label><Input inputMode="tel" placeholder="(11) 99999-9999" value={fmtPhone(phone)} onChange={(e) => setPhone(onlyDigits(e.target.value).slice(0, 11))} /></div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1 col-span-1"><Label>CEP</Label>
+                  <Input inputMode="numeric" placeholder="00000-000" value={fmtCep(addr.cep)} onChange={(e) => setAddr((a) => ({ ...a, cep: onlyDigits(e.target.value).slice(0, 8) }))} onBlur={() => lookupCep(addr.cep)} />
+                </div>
+                <div className="space-y-1 col-span-2"><Label>Endereço</Label>
+                  <Input value={addr.street} onChange={(e) => setAddr((a) => ({ ...a, street: e.target.value }))} maxLength={120} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1"><Label>Número</Label>
+                  <Input value={addr.number} onChange={(e) => setAddr((a) => ({ ...a, number: e.target.value }))} maxLength={20} />
+                </div>
+                <div className="space-y-1"><Label>Bairro</Label>
+                  <Input value={addr.district} onChange={(e) => setAddr((a) => ({ ...a, district: e.target.value }))} maxLength={80} />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1 col-span-2"><Label>Cidade</Label>
+                  <Input value={addr.city} onChange={(e) => setAddr((a) => ({ ...a, city: e.target.value }))} maxLength={80} />
+                </div>
+                <div className="space-y-1"><Label>UF</Label>
+                  <Input value={addr.uf} maxLength={2} onChange={(e) => setAddr((a) => ({ ...a, uf: e.target.value.toUpperCase() }))} />
+                </div>
+              </div>
               <div className="grid gap-3 pt-2">
                 <Button onClick={() => pay("card")} disabled={!!loading} className="h-auto py-3 flex-col">
                   <span className="flex items-center gap-2">{loading === "card" ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}Cartão de crédito — R$ 6.499,99</span>
