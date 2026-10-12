@@ -896,7 +896,6 @@ export default function ExamPage() {
           {currentIndex + 1 < questions.length ? (
             <Button
               onClick={() => goToQuestion(currentIndex + 1)}
-              disabled={!selectedOption}
               className="gradient-primary text-primary-foreground"
             >
               Próxima <ArrowRight className="w-4 h-4 ml-2" />
