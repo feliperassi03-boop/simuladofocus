@@ -23,16 +23,39 @@ export default function TsaMentoriaPage() {
   const [email, setEmail] = useState("");
   const [cpf, setCpf] = useState("");
   const [phone, setPhone] = useState("");
+  const [addr, setAddr] = useState({ cep: "", street: "", number: "", district: "", city: "", uf: "" });
   const [loading, setLoading] = useState<"card" | "pix" | null>(null);
 
+  const lookupCep = async (cep: string) => {
+    if (cep.length !== 8) return;
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const d = await res.json();
+      if (!d.erro) {
+        setAddr((a) => ({
+          ...a,
+          street: d.logradouro || a.street,
+          district: d.bairro || a.district,
+          city: d.localidade || a.city,
+          uf: d.uf || a.uf,
+        }));
+      }
+    } catch { /* segue com preenchimento manual */ }
+  };
+
+  const formOk =
+    name.trim().length >= 3 && email.includes("@") && cpf.length === 11 &&
+    (phone.length === 10 || phone.length === 11) && addr.cep.length === 8 &&
+    addr.street.trim() && addr.number.trim() && addr.district.trim() && addr.city.trim() && addr.uf.trim().length === 2;
+
   const pay = async (method: "card" | "pix") => {
-    if (name.trim().length < 3 || !email.includes("@") || cpf.length !== 11 || (phone.length !== 10 && phone.length !== 11)) {
-      toast({ title: "Preencha nome, e-mail, CPF e celular", variant: "destructive" });
+    if (!formOk) {
+      toast({ title: "Preencha todos os dados", variant: "destructive" });
       return;
     }
     setLoading(method);
     const { data, error } = await supabase.functions.invoke("asaas-checkout-public", {
-      body: { name: name.trim(), email: email.trim(), cpf, phone, method },
+      body: { name: name.trim(), email: email.trim(), cpf, phone, address: { postalCode: addr.cep, street: addr.street.trim(), number: addr.number.trim(), district: addr.district.trim(), city: addr.city.trim(), uf: addr.uf.trim() }, method },
     });
     const msg = (data as any)?.error || (error as any)?.context && (await (error as any).context.json().catch(() => null))?.error;
     if (data?.payment_url) {
