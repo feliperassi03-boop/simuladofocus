@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -64,6 +65,11 @@ const emptyForm = {
 export default function AdminPage() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const TABS = ["questions", "exams", "tea", "results", "doubts", "allowed-emails", "signups", "atf", "videoaulas", "assinaturas"];
+  const tabParam = searchParams.get("tab") || "";
+  const activeTab = TABS.includes(tabParam) ? tabParam : "questions";
+  const changeTab = (v: string) => setSearchParams(v === "questions" ? {} : { tab: v }, { replace: true });
   const [questions, setQuestions] = useState<Question[]>([]);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [form, setForm] = useState(emptyForm);
@@ -375,7 +381,7 @@ export default function AdminPage() {
         </Card>
       </div>
 
-      <Tabs defaultValue="questions">
+      <Tabs value={activeTab} onValueChange={changeTab}>
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="questions">Perguntas</TabsTrigger>
           <TabsTrigger value="exams">Provas</TabsTrigger>
