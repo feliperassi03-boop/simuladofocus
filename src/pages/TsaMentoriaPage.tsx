@@ -9,9 +9,12 @@ import { useToast } from "@/hooks/use-toast";
 import { CheckCircle2, CreditCard, QrCode, Loader2 } from "lucide-react";
 import logoAsset from "@/assets/aumakua-logo.jpeg.asset.json";
 
-const onlyDigits = (s: string) => s.replace(/\D/g, "").slice(0, 11);
+const onlyDigits = (s: string) => s.replace(/\D/g, "");
 const fmtCpf = (d: string) =>
   d.replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+const fmtPhone = (d: string) =>
+  d.replace(/(\d{2})(\d)/, "($1) $2").replace(/(\d{5})(\d{1,4})$/, "$1-$2");
+const fmtCep = (d: string) => d.replace(/(\d{5})(\d{1,3})$/, "$1-$2");
 
 export default function TsaMentoriaPage() {
   const [params] = useSearchParams();
@@ -20,16 +23,40 @@ export default function TsaMentoriaPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [cpf, setCpf] = useState("");
+  const [phone, setPhone] = useState("");
+  const [addr, setAddr] = useState({ cep: "", street: "", number: "", district: "", city: "", uf: "" });
   const [loading, setLoading] = useState<"card" | "pix" | null>(null);
 
+  const lookupCep = async (cep: string) => {
+    if (cep.length !== 8) return;
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const d = await res.json();
+      if (!d.erro) {
+        setAddr((a) => ({
+          ...a,
+          street: d.logradouro || a.street,
+          district: d.bairro || a.district,
+          city: d.localidade || a.city,
+          uf: d.uf || a.uf,
+        }));
+      }
+    } catch { /* segue com preenchimento manual */ }
+  };
+
+  const formOk =
+    name.trim().length >= 3 && email.includes("@") && cpf.length === 11 &&
+    (phone.length === 10 || phone.length === 11) && addr.cep.length === 8 &&
+    addr.street.trim() && addr.number.trim() && addr.district.trim() && addr.city.trim() && addr.uf.trim().length === 2;
+
   const pay = async (method: "card" | "pix") => {
-    if (name.trim().length < 3 || !email.includes("@") || cpf.length !== 11) {
-      toast({ title: "Preencha nome, e-mail e CPF", variant: "destructive" });
+    if (!formOk) {
+      toast({ title: "Preencha todos os dados", variant: "destructive" });
       return;
     }
     setLoading(method);
     const { data, error } = await supabase.functions.invoke("asaas-checkout-public", {
-      body: { name: name.trim(), email: email.trim(), cpf, method },
+      body: { name: name.trim(), email: email.trim(), cpf, phone, address: { postalCode: addr.cep, street: addr.street.trim(), number: addr.number.trim(), district: addr.district.trim(), city: addr.city.trim(), uf: addr.uf.trim() }, method },
     });
     const msg = (data as any)?.error || (error as any)?.context && (await (error as any).context.json().catch(() => null))?.error;
     if (data?.payment_url) {
@@ -64,7 +91,32 @@ export default function TsaMentoriaPage() {
               <div className="space-y-1"><Label>Nome completo</Label><Input value={name} onChange={(e) => setName(e.target.value)} maxLength={120} /></div>
               <div className="space-y-1"><Label>E-mail</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={255} />
                 <p className="text-xs text-muted-foreground">Use este mesmo e-mail depois para criar sua conta.</p></div>
-              <div className="space-y-1"><Label>CPF</Label><Input inputMode="numeric" value={fmtCpf(cpf)} onChange={(e) => setCpf(onlyDigits(e.target.value))} /></div>
+              <div className="space-y-1"><Label>CPF</Label><Input inputMode="numeric" value={fmtCpf(cpf)} onChange={(e) => setCpf(onlyDigits(e.target.value).slice(0, 11))} /></div>
+              <div className="space-y-1"><Label>Celular (WhatsApp)</Label><Input inputMode="tel" placeholder="(11) 99999-9999" value={fmtPhone(phone)} onChange={(e) => setPhone(onlyDigits(e.target.value).slice(0, 11))} /></div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1 col-span-1"><Label>CEP</Label>
+                  <Input inputMode="numeric" placeholder="00000-000" value={fmtCep(addr.cep)} onChange={(e) => setAddr((a) => ({ ...a, cep: onlyDigits(e.target.value).slice(0, 8) }))} onBlur={() => lookupCep(addr.cep)} />
+                </div>
+                <div className="space-y-1 col-span-2"><Label>Endereço</Label>
+                  <Input value={addr.street} onChange={(e) => setAddr((a) => ({ ...a, street: e.target.value }))} maxLength={120} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1"><Label>Número</Label>
+                  <Input value={addr.number} onChange={(e) => setAddr((a) => ({ ...a, number: e.target.value }))} maxLength={20} />
+                </div>
+                <div className="space-y-1"><Label>Bairro</Label>
+                  <Input value={addr.district} onChange={(e) => setAddr((a) => ({ ...a, district: e.target.value }))} maxLength={80} />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1 col-span-2"><Label>Cidade</Label>
+                  <Input value={addr.city} onChange={(e) => setAddr((a) => ({ ...a, city: e.target.value }))} maxLength={80} />
+                </div>
+                <div className="space-y-1"><Label>UF</Label>
+                  <Input value={addr.uf} maxLength={2} onChange={(e) => setAddr((a) => ({ ...a, uf: e.target.value.toUpperCase() }))} />
+                </div>
+              </div>
               <div className="grid gap-3 pt-2">
                 <Button onClick={() => pay("card")} disabled={!!loading} className="h-auto py-3 flex-col">
                   <span className="flex items-center gap-2">{loading === "card" ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}Cartão de crédito — R$ 6.499,99</span>
