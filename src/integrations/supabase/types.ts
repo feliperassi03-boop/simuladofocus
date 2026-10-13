@@ -711,6 +711,7 @@ export type Database = {
           created_at: string
           file_name: string
           file_path: string
+          folder: string | null
           id: string
           module_id: string
         }
@@ -718,6 +719,7 @@ export type Database = {
           created_at?: string
           file_name: string
           file_path: string
+          folder?: string | null
           id?: string
           module_id: string
         }
@@ -725,6 +727,7 @@ export type Database = {
           created_at?: string
           file_name?: string
           file_path?: string
+          folder?: string | null
           id?: string
           module_id?: string
         }
