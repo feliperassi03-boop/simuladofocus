@@ -142,22 +142,40 @@ export default function VideoaulasTab() {
             <Input placeholder="Ex.: Hemato" value={newModule} onChange={(e) => setNewModule(e.target.value)} />
             <Button onClick={addModule}><Plus className="w-4 h-4 mr-1" /> Criar</Button>
           </div>
-          {modules.map((m) => (
+          {modules.map((m) => {
+            const mFiles = files.filter((f) => f.module_id === m.id);
+            const folders = Array.from(new Set(mFiles.map((f) => f.folder || "")));
+            return (
             <div key={m.id} className="rounded-lg border border-border p-3 space-y-2">
               <div className="flex items-center justify-between gap-2">
                 <p className="font-semibold break-words">{m.title}</p>
-                <div className="flex items-center gap-1">
-                  <label className="inline-flex items-center gap-1 text-xs cursor-pointer rounded-md border border-border px-2 py-1 hover:bg-accent/30">
-                    <FileUp className="w-4 h-4" /> Adicionar arquivos
-                    <input type="file" multiple className="hidden" onChange={(e) => { uploadModuleFiles(m.id, e.target.files); e.target.value = ""; }} />
-                  </label>
-                  <Button size="icon" variant="ghost" onClick={() => deleteModule(m.id)}><Trash2 className="w-4 h-4" /></Button>
-                </div>
+                <Button size="icon" variant="ghost" onClick={() => deleteModule(m.id)}><Trash2 className="w-4 h-4" /></Button>
               </div>
-              {files.filter((f) => f.module_id === m.id).map((f) => (
-                <div key={f.id} className="flex items-center justify-between gap-2 text-sm pl-3">
-                  <span className="break-words flex items-center gap-1"><FileText className="w-4 h-4 shrink-0" />{f.file_name}</span>
-                  <Button size="icon" variant="ghost" onClick={() => deleteFile(f)}><Trash2 className="w-4 h-4" /></Button>
+              <div className="flex flex-wrap items-center gap-2">
+                <Input
+                  className="h-8 w-40 text-xs"
+                  placeholder="Pasta (ex.: Apostilas)"
+                  list={`folders-${m.id}`}
+                  value={folderByModule[m.id] || ""}
+                  onChange={(e) => setFolderByModule({ ...folderByModule, [m.id]: e.target.value })}
+                />
+                <datalist id={`folders-${m.id}`}>
+                  {folders.filter(Boolean).map((fo) => <option key={fo} value={fo} />)}
+                </datalist>
+                <label className="inline-flex items-center gap-1 text-xs cursor-pointer rounded-md border border-border px-2 py-1 hover:bg-accent/30">
+                  <FileUp className="w-4 h-4" /> Adicionar arquivos
+                  <input type="file" multiple className="hidden" onChange={(e) => { uploadModuleFiles(m.id, e.target.files); e.target.value = ""; }} />
+                </label>
+              </div>
+              {(folders.length ? folders : [""]).map((fo) => (
+                <div key={fo || "__root"} className="space-y-1">
+                  {fo && <p className="text-xs font-semibold text-muted-foreground pl-3 flex items-center gap-1"><Folder className="w-3 h-3" /> {fo}</p>}
+                  {mFiles.filter((f) => (f.folder || "") === fo).map((f) => (
+                    <div key={f.id} className="flex items-center justify-between gap-2 text-sm pl-3">
+                      <span className="break-words flex items-center gap-1"><FileText className="w-4 h-4 shrink-0" />{f.file_name}</span>
+                      <Button size="icon" variant="ghost" onClick={() => deleteFile(f)}><Trash2 className="w-4 h-4" /></Button>
+                    </div>
+                  ))}
                 </div>
               ))}
               {lessons.filter((l) => l.module_id === m.id).map((l) => (
