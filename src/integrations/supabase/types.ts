@@ -706,6 +706,38 @@ export type Database = {
           },
         ]
       }
+      video_module_files: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_path: string
+          id: string
+          module_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          file_path: string
+          id?: string
+          module_id: string
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          id?: string
+          module_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_module_files_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "video_modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       video_modules: {
         Row: {
           created_at: string
