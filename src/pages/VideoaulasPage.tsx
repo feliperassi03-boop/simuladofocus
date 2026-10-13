@@ -36,7 +36,7 @@ export default function VideoaulasPage() {
         user ? supabase.from("video_progress").select("lesson_id").eq("user_id", user.id) : Promise.resolve({ data: [] as any[] }),
         supabase.from("video_module_files").select("*").order("created_at"),
       ]);
-      setModules((m.data as Module[]) || []);
+      setModules(((m.data as Module[]) || []).slice().sort((a, b) => a.title.localeCompare(b.title, "pt-BR", { sensitivity: "base" })));
       setLessons((l.data as Lesson[]) || []);
       setModFiles((f.data as ModFile[]) || []);
       setWatched(new Set(((p as any).data || []).map((r: any) => r.lesson_id)));
