@@ -6,17 +6,21 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle2, Circle, FileDown, Loader2, PlayCircle, Send, MessageCircleQuestion } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { CheckCircle2, Circle, FileDown, FileText, Loader2, PlayCircle, Send, MessageCircleQuestion } from "lucide-react";
 
 type Module = { id: string; title: string; description: string | null; sort_order: number };
 type Lesson = { id: string; module_id: string; title: string; description: string | null; video_path: string; pdf_path: string | null; pdf_name: string | null; sort_order: number };
 type Doubt = { id: string; lesson_id: string | null; doubt_text: string; admin_response: string | null; created_at: string };
+type ModFile = { id: string; module_id: string; file_name: string; file_path: string };
 
 export default function VideoaulasPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [modules, setModules] = useState<Module[]>([]);
   const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [modFiles, setModFiles] = useState<ModFile[]>([]);
+  const [filesModule, setFilesModule] = useState<Module | null>(null);
   const [watched, setWatched] = useState<Set<string>>(new Set());
   const [current, setCurrent] = useState<Lesson | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
@@ -26,13 +30,15 @@ export default function VideoaulasPage() {
 
   useEffect(() => {
     (async () => {
-      const [m, l, p] = await Promise.all([
+      const [m, l, p, f] = await Promise.all([
         supabase.from("video_modules").select("*").order("sort_order").order("title"),
         supabase.from("video_lessons").select("*").order("sort_order").order("created_at"),
         user ? supabase.from("video_progress").select("lesson_id").eq("user_id", user.id) : Promise.resolve({ data: [] as any[] }),
+        supabase.from("video_module_files").select("*").order("created_at"),
       ]);
       setModules((m.data as Module[]) || []);
       setLessons((l.data as Lesson[]) || []);
+      setModFiles((f.data as ModFile[]) || []);
       setWatched(new Set(((p as any).data || []).map((r: any) => r.lesson_id)));
       setLoading(false);
     })();
@@ -94,10 +100,34 @@ export default function VideoaulasPage() {
     return map;
   }, [lessons]);
 
+  const filesByModule = useMemo(() => {
+    const map: Record<string, ModFile[]> = {};
+    modFiles.forEach((f) => (map[f.module_id] ||= []).push(f));
+    return map;
+  }, [modFiles]);
+
+  const openFile = async (f: ModFile) => {
+    const { data } = await supabase.storage.from("lesson-media").createSignedUrl(f.file_path, 600);
+    if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+  };
+
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>;
 
   return (
     <div className="space-y-6">
+      <Dialog open={!!filesModule} onOpenChange={(o) => !o && setFilesModule(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle className="break-words">Arquivos · {filesModule?.title}</DialogTitle></DialogHeader>
+          <div className="space-y-2">
+            {(filesModule ? filesByModule[filesModule.id] || [] : []).map((f) => (
+              <button key={f.id} onClick={() => openFile(f)} className="w-full flex items-center gap-2 rounded-md border border-border p-2 text-left hover:bg-accent/20">
+                <FileDown className="w-4 h-4 shrink-0 text-primary" />
+                <span className="break-words text-sm text-foreground">{f.file_name}</span>
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
       <div>
         <h1 className="text-2xl font-display font-bold text-foreground">VIDEOAULAS</h1>
         <p className="text-muted-foreground mt-1">Assista às aulas por tema e acompanhe seu progresso</p>
@@ -157,12 +187,19 @@ export default function VideoaulasPage() {
             const done = list.filter((l) => watched.has(l.id)).length;
             return (
               <AccordionItem key={m.id} value={m.id} className="rounded-lg border border-border bg-card px-4">
-                <AccordionTrigger className="text-left">
-                  <div className="min-w-0">
-                    <p className="font-display font-semibold break-words">{m.title}</p>
-                    <p className="text-xs text-muted-foreground">{done}/{list.length} assistidas</p>
-                  </div>
-                </AccordionTrigger>
+                <div className="flex items-center gap-2">
+                  <AccordionTrigger className="text-left flex-1">
+                    <div className="min-w-0">
+                      <p className="font-display font-semibold break-words">{m.title}</p>
+                      <p className="text-xs text-muted-foreground">{done}/{list.length} assistidas</p>
+                    </div>
+                  </AccordionTrigger>
+                  {(filesByModule[m.id]?.length ?? 0) > 0 && (
+                    <Button variant="outline" size="sm" onClick={() => setFilesModule(m)} aria-label="Arquivos do módulo">
+                      <FileText className="w-4 h-4 mr-1" /> {filesByModule[m.id].length}
+                    </Button>
+                  )}
+                </div>
                 <AccordionContent className="space-y-1">
                   {list.length === 0 && <p className="text-sm text-muted-foreground">Sem aulas neste módulo.</p>}
                   {list.map((l) => (
