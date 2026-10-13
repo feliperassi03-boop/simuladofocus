@@ -13,7 +13,7 @@ import { Plus, Trash2, Upload, Send, FileUp, FileText } from "lucide-react";
 type Module = { id: string; title: string; sort_order: number };
 type Lesson = { id: string; module_id: string; title: string; video_path: string; pdf_path: string | null; sort_order: number };
 type Doubt = { id: string; student_name: string; student_email: string | null; lesson_title: string; doubt_text: string; admin_response: string | null; created_at: string };
-type ModFile = { id: string; module_id: string; file_name: string; file_path: string };
+type ModFile = { id: string; module_id: string; file_name: string; file_path: string; folder: string | null };
 
 const safeName = (n: string) => n.normalize("NFD").replace(/[^\w.-]+/g, "_");
 
@@ -32,6 +32,7 @@ export default function VideoaulasTab() {
   const [pdf, setPdf] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [folderByModule, setFolderByModule] = useState<Record<string, string>>({});
 
   const load = async () => {
     const [m, l, d, f] = await Promise.all([
