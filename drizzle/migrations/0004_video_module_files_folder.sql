@@ -1,0 +1,1 @@
+ALTER TABLE public.video_module_files ADD COLUMN folder text;

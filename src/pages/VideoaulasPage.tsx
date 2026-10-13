@@ -7,12 +7,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { CheckCircle2, Circle, FileDown, FileText, Loader2, PlayCircle, Send, MessageCircleQuestion } from "lucide-react";
+import { CheckCircle2, Circle, FileDown, FileText, Folder, Loader2, PlayCircle, Send, MessageCircleQuestion } from "lucide-react";
 
 type Module = { id: string; title: string; description: string | null; sort_order: number };
 type Lesson = { id: string; module_id: string; title: string; description: string | null; video_path: string; pdf_path: string | null; pdf_name: string | null; sort_order: number };
 type Doubt = { id: string; lesson_id: string | null; doubt_text: string; admin_response: string | null; created_at: string };
-type ModFile = { id: string; module_id: string; file_name: string; file_path: string };
+type ModFile = { id: string; module_id: string; file_name: string; file_path: string; folder: string | null };
 
 export default function VideoaulasPage() {
   const { user } = useAuth();
@@ -118,12 +118,17 @@ export default function VideoaulasPage() {
       <Dialog open={!!filesModule} onOpenChange={(o) => !o && setFilesModule(null)}>
         <DialogContent>
           <DialogHeader><DialogTitle className="break-words">Arquivos · {filesModule?.title}</DialogTitle></DialogHeader>
-          <div className="space-y-2">
-            {(filesModule ? filesByModule[filesModule.id] || [] : []).map((f) => (
-              <button key={f.id} onClick={() => openFile(f)} className="w-full flex items-center gap-2 rounded-md border border-border p-2 text-left hover:bg-accent/20">
-                <FileDown className="w-4 h-4 shrink-0 text-primary" />
-                <span className="break-words text-sm text-foreground">{f.file_name}</span>
-              </button>
+          <div className="space-y-3">
+            {Array.from(new Set((filesModule ? filesByModule[filesModule.id] || [] : []).map((f) => f.folder || ""))).map((fo) => (
+              <div key={fo || "__root"} className="space-y-2">
+                {fo && <p className="text-xs font-semibold text-muted-foreground flex items-center gap-1"><Folder className="w-3 h-3" /> {fo}</p>}
+                {(filesModule ? filesByModule[filesModule.id] || [] : []).filter((f) => (f.folder || "") === fo).map((f) => (
+                  <button key={f.id} onClick={() => openFile(f)} className="w-full flex items-center gap-2 rounded-md border border-border p-2 text-left hover:bg-accent/20">
+                    <FileDown className="w-4 h-4 shrink-0 text-primary" />
+                    <span className="break-words text-sm text-foreground">{f.file_name}</span>
+                  </button>
+                ))}
+              </div>
             ))}
           </div>
         </DialogContent>
