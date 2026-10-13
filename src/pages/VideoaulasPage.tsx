@@ -106,10 +106,18 @@ export default function VideoaulasPage() {
     return map;
   }, [modFiles]);
 
-  const openFile = async (f: ModFile) => {
-    const { data } = await supabase.storage.from("lesson-media").createSignedUrl(f.file_path, 600);
-    if (data?.signedUrl) window.open(data.signedUrl, "_blank");
-  };
+  const [fileUrls, setFileUrls] = useState<Record<string, string>>({});
+  useEffect(() => {
+    if (!filesModule) return;
+    const list = filesByModule[filesModule.id] || [];
+    if (!list.length) return;
+    (async () => {
+      const { data } = await supabase.storage.from("lesson-media").createSignedUrls(list.map((f) => f.file_path), 60 * 60 * 2);
+      const map: Record<string, string> = {};
+      (data || []).forEach((d, i) => { if (d.signedUrl) map[list[i].id] = d.signedUrl; });
+      setFileUrls(map);
+    })();
+  }, [filesModule, filesByModule]);
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>;
 
@@ -123,10 +131,10 @@ export default function VideoaulasPage() {
               <div key={fo || "__root"} className="space-y-2">
                 {fo && <p className="text-xs font-semibold text-muted-foreground flex items-center gap-1"><Folder className="w-3 h-3" /> {fo}</p>}
                 {(filesModule ? filesByModule[filesModule.id] || [] : []).filter((f) => (f.folder || "") === fo).map((f) => (
-                  <button key={f.id} onClick={() => openFile(f)} className="w-full flex items-center gap-2 rounded-md border border-border p-2 text-left hover:bg-accent/20">
-                    <FileDown className="w-4 h-4 shrink-0 text-primary" />
+                  <a key={f.id} href={fileUrls[f.id] || undefined} target="_blank" rel="noopener noreferrer" aria-disabled={!fileUrls[f.id]} className={`w-full flex items-center gap-2 rounded-md border border-border p-2 text-left hover:bg-accent/20 ${fileUrls[f.id] ? "" : "opacity-60 pointer-events-none"}`}>
+                    {fileUrls[f.id] ? <FileDown className="w-4 h-4 shrink-0 text-primary" /> : <Loader2 className="w-4 h-4 shrink-0 animate-spin text-primary" />}
                     <span className="break-words text-sm text-foreground">{f.file_name}</span>
-                  </button>
+                  </a>
                 ))}
               </div>
             ))}
