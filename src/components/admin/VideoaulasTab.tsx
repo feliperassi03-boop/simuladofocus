@@ -41,7 +41,7 @@ export default function VideoaulasTab() {
       supabase.from("video_doubts").select("*").order("created_at", { ascending: false }),
       supabase.from("video_module_files").select("*").order("created_at"),
     ]);
-    setModules((m.data as Module[]) || []);
+    setModules(((m.data as Module[]) || []).slice().sort((a, b) => a.title.localeCompare(b.title, "pt-BR", { sensitivity: "base" })));
     setLessons((l.data as Lesson[]) || []);
     setDoubts((d.data as Doubt[]) || []);
     setFiles((f.data as ModFile[]) || []);
