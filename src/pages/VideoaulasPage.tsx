@@ -218,7 +218,7 @@ export default function VideoaulasPage() {
                   {list.map((l) => (
                     <div key={l.id} className={`flex items-center gap-2 rounded-md p-2 ${current?.id === l.id ? "bg-accent/40" : "hover:bg-accent/20"}`}>
                       <button onClick={() => toggleWatched(l.id)} aria-label="Marcar como assistida">
-                        {watched.has(l.id) ? <CheckCircle2 className="w-5 h-5 text-primary" /> : <Circle className="w-5 h-5 text-muted-foreground" />}
+                        {watched.has(l.id) ? <CheckCircle2 className="w-5 h-5 text-success" /> : <Circle className="w-5 h-5 text-muted-foreground" />}
                       </button>
                       <button onClick={() => openLesson(l)} className="flex-1 min-w-0 flex items-center gap-2 text-left">
                         <PlayCircle className="w-4 h-4 shrink-0 text-primary" />

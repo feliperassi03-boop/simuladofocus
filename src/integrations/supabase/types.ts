@@ -83,6 +83,32 @@ export type Database = {
         }
         Relationships: []
       }
+      exam_completions: {
+        Row: {
+          completed_at: string
+          exam_id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          exam_id: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          exam_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exam_completions_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "exams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       exam_questions: {
         Row: {
           exam_id: string

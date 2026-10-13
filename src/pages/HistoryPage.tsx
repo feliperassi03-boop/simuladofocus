@@ -5,7 +5,7 @@ import { normalizeQuestionText } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, XCircle, ArrowLeft, ArrowRight, Trophy, BookOpen, Clock, MessageSquareText, Eye } from "lucide-react";
+import { CheckCircle, CheckCircle2, PlayCircle, XCircle, ArrowLeft, ArrowRight, Trophy, BookOpen, Clock, MessageSquareText, Eye } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
 
 interface Attempt {
@@ -52,9 +52,36 @@ export default function HistoryPage() {
   const [reviewQuestions, setReviewQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  const [doneLessons, setDoneLessons] = useState<{ id: string; title: string; module: string; at: string }[]>([]);
+  const [doneExams, setDoneExams] = useState<{ id: string; title: string; at: string }[]>([]);
+
   useEffect(() => {
     if (!user) return;
     fetchAttempts();
+    (async () => {
+      const [vp, ec] = await Promise.all([
+        supabase.from("video_progress").select("lesson_id, watched_at").eq("user_id", user.id).order("watched_at", { ascending: false }),
+        supabase.from("exam_completions").select("exam_id, completed_at").eq("user_id", user.id).order("completed_at", { ascending: false }),
+      ]);
+      const lessonIds = (vp.data || []).map((r) => r.lesson_id);
+      if (lessonIds.length) {
+        const { data: ls } = await supabase.from("video_lessons").select("id, title, module_id").in("id", lessonIds);
+        const modIds = [...new Set((ls || []).map((l) => l.module_id))];
+        const { data: ms } = modIds.length ? await supabase.from("video_modules").select("id, title").in("id", modIds) : { data: [] as any[] };
+        const lMap = new Map((ls || []).map((l) => [l.id, l]));
+        const mMap = new Map((ms || []).map((m: any) => [m.id, m.title]));
+        setDoneLessons((vp.data || []).filter((r) => lMap.has(r.lesson_id)).map((r) => {
+          const l = lMap.get(r.lesson_id)!;
+          return { id: l.id, title: l.title, module: mMap.get(l.module_id) || "", at: r.watched_at };
+        }));
+      } else setDoneLessons([]);
+      const examIds = (ec.data || []).map((r) => r.exam_id);
+      if (examIds.length) {
+        const { data: ex } = await supabase.from("exams").select("id, title").in("id", examIds);
+        const eMap = new Map((ex || []).map((e) => [e.id, e.title]));
+        setDoneExams((ec.data || []).map((r) => ({ id: r.exam_id, title: eMap.get(r.exam_id) || "Prova", at: r.completed_at })));
+      } else setDoneExams([]);
+    })();
   }, [user]);
 
   const fetchAttempts = async () => {
@@ -290,9 +317,57 @@ export default function HistoryPage() {
   // List view
   return (
     <div className="max-w-2xl mx-auto animate-fade-in">
+      <h2 className="text-2xl font-display font-bold text-foreground mb-4 flex items-center gap-2">
+        <PlayCircle className="w-6 h-6 text-primary" />
+        Aulas concluídas ({doneLessons.length})
+      </h2>
+      <Card className="shadow-elevated mb-8">
+        <CardContent className="py-3">
+          {doneLessons.length === 0 ? (
+            <p className="text-muted-foreground text-sm py-4 text-center">Nenhuma aula marcada como assistida ainda.</p>
+          ) : (
+            <ul className="divide-y divide-border">
+              {doneLessons.map((l) => (
+                <li key={l.id} className="flex items-center gap-3 py-2">
+                  <CheckCircle2 className="w-5 h-5 text-success shrink-0" />
+                  <div className="min-w-0">
+                    <p className="font-medium break-words">{l.title}</p>
+                    <p className="text-xs text-muted-foreground">{l.module} · {new Date(l.at).toLocaleDateString("pt-BR")}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      <h2 className="text-2xl font-display font-bold text-foreground mb-4 flex items-center gap-2">
+        <CheckCircle2 className="w-6 h-6 text-success" />
+        Simulados / questões concluídos ({doneExams.length})
+      </h2>
+      <Card className="shadow-elevated mb-8">
+        <CardContent className="py-3">
+          {doneExams.length === 0 ? (
+            <p className="text-muted-foreground text-sm py-4 text-center">Nenhuma prova marcada como concluída ainda.</p>
+          ) : (
+            <ul className="divide-y divide-border">
+              {doneExams.map((e) => (
+                <li key={e.id} className="flex items-center gap-3 py-2">
+                  <CheckCircle2 className="w-5 h-5 text-success shrink-0" />
+                  <div className="min-w-0">
+                    <p className="font-medium break-words">{e.title}</p>
+                    <p className="text-xs text-muted-foreground">{new Date(e.at).toLocaleDateString("pt-BR")}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
       <h1 className="text-2xl font-display font-bold text-foreground mb-6 flex items-center gap-2">
         <BookOpen className="w-6 h-6 text-primary" />
-        Meus Simulados
+        Meus Simulados (notas)
       </h1>
 
       {attempts.length === 0 ? (
