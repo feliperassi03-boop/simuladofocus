@@ -155,13 +155,24 @@ export default function VideoaulasTab() {
                 <Input
                   className="h-8 w-40 text-xs"
                   placeholder="Pasta (ex.: Apostilas)"
-                  list={`folders-${m.id}`}
+                  autoComplete="off"
                   value={folderByModule[m.id] || ""}
                   onChange={(e) => setFolderByModule({ ...folderByModule, [m.id]: e.target.value })}
                 />
-                <datalist id={`folders-${m.id}`}>
-                  {folders.filter(Boolean).map((fo) => <option key={fo} value={fo} />)}
-                </datalist>
+                {folders.filter(Boolean).length > 0 && (
+                  <div className="flex flex-wrap items-center gap-1">
+                    {folders.filter(Boolean).map((fo) => (
+                      <button
+                        key={fo}
+                        type="button"
+                        onClick={() => setFolderByModule({ ...folderByModule, [m.id]: fo })}
+                        className="text-xs rounded-full border border-border px-2 py-0.5 hover:bg-accent/30"
+                      >
+                        <Folder className="w-3 h-3 inline mr-1" />{fo}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 <label className="inline-flex items-center gap-1 text-xs cursor-pointer rounded-md border border-border px-2 py-1 hover:bg-accent/30">
                   <FileUp className="w-4 h-4" /> Adicionar arquivos
                   <input type="file" multiple className="hidden" onChange={(e) => { uploadModuleFiles(m.id, e.target.files); e.target.value = ""; }} />
