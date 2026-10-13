@@ -8,11 +8,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Upload, Send } from "lucide-react";
+import { Plus, Trash2, Upload, Send, FileUp, FileText } from "lucide-react";
 
 type Module = { id: string; title: string; sort_order: number };
 type Lesson = { id: string; module_id: string; title: string; video_path: string; pdf_path: string | null; sort_order: number };
 type Doubt = { id: string; student_name: string; student_email: string | null; lesson_title: string; doubt_text: string; admin_response: string | null; created_at: string };
+type ModFile = { id: string; module_id: string; file_name: string; file_path: string };
 
 const safeName = (n: string) => n.normalize("NFD").replace(/[^\w.-]+/g, "_");
 
@@ -20,6 +21,7 @@ export default function VideoaulasTab() {
   const { toast } = useToast();
   const [modules, setModules] = useState<Module[]>([]);
   const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [files, setFiles] = useState<ModFile[]>([]);
   const [doubts, setDoubts] = useState<Doubt[]>([]);
   const [replies, setReplies] = useState<Record<string, string>>({});
   const [newModule, setNewModule] = useState("");
@@ -32,14 +34,16 @@ export default function VideoaulasTab() {
   const [progress, setProgress] = useState(0);
 
   const load = async () => {
-    const [m, l, d] = await Promise.all([
+    const [m, l, d, f] = await Promise.all([
       supabase.from("video_modules").select("*").order("sort_order").order("title"),
       supabase.from("video_lessons").select("*").order("sort_order").order("created_at"),
       supabase.from("video_doubts").select("*").order("created_at", { ascending: false }),
+      supabase.from("video_module_files").select("*").order("created_at"),
     ]);
     setModules((m.data as Module[]) || []);
     setLessons((l.data as Lesson[]) || []);
     setDoubts((d.data as Doubt[]) || []);
+    setFiles((f.data as ModFile[]) || []);
   };
   useEffect(() => { load(); }, []);
 
@@ -51,9 +55,32 @@ export default function VideoaulasTab() {
     load();
   };
 
+  const uploadModuleFiles = async (mid: string, list: FileList | null) => {
+    if (!list?.length) return;
+    toast({ title: "Enviando arquivos..." });
+    for (const f of Array.from(list)) {
+      const path = `module-files/${mid}/${Date.now()}_${safeName(f.name)}`;
+      const up = await supabase.storage.from("lesson-media").upload(path, f, { contentType: f.type || undefined });
+      if (up.error) { toast({ title: `Erro em ${f.name}`, description: up.error.message, variant: "destructive" }); continue; }
+      await supabase.from("video_module_files").insert({ module_id: mid, file_name: f.name, file_path: path });
+    }
+    toast({ title: "Arquivos adicionados!" });
+    load();
+  };
+
+  const deleteFile = async (f: ModFile) => {
+    if (!confirm(`Excluir o arquivo "${f.file_name}"?`)) return;
+    await supabase.storage.from("lesson-media").remove([f.file_path]);
+    await supabase.from("video_module_files").delete().eq("id", f.id);
+    load();
+  };
+
   const deleteModule = async (id: string) => {
     if (!confirm("Excluir este módulo e todas as suas aulas?")) return;
-    const paths = lessons.filter((l) => l.module_id === id).flatMap((l) => [l.video_path, l.pdf_path].filter(Boolean) as string[]);
+    const paths = [
+      ...lessons.filter((l) => l.module_id === id).flatMap((l) => [l.video_path, l.pdf_path].filter(Boolean) as string[]),
+      ...files.filter((f) => f.module_id === id).map((f) => f.file_path),
+    ];
     if (paths.length) await supabase.storage.from("lesson-media").remove(paths);
     await supabase.from("video_modules").delete().eq("id", id);
     load();
@@ -117,8 +144,20 @@ export default function VideoaulasTab() {
             <div key={m.id} className="rounded-lg border border-border p-3 space-y-2">
               <div className="flex items-center justify-between gap-2">
                 <p className="font-semibold break-words">{m.title}</p>
-                <Button size="icon" variant="ghost" onClick={() => deleteModule(m.id)}><Trash2 className="w-4 h-4" /></Button>
+                <div className="flex items-center gap-1">
+                  <label className="inline-flex items-center gap-1 text-xs cursor-pointer rounded-md border border-border px-2 py-1 hover:bg-accent/30">
+                    <FileUp className="w-4 h-4" /> Adicionar arquivos
+                    <input type="file" multiple className="hidden" onChange={(e) => { uploadModuleFiles(m.id, e.target.files); e.target.value = ""; }} />
+                  </label>
+                  <Button size="icon" variant="ghost" onClick={() => deleteModule(m.id)}><Trash2 className="w-4 h-4" /></Button>
+                </div>
               </div>
+              {files.filter((f) => f.module_id === m.id).map((f) => (
+                <div key={f.id} className="flex items-center justify-between gap-2 text-sm pl-3">
+                  <span className="break-words flex items-center gap-1"><FileText className="w-4 h-4 shrink-0" />{f.file_name}</span>
+                  <Button size="icon" variant="ghost" onClick={() => deleteFile(f)}><Trash2 className="w-4 h-4" /></Button>
+                </div>
+              ))}
               {lessons.filter((l) => l.module_id === m.id).map((l) => (
                 <div key={l.id} className="flex items-center justify-between gap-2 text-sm pl-3">
                   <span className="break-words">{l.title}{l.pdf_path ? " · PDF" : ""}</span>
