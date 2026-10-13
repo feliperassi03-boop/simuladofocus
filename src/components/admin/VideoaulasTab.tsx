@@ -58,12 +58,13 @@ export default function VideoaulasTab() {
 
   const uploadModuleFiles = async (mid: string, list: FileList | null) => {
     if (!list?.length) return;
+    const folder = (folderByModule[mid] || "").trim() || null;
     toast({ title: "Enviando arquivos..." });
     for (const f of Array.from(list)) {
       const path = `module-files/${mid}/${Date.now()}_${safeName(f.name)}`;
       const up = await supabase.storage.from("lesson-media").upload(path, f, { contentType: f.type || undefined });
       if (up.error) { toast({ title: `Erro em ${f.name}`, description: up.error.message, variant: "destructive" }); continue; }
-      await supabase.from("video_module_files").insert({ module_id: mid, file_name: f.name, file_path: path });
+      await supabase.from("video_module_files").insert({ module_id: mid, file_name: f.name, file_path: path, folder });
     }
     toast({ title: "Arquivos adicionados!" });
     load();
