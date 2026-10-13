@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { Play, FileText, Loader2, FolderOpen, Bell, Trophy, PlayCircle } from "lucide-react";
+import { Play, FileText, Loader2, FolderOpen, Bell, Trophy, PlayCircle, CheckCircle2, Circle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
@@ -96,6 +96,26 @@ export default function ProvasPage() {
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
   }, [user, authLoading, navigate]);
+
+  const [done, setDone] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("exam_completions").select("exam_id").eq("user_id", user.id)
+      .then(({ data }) => setDone(new Set((data || []).map((r) => r.exam_id))));
+  }, [user]);
+  const toggleDone = async (examId: string) => {
+    if (!user) return;
+    const next = new Set(done);
+    if (done.has(examId)) {
+      next.delete(examId);
+      setDone(next);
+      await supabase.from("exam_completions").delete().eq("user_id", user.id).eq("exam_id", examId);
+    } else {
+      next.add(examId);
+      setDone(next);
+      await supabase.from("exam_completions").insert({ user_id: user.id, exam_id: examId });
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -336,13 +356,26 @@ export default function ProvasPage() {
                               {exam.question_count === 1 ? "questão" : "questões"}
                             </p>
                           </div>
-                          <Button
-                            size="sm"
-                            className="gradient-primary text-primary-foreground shrink-0"
-                            onClick={() => navigate(exam.exam_type === "tea" ? `/prova-tea/${exam.id}` : `/prova/${exam.id}`)}
-                          >
-                            <Play className="w-4 h-4 mr-2" /> Iniciar
-                          </Button>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => toggleDone(exam.id)}
+                              aria-label={done.has(exam.id) ? "Desmarcar como concluída" : "Marcar como concluída"}
+                              title={done.has(exam.id) ? "Concluída — toque para desmarcar" : "Marcar como concluída"}
+                              className="p-1"
+                            >
+                              {done.has(exam.id)
+                                ? <CheckCircle2 className="w-6 h-6 text-success" />
+                                : <Circle className="w-6 h-6 text-muted-foreground" />}
+                            </button>
+                            <Button
+                              size="sm"
+                              className="gradient-primary text-primary-foreground"
+                              onClick={() => navigate(exam.exam_type === "tea" ? `/prova-tea/${exam.id}` : `/prova/${exam.id}`)}
+                            >
+                              <Play className="w-4 h-4 mr-2" /> Iniciar
+                            </Button>
+                          </div>
                         </div>
                       ))}
                     </div>
