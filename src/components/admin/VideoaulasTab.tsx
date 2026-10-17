@@ -97,6 +97,16 @@ export default function VideoaulasTab() {
     load();
   };
 
+  const renameLesson = async (l: Lesson) => {
+    const next = lessonTitle.trim();
+    if (!next || next === l.title) { setEditingLesson(null); return; }
+    const { error } = await supabase.from("video_lessons").update({ title: next }).eq("id", l.id);
+    if (error) return toast({ title: "Erro ao renomear", description: error.message, variant: "destructive" });
+    toast({ title: "Nome da aula atualizado!" });
+    setEditingLesson(null);
+    load();
+  };
+
   const addLesson = async () => {
     if (!moduleId || !title.trim() || !video) return toast({ title: "Escolha o módulo, o título e o vídeo.", variant: "destructive" });
     setUploading(true);
