@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Upload, Send, FileUp, FileText, Folder } from "lucide-react";
+import { Plus, Trash2, Upload, Send, FileUp, FileText, Folder, Pencil, Check, X } from "lucide-react";
 
 type Module = { id: string; title: string; sort_order: number };
 type Lesson = { id: string; module_id: string; title: string; video_path: string; pdf_path: string | null; sort_order: number };
