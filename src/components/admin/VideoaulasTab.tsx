@@ -33,6 +33,8 @@ export default function VideoaulasTab() {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [folderByModule, setFolderByModule] = useState<Record<string, string>>({});
+  const [editingLesson, setEditingLesson] = useState<string | null>(null);
+  const [lessonTitle, setLessonTitle] = useState("");
 
   const load = async () => {
     const [m, l, d, f] = await Promise.all([
