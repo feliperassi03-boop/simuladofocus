@@ -203,8 +203,34 @@ export default function VideoaulasTab() {
               ))}
               {lessons.filter((l) => l.module_id === m.id).map((l) => (
                 <div key={l.id} className="flex items-center justify-between gap-2 text-sm pl-3">
-                  <span className="break-words">{l.title}{l.pdf_path ? " · PDF" : ""}</span>
-                  <Button size="icon" variant="ghost" onClick={() => deleteLesson(l)}><Trash2 className="w-4 h-4" /></Button>
+                  {editingLesson === l.id ? (
+                    <div className="flex flex-1 items-center gap-1 min-w-0">
+                      <Input
+                        className="h-8 text-sm"
+                        value={lessonTitle}
+                        autoFocus
+                        onChange={(e) => setLessonTitle(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === "Enter") renameLesson(l); if (e.key === "Escape") setEditingLesson(null); }}
+                      />
+                      <Button size="icon" variant="ghost" onClick={() => renameLesson(l)} aria-label="Salvar nome"><Check className="w-4 h-4" /></Button>
+                      <Button size="icon" variant="ghost" onClick={() => setEditingLesson(null)} aria-label="Cancelar"><X className="w-4 h-4" /></Button>
+                    </div>
+                  ) : (
+                    <>
+                      <span className="break-words">{l.title}{l.pdf_path ? " · PDF" : ""}</span>
+                      <span className="flex items-center gap-0.5 shrink-0">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          aria-label="Renomear aula"
+                          onClick={() => { setEditingLesson(l.id); setLessonTitle(l.title); }}
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button size="icon" variant="ghost" onClick={() => deleteLesson(l)}><Trash2 className="w-4 h-4" /></Button>
+                      </span>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
