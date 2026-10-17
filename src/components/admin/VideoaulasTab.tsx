@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Upload, Send, FileUp, FileText, Folder } from "lucide-react";
+import { Plus, Trash2, Upload, Send, FileUp, FileText, Folder, Pencil, Check, X } from "lucide-react";
 
 type Module = { id: string; title: string; sort_order: number };
 type Lesson = { id: string; module_id: string; title: string; video_path: string; pdf_path: string | null; sort_order: number };
@@ -33,6 +33,8 @@ export default function VideoaulasTab() {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [folderByModule, setFolderByModule] = useState<Record<string, string>>({});
+  const [editingLesson, setEditingLesson] = useState<string | null>(null);
+  const [lessonTitle, setLessonTitle] = useState("");
 
   const load = async () => {
     const [m, l, d, f] = await Promise.all([
@@ -92,6 +94,16 @@ export default function VideoaulasTab() {
     if (!confirm(`Excluir a aula "${l.title}"?`)) return;
     await supabase.storage.from("lesson-media").remove([l.video_path, l.pdf_path].filter(Boolean) as string[]);
     await supabase.from("video_lessons").delete().eq("id", l.id);
+    load();
+  };
+
+  const renameLesson = async (l: Lesson) => {
+    const next = lessonTitle.trim();
+    if (!next || next === l.title) { setEditingLesson(null); return; }
+    const { error } = await supabase.from("video_lessons").update({ title: next }).eq("id", l.id);
+    if (error) return toast({ title: "Erro ao renomear", description: error.message, variant: "destructive" });
+    toast({ title: "Nome da aula atualizado!" });
+    setEditingLesson(null);
     load();
   };
 
@@ -191,8 +203,34 @@ export default function VideoaulasTab() {
               ))}
               {lessons.filter((l) => l.module_id === m.id).map((l) => (
                 <div key={l.id} className="flex items-center justify-between gap-2 text-sm pl-3">
-                  <span className="break-words">{l.title}{l.pdf_path ? " · PDF" : ""}</span>
-                  <Button size="icon" variant="ghost" onClick={() => deleteLesson(l)}><Trash2 className="w-4 h-4" /></Button>
+                  {editingLesson === l.id ? (
+                    <div className="flex flex-1 items-center gap-1 min-w-0">
+                      <Input
+                        className="h-8 text-sm"
+                        value={lessonTitle}
+                        autoFocus
+                        onChange={(e) => setLessonTitle(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === "Enter") renameLesson(l); if (e.key === "Escape") setEditingLesson(null); }}
+                      />
+                      <Button size="icon" variant="ghost" onClick={() => renameLesson(l)} aria-label="Salvar nome"><Check className="w-4 h-4" /></Button>
+                      <Button size="icon" variant="ghost" onClick={() => setEditingLesson(null)} aria-label="Cancelar"><X className="w-4 h-4" /></Button>
+                    </div>
+                  ) : (
+                    <>
+                      <span className="break-words">{l.title}{l.pdf_path ? " · PDF" : ""}</span>
+                      <span className="flex items-center gap-0.5 shrink-0">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          aria-label="Renomear aula"
+                          onClick={() => { setEditingLesson(l.id); setLessonTitle(l.title); }}
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button size="icon" variant="ghost" onClick={() => deleteLesson(l)}><Trash2 className="w-4 h-4" /></Button>
+                      </span>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
