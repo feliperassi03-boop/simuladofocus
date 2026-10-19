@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "temp h264 upload" ON storage.objects;
