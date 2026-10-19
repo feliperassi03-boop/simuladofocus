@@ -1,0 +1,1 @@
+CREATE POLICY "temp h264 upload" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id='lesson-media' AND name LIKE 'videos/%\_h264.mp4' AND auth.uid()='28660754-9971-4e5b-a37e-3cb3c4dead2c'::uuid);
