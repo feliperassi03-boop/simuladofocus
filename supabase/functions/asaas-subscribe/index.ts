@@ -2,7 +2,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3";
 
-const ASAAS_URL = "https://api-sandbox.asaas.com/v3"; // SANDBOX
+const ASAAS_URL = "https://api.asaas.com/v3"; // PRODUÇÃO
 type PlanKey = "tsa" | "tea";
 const PLANS: Record<PlanKey, { name: string; card: number; pix: number }> = {
   tsa: { name: "Mentoria AUMAKUA TSA 2027", card: 6499.99, pix: 6000.0 },
@@ -123,7 +123,7 @@ Deno.serve(async (req) => {
         items: [{ name: plan.name, description: `${plan.name} — acesso por 12 meses`, quantity: 1, value }],
       }),
     });
-    const paymentUrl: string = checkout.link || `https://sandbox.asaas.com/checkoutSession/show?id=${checkout.id}`;
+    const paymentUrl: string = checkout.link || `https://www.asaas.com/checkoutSession/show?id=${checkout.id}`;
 
     const { error: upErr } = await admin.from("assinaturas").update({
       aluno_nome: name, cpf, valor: value, asaas_customer_id: customerId,
