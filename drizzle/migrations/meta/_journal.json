@@ -57,6 +57,13 @@
       "when": 1792429531335,
       "tag": "0007_drop_temp_h264_upload",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792970309430,
+      "tag": "0008_checkout_document_acceptances",
+      "breakpoints": true
     }
   ]
 }
