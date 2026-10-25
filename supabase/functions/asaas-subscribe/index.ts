@@ -1,6 +1,8 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3";
+import { isCurrentConsent } from "../_shared/checkout-consent.ts";
+import { recordCheckoutConsent } from "../_shared/record-checkout-consent.ts";
 
 const ASAAS_URL = "https://api.asaas.com/v3"; // PRODUÇÃO
 type PlanKey = "tsa" | "tea";
@@ -19,6 +21,7 @@ const Body = z.object({
   cpf: z.string().regex(/^\d{11}$/).optional(),
   method: z.enum(["card", "pix"]).default("card"),
   plan: z.enum(["tsa", "tea"]).default("tsa"),
+  consent: z.unknown().optional(),
 });
 
 function validCpf(cpf: string) {
@@ -76,11 +79,17 @@ Deno.serve(async (req) => {
     if (!cpf) return json({ need_cpf: true }, 200);
     if (!validCpf(cpf)) return json({ error: "CPF inválido" }, 400);
 
-    const name = parsed.data.name || pending?.aluno_nome || user.user_metadata?.full_name || user.email!.split("@")[0];
-    const email = user.email!;
+    const email = user.email;
+    if (!email) return json({ error: "Informe um e-mail válido" }, 400);
+    const name = parsed.data.name || pending?.aluno_nome || user.user_metadata?.full_name || email.split("@")[0];
   const method = parsed.data.method;
   const plan = PLANS[parsed.data.plan];
   const value = method === "pix" ? plan.pix : plan.card;
+
+    if (!isCurrentConsent(parsed.data.consent)) return json({ error: "Aceite os dois documentos na versão atual" }, 400);
+    const buyer = z.object({ name: z.string().trim().min(3).max(120), email: z.string().email().max(255) }).safeParse({ name, email });
+    if (!buyer.success) return json({ error: "Informe nome e e-mail válidos" }, 400);
+    await recordCheckoutConsent(admin, req, { userId: user.id, ...buyer.data, plan: parsed.data.plan, method, value });
 
     // Cliente: reutiliza se já existir
     let customerId: string | undefined = rows.find((r) => r.asaas_customer_id)?.asaas_customer_id;

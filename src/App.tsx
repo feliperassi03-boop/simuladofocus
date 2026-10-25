@@ -21,6 +21,7 @@ import VideoaulasPage from "./pages/VideoaulasPage";
 import PlanosPage from "./pages/PlanosPage";
 import AssinaturasTab from "@/components/admin/AssinaturasTab";
 import NotFound from "./pages/NotFound";
+import LegalDocumentPage from "./pages/LegalDocumentPage";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +72,8 @@ const App = () => (
             <Route path="/inscricao-simulado" element={<SignupSimuladoPage />} />
             <Route path="/simulado-atf" element={<SimuladoAtfPage />} />
             <Route path="/tsa-mentoria" element={<TsaMentoriaPage />} />
+            <Route path="/termos" element={<LegalDocumentPage document="termos" />} />
+            <Route path="/privacidade" element={<LegalDocumentPage document="privacidade" />} />
             <Route path="/" element={<ProtectedRoute><HomeRedirect /></ProtectedRoute>} />
 
             <Route path="/provas" element={<StudentRoute><ProvasPage /></StudentRoute>} />
