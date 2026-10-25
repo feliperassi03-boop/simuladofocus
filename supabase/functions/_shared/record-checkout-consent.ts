@@ -1,8 +1,19 @@
-import type { createClient } from "npm:@supabase/supabase-js@2";
 import { DOCUMENT_VERSIONS } from "./checkout-consent.ts";
 
+type Acceptance = {
+  acceptance_group_id: string; user_id: string | null; buyer_name: string; buyer_email: string;
+  document_type: "termos" | "privacidade"; document_version: string; accepted_at: string;
+  ip_address: string; ip_source: string; plan_key: string; payment_method: string;
+  order_value: number; applied_coupon: null;
+};
+type AcceptanceWriter = {
+  from(table: "checkout_document_acceptances"): {
+    insert(rows: Acceptance[]): PromiseLike<{ error: unknown }>;
+  };
+};
+
 export async function recordCheckoutConsent(
-  admin: ReturnType<typeof createClient>, req: Request,
+  admin: AcceptanceWriter, req: Request,
   buyer: { userId?: string; name: string; email: string; plan: string; method: string; value: number },
 ) {
   // Read proxy metadata only, never a buyer-supplied body field. Preserve provenance.
