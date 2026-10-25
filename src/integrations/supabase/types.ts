@@ -83,6 +83,57 @@ export type Database = {
         }
         Relationships: []
       }
+      checkout_document_acceptances: {
+        Row: {
+          acceptance_group_id: string
+          accepted_at: string
+          applied_coupon: string | null
+          buyer_email: string
+          buyer_name: string
+          document_type: string
+          document_version: string
+          id: string
+          ip_address: unknown
+          ip_source: string
+          order_value: number
+          payment_method: string
+          plan_key: string
+          user_id: string | null
+        }
+        Insert: {
+          acceptance_group_id: string
+          accepted_at?: string
+          applied_coupon?: string | null
+          buyer_email: string
+          buyer_name: string
+          document_type: string
+          document_version: string
+          id?: string
+          ip_address: unknown
+          ip_source: string
+          order_value: number
+          payment_method: string
+          plan_key: string
+          user_id?: string | null
+        }
+        Update: {
+          acceptance_group_id?: string
+          accepted_at?: string
+          applied_coupon?: string | null
+          buyer_email?: string
+          buyer_name?: string
+          document_type?: string
+          document_version?: string
+          id?: string
+          ip_address?: unknown
+          ip_source?: string
+          order_value?: number
+          payment_method?: string
+          plan_key?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       exam_completions: {
         Row: {
           completed_at: string

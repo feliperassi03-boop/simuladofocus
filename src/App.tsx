@@ -21,8 +21,14 @@ import VideoaulasPage from "./pages/VideoaulasPage";
 import PlanosPage from "./pages/PlanosPage";
 import AssinaturasTab from "@/components/admin/AssinaturasTab";
 import NotFound from "./pages/NotFound";
+import LegalDocumentPage from "./pages/LegalDocumentPage";
 
 const queryClient = new QueryClient();
+
+// Support direct legal-document URLs while preserving the app's hash routing.
+if (["/termos", "/privacidade"].includes(window.location.pathname)) {
+  window.history.replaceState(null, "", `/#${window.location.pathname}`);
+}
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -71,6 +77,8 @@ const App = () => (
             <Route path="/inscricao-simulado" element={<SignupSimuladoPage />} />
             <Route path="/simulado-atf" element={<SimuladoAtfPage />} />
             <Route path="/tsa-mentoria" element={<TsaMentoriaPage />} />
+            <Route path="/termos" element={<LegalDocumentPage document="termos" />} />
+            <Route path="/privacidade" element={<LegalDocumentPage document="privacidade" />} />
             <Route path="/" element={<ProtectedRoute><HomeRedirect /></ProtectedRoute>} />
 
             <Route path="/provas" element={<StudentRoute><ProvasPage /></StudentRoute>} />

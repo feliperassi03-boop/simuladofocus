@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle2, Loader2 } from "lucide-react";
+import CheckoutReview from "@/components/CheckoutReview";
+import { DOCUMENT_VERSIONS, INITIAL_CONSENT, canProceedToPayment } from "../../supabase/functions/_shared/checkout-consent";
 
 const PLANS_UI = {
   tsa: { name: "Mentoria AUMAKUA TSA 2027", card: "R$ 6.499,99", card3x: "R$ 2.166,66", pix: "R$ 6.000,00" },
@@ -29,11 +31,23 @@ export default function PlanosPage() {
   const [askCpf, setAskCpf] = useState(false);
   const [cpf, setCpf] = useState("");
   const [name, setName] = useState<string>(user?.user_metadata?.full_name || "");
+  const [reviewing, setReviewing] = useState(false);
+  const [terms, setTerms] = useState(INITIAL_CONSENT.terms);
+  const [privacy, setPrivacy] = useState(INITIAL_CONSENT.privacy);
+
+  const startReview = (m: "card" | "pix") => {
+    setMethod(m);
+    setTerms(false);
+    setPrivacy(false);
+    setAskCpf(true);
+  };
 
   const subscribe = async (m: "card" | "pix", extra?: { cpf: string; name: string }) => {
+    if (!canProceedToPayment(terms, privacy)) return;
     setMethod(m);
     setLoading(m);
-    const { data, error } = await supabase.functions.invoke("asaas-subscribe", { body: { plan, ...(extra ?? {}), method: m } });
+    const { data, error } = await supabase.functions.invoke("asaas-subscribe", { body: { plan, ...(extra ?? {}), method: m,
+      consent: { terms, privacy, termsVersion: DOCUMENT_VERSIONS.termos, privacyVersion: DOCUMENT_VERSIONS.privacidade } } });
     setLoading(null);
     if (error || data?.error) {
       let msg = data?.error || error?.message;
@@ -53,7 +67,7 @@ export default function PlanosPage() {
     if (digits.length !== 11) return toast({ title: "Informe um CPF válido.", variant: "destructive" });
     if (name.trim().length < 3) return toast({ title: "Informe seu nome completo.", variant: "destructive" });
     setAskCpf(false);
-    subscribe(method, { cpf: digits, name: name.trim() });
+    setReviewing(true);
   };
 
   return (
@@ -63,6 +77,10 @@ export default function PlanosPage() {
         <p className="text-muted-foreground mt-1">Ambiente de testes (sandbox) — nenhuma cobrança real.</p>
       </div>
       <Card className="shadow-card">
+        {reviewing ? <CardContent className="pt-6"><CheckoutReview name={name.trim()} email={user?.email || ""} product={cur.name} value={cur[method]} method={method}
+          terms={terms} privacy={privacy} loading={!!loading} onTerms={setTerms} onPrivacy={setPrivacy}
+          onEdit={() => { setReviewing(false); setTerms(false); setPrivacy(false); setAskCpf(true); }}
+          onPay={() => subscribe(method, { cpf: cpf.replace(/\D/g, ""), name: name.trim() })} /></CardContent> : <>
         <CardHeader>
           <div className="grid grid-cols-2 gap-2 mb-2">
             {(["tsa", "tea"] as const).map((p) => (
@@ -82,13 +100,14 @@ export default function PlanosPage() {
             <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-primary" /> VIDEOAULAS</li>
             <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-primary" /> Acesso por 12 meses após a confirmação do pagamento</li>
           </ul>
-          <Button className="w-full gradient-primary text-primary-foreground" size="lg" disabled={!!loading} onClick={() => subscribe("card")}>
+          <Button className="w-full gradient-primary text-primary-foreground" size="lg" disabled={!!loading} onClick={() => startReview("card")}>
             {loading === "card" ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null} Cartão de crédito — até 3x de {cur.card3x}
           </Button>
-          <Button className="w-full" variant="outline" size="lg" disabled={!!loading} onClick={() => subscribe("pix")}>
+          <Button className="w-full" variant="outline" size="lg" disabled={!!loading} onClick={() => startReview("pix")}>
             {loading === "pix" ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null} Pix — {cur.pix}
           </Button>
         </CardContent>
+        </>}
       </Card>
 
       <Dialog open={askCpf} onOpenChange={setAskCpf}>
@@ -98,7 +117,7 @@ export default function PlanosPage() {
             <DialogDescription>Precisamos do seu nome e CPF para emitir a cobrança.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
-            <div><Label>Nome completo</Label><Input value={name} onChange={(e) => setName(e.target.value)} /></div>
+            <div><Label>Nome completo</Label><Input value={name} maxLength={120} onChange={(e) => setName(e.target.value)} /></div>
             <div><Label>CPF</Label><Input inputMode="numeric" value={cpf} onChange={(e) => setCpf(formatCpf(e.target.value))} placeholder="000.000.000-00" /></div>
           </div>
           <DialogFooter><Button onClick={confirmCpf}>Continuar</Button></DialogFooter>

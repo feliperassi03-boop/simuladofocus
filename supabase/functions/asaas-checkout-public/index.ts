@@ -1,6 +1,8 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3";
+import { isCurrentConsent } from "../_shared/checkout-consent.ts";
+import { recordCheckoutConsent } from "../_shared/record-checkout-consent.ts";
 
 // Checkout público (link de vendas, sem login). Preço e plano são constantes do servidor.
 const ASAAS_URL = "https://api.asaas.com/v3"; // PRODUÇÃO
@@ -30,6 +32,7 @@ const Body = z.object({
   }),
   method: z.enum(["card", "pix"]),
   plan: z.enum(["tsa", "tea"]).default("tsa"),
+  consent: z.unknown().refine(isCurrentConsent, "Aceite os dois documentos na versão atual"),
 });
 
 const customerAddress = (a: z.infer<typeof Body>["address"]) => ({
@@ -82,6 +85,8 @@ Deno.serve(async (req) => {
     }
 
     const value = method === "pix" ? plan.pix : plan.card;
+
+    await recordCheckoutConsent(admin, req, { name, email, plan: parsed.data.plan, method, value });
 
     let customerId: string | undefined = list.find((r) => r.asaas_customer_id)?.asaas_customer_id;
     if (!customerId) customerId = (await asaas(`/customers?cpfCnpj=${cpf}`))?.data?.[0]?.id;
