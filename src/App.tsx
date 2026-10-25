@@ -25,6 +25,11 @@ import LegalDocumentPage from "./pages/LegalDocumentPage";
 
 const queryClient = new QueryClient();
 
+// Support direct legal-document URLs while preserving the app's hash routing.
+if (["/termos", "/privacidade"].includes(window.location.pathname)) {
+  window.history.replaceState(null, "", `/#${window.location.pathname}`);
+}
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   if (loading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Carregando...</div>;
