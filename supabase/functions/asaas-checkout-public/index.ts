@@ -4,9 +4,11 @@ import { z } from "npm:zod@3";
 
 // Checkout público (link de vendas, sem login). Preço e plano são constantes do servidor.
 const ASAAS_URL = "https://api-sandbox.asaas.com/v3"; // SANDBOX
-const PLAN_NAME = "Mentoria AUMAKUA TSA 2027";
-const CARD_VALUE = 6499.99;
-const PIX_VALUE = 6000.0;
+type PlanKey = "tsa" | "tea";
+const PLANS: Record<PlanKey, { name: string; card: number; pix: number }> = {
+  tsa: { name: "Mentoria AUMAKUA TSA 2027", card: 6499.99, pix: 6000.0 },
+  tea: { name: "Mentoria AUMAKUA TEA 2027", card: 5299.0, pix: 4769.1 },
+};
 const MAX_INSTALLMENTS = 3;
 const SITE = "https://aumakua-app.lovable.app";
 
@@ -27,6 +29,7 @@ const Body = z.object({
     uf: z.string().trim().regex(/^[A-Za-z]{2}$/),
   }),
   method: z.enum(["card", "pix"]),
+  plan: z.enum(["tsa", "tea"]).default("tsa"),
 });
 
 const customerAddress = (a: z.infer<typeof Body>["address"]) => ({
@@ -67,6 +70,7 @@ Deno.serve(async (req) => {
     const parsed = Body.safeParse(await req.json().catch(() => ({})));
     if (!parsed.success) return json({ error: "Preencha nome, e-mail e CPF corretamente" }, 400);
     const { name, email, cpf, phone, address, method } = parsed.data;
+    const plan = PLANS[parsed.data.plan];
     if (!validCpf(cpf)) return json({ error: "CPF inválido" }, 400);
 
     const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
@@ -77,7 +81,7 @@ Deno.serve(async (req) => {
       return json({ error: "Este e-mail já tem acesso ativo. Basta criar a conta / entrar com ele." }, 409);
     }
 
-    const value = method === "pix" ? PIX_VALUE : CARD_VALUE;
+    const value = method === "pix" ? plan.pix : plan.card;
 
     let customerId: string | undefined = list.find((r) => r.asaas_customer_id)?.asaas_customer_id;
     if (!customerId) customerId = (await asaas(`/customers?cpfCnpj=${cpf}`))?.data?.[0]?.id;
@@ -99,7 +103,7 @@ Deno.serve(async (req) => {
     }
 
     const { data: ins, error: insErr } = await admin.from("assinaturas").insert({
-      user_id: null, aluno_nome: name, aluno_email: email, cpf, plano: PLAN_NAME,
+      user_id: null, aluno_nome: name, aluno_email: email, cpf, plano: plan.name,
       valor: value, status: "pendente", asaas_customer_id: customerId,
     }).select("id").single();
     if (insErr) throw insErr;
@@ -115,7 +119,7 @@ Deno.serve(async (req) => {
         customer: customerId,
         externalReference: ins.id,
         callback: { successUrl: `${back}?pago=1`, cancelUrl: back, expiredUrl: back },
-        items: [{ name: PLAN_NAME, description: `${PLAN_NAME} — acesso por 12 meses`, quantity: 1, value }],
+        items: [{ name: plan.name, description: `${plan.name} — acesso por 12 meses`, quantity: 1, value }],
       }),
     });
     const paymentUrl: string = checkout.link || `https://sandbox.asaas.com/checkoutSession/show?id=${checkout.id}`;

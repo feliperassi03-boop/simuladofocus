@@ -3,9 +3,11 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3";
 
 const ASAAS_URL = "https://api-sandbox.asaas.com/v3"; // SANDBOX
-const PLAN_NAME = "Mentoria AUMAKUA TSA 2027";
-const CARD_VALUE = 6499.99; // cartão de crédito, até 3x
-const PIX_VALUE = 6000.0; // Pix à vista
+type PlanKey = "tsa" | "tea";
+const PLANS: Record<PlanKey, { name: string; card: number; pix: number }> = {
+  tsa: { name: "Mentoria AUMAKUA TSA 2027", card: 6499.99, pix: 6000.0 },
+  tea: { name: "Mentoria AUMAKUA TEA 2027", card: 5299.0, pix: 4769.1 },
+};
 const MAX_INSTALLMENTS = 3;
 const ADMIN_ONLY = true; // fase de testes: só administradores podem assinar
 
@@ -16,6 +18,7 @@ const Body = z.object({
   name: z.string().trim().min(3).max(120).optional(),
   cpf: z.string().regex(/^\d{11}$/).optional(),
   method: z.enum(["card", "pix"]).default("card"),
+  plan: z.enum(["tsa", "tea"]).default("tsa"),
 });
 
 function validCpf(cpf: string) {
@@ -75,8 +78,9 @@ Deno.serve(async (req) => {
 
     const name = parsed.data.name || pending?.aluno_nome || user.user_metadata?.full_name || user.email!.split("@")[0];
     const email = user.email!;
-    const method = parsed.data.method;
-    const value = method === "pix" ? PIX_VALUE : CARD_VALUE;
+  const method = parsed.data.method;
+  const plan = PLANS[parsed.data.plan];
+  const value = method === "pix" ? plan.pix : plan.card;
 
     // Cliente: reutiliza se já existir
     let customerId: string | undefined = rows.find((r) => r.asaas_customer_id)?.asaas_customer_id;
@@ -96,7 +100,7 @@ Deno.serve(async (req) => {
     let rowId = pending?.id as string | undefined;
     if (!rowId) {
       const { data: ins, error: insErr } = await admin.from("assinaturas").insert({
-        user_id: user.id, aluno_nome: name, aluno_email: email, cpf, plano: PLAN_NAME,
+        user_id: user.id, aluno_nome: name, aluno_email: email, cpf, plano: plan.name,
         valor: value, status: "pendente", asaas_customer_id: customerId,
       }).select("id").single();
       if (insErr) throw insErr;
@@ -116,7 +120,7 @@ Deno.serve(async (req) => {
         customer: customerId,
         externalReference: rowId,
         callback: { successUrl: `${back}?pago=1`, cancelUrl: back, expiredUrl: back },
-        items: [{ name: PLAN_NAME, description: `${PLAN_NAME} — acesso por 12 meses`, quantity: 1, value }],
+        items: [{ name: plan.name, description: `${plan.name} — acesso por 12 meses`, quantity: 1, value }],
       }),
     });
     const paymentUrl: string = checkout.link || `https://sandbox.asaas.com/checkoutSession/show?id=${checkout.id}`;
