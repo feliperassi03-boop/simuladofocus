@@ -1,4 +1,4 @@
-import { createClient } from "npm:@supabase/supabase-js@2";
+import type { createClient } from "npm:@supabase/supabase-js@2";
 import { DOCUMENT_VERSIONS } from "./checkout-consent.ts";
 
 export async function recordCheckoutConsent(
