@@ -19,6 +19,7 @@ const json = (body: unknown, status = 200) =>
 const Body = z.object({
   name: z.string().trim().min(3).max(120).optional(),
   cpf: z.string().regex(/^\d{11}$/).optional(),
+  phone: z.string().regex(/^\d{10,11}$/).optional(),
   method: z.enum(["card", "pix"]).default("card"),
   plan: z.enum(["tsa", "tea"]).default("tsa"),
   consent: z.unknown().optional(),
@@ -92,15 +93,28 @@ Deno.serve(async (req) => {
     await recordCheckoutConsent(admin, req, { userId: user.id, ...buyer.data, plan: parsed.data.plan, method, value });
 
     // Cliente: reutiliza se já existir
+    const phone = parsed.data.phone;
     let customerId: string | undefined = rows.find((r) => r.asaas_customer_id)?.asaas_customer_id;
     if (!customerId) {
       const found = await asaas(`/customers?cpfCnpj=${cpf}`);
       customerId = found?.data?.[0]?.id;
     }
+    if (customerId) {
+      // Asaas exige telefone no cliente; atualiza se estiver faltando
+      const cur = await asaas(`/customers/${customerId}`).catch(() => null);
+      if (!cur?.phone) {
+        if (!phone) return json({ need_phone: true }, 200);
+        await asaas(`/customers/${customerId}`, {
+          method: "POST",
+          body: JSON.stringify({ phone, mobilePhone: phone }),
+        });
+      }
+    }
     if (!customerId) {
+      if (!phone) return json({ need_phone: true }, 200);
       const created = await asaas("/customers", {
         method: "POST",
-        body: JSON.stringify({ name, cpfCnpj: cpf, email, externalReference: user.id }),
+        body: JSON.stringify({ name, cpfCnpj: cpf, email, phone, mobilePhone: phone, externalReference: user.id }),
       });
       customerId = created.id;
     }

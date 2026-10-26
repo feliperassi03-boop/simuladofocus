@@ -21,6 +21,13 @@ const formatCpf = (v: string) => {
   return d.replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d{1,2})$/, "$1-$2");
 };
 
+const formatPhone = (v: string) => {
+  const d = v.replace(/\D/g, "").slice(0, 11);
+  if (d.length <= 2) return d;
+  if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+  return `(${d.slice(0, 2)}) ${d.slice(2, d.length - 4)}-${d.slice(-4)}`;
+};
+
 export default function PlanosPage() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -30,6 +37,7 @@ export default function PlanosPage() {
   const cur = PLANS_UI[plan];
   const [askCpf, setAskCpf] = useState(false);
   const [cpf, setCpf] = useState("");
+  const [phone, setPhone] = useState("");
   const [name, setName] = useState<string>(user?.user_metadata?.full_name || "");
   const [reviewing, setReviewing] = useState(false);
   const [terms, setTerms] = useState(INITIAL_CONSENT.terms);
@@ -42,7 +50,7 @@ export default function PlanosPage() {
     setAskCpf(true);
   };
 
-  const subscribe = async (m: "card" | "pix", extra?: { cpf: string; name: string }) => {
+  const subscribe = async (m: "card" | "pix", extra?: { cpf: string; name: string; phone: string }) => {
     if (!canProceedToPayment(terms, privacy)) return;
     setMethod(m);
     setLoading(m);
@@ -54,7 +62,7 @@ export default function PlanosPage() {
       try { msg = (await (error as any)?.context?.json())?.error || msg; } catch { /* ignore */ }
       return toast({ title: "Não foi possível assinar", description: msg, variant: "destructive" });
     }
-    if (data?.need_cpf) return setAskCpf(true);
+    if (data?.need_cpf || data?.need_phone) return setAskCpf(true);
     if (data?.payment_url) {
       window.location.href = data.payment_url;
     } else {
@@ -65,6 +73,8 @@ export default function PlanosPage() {
   const confirmCpf = () => {
     const digits = cpf.replace(/\D/g, "");
     if (digits.length !== 11) return toast({ title: "Informe um CPF válido.", variant: "destructive" });
+    const phoneDigits = phone.replace(/\D/g, "");
+    if (phoneDigits.length < 10 || phoneDigits.length > 11) return toast({ title: "Informe um celular válido com DDD.", variant: "destructive" });
     if (name.trim().length < 3) return toast({ title: "Informe seu nome completo.", variant: "destructive" });
     setAskCpf(false);
     setReviewing(true);
@@ -80,7 +90,7 @@ export default function PlanosPage() {
         {reviewing ? <CardContent className="pt-6"><CheckoutReview name={name.trim()} email={user?.email || ""} product={cur.name} value={cur[method]} method={method}
           terms={terms} privacy={privacy} loading={!!loading} onTerms={setTerms} onPrivacy={setPrivacy}
           onEdit={() => { setReviewing(false); setTerms(false); setPrivacy(false); setAskCpf(true); }}
-          onPay={() => subscribe(method, { cpf: cpf.replace(/\D/g, ""), name: name.trim() })} /></CardContent> : <>
+          onPay={() => subscribe(method, { cpf: cpf.replace(/\D/g, ""), name: name.trim(), phone: phone.replace(/\D/g, "") })} /></CardContent> : <>
         <CardHeader>
           <div className="grid grid-cols-2 gap-2 mb-2">
             {(["tsa", "tea"] as const).map((p) => (
@@ -114,11 +124,12 @@ export default function PlanosPage() {
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Seus dados</DialogTitle>
-            <DialogDescription>Precisamos do seu nome e CPF para emitir a cobrança.</DialogDescription>
+            <DialogDescription>Precisamos do seu nome, CPF e celular para emitir a cobrança.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             <div><Label>Nome completo</Label><Input value={name} maxLength={120} onChange={(e) => setName(e.target.value)} /></div>
             <div><Label>CPF</Label><Input inputMode="numeric" value={cpf} onChange={(e) => setCpf(formatCpf(e.target.value))} placeholder="000.000.000-00" /></div>
+            <div><Label>Celular</Label><Input inputMode="numeric" value={phone} onChange={(e) => setPhone(formatPhone(e.target.value))} placeholder="(00) 00000-0000" /></div>
           </div>
           <DialogFooter><Button onClick={confirmCpf}>Continuar</Button></DialogFooter>
         </DialogContent>
