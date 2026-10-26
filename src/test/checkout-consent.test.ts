@@ -33,7 +33,7 @@ describe("Aceite antes do pagamento", () => {
       expect(row.buyer_name).toBe("Comprador Teste");
       expect(row.buyer_email).toBe("teste@example.invalid");
       expect(row.ip_address).toBe("192.0.2.1");
-      expect(row.document_version).toBe("2026-10-26-v1");
+      expect(row.document_version).toBe("2026-10-25-provisorio-v1");
       expect(new Date(String(row.accepted_at)).getTime()).toBeGreaterThanOrEqual(before);
     }
   });
