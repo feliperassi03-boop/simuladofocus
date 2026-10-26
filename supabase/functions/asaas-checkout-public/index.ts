@@ -6,11 +6,10 @@ import { recordCheckoutConsent } from "../_shared/record-checkout-consent.ts";
 
 // Checkout público (link de vendas, sem login). Preço e plano são constantes do servidor.
 const ASAAS_URL = "https://api.asaas.com/v3"; // PRODUÇÃO
-type PlanKey = "tsa" | "tea" | "teste";
+type PlanKey = "tsa" | "tea";
 const PLANS: Record<PlanKey, { name: string; card: number; pix: number }> = {
   tsa: { name: "Mentoria AUMAKUA TSA 2027", card: 6499.99, pix: 6000.0 },
   tea: { name: "Mentoria AUMAKUA TEA 2027", card: 5299.0, pix: 4769.1 },
-  teste: { name: "Teste AUMAKUA (temporário)", card: 5.0, pix: 5.0 }, // TEMPORÁRIO: remover após teste do webhook
 };
 const MAX_INSTALLMENTS = 3;
 const SITE = "https://aumakua-app.lovable.app";
@@ -32,7 +31,7 @@ const Body = z.object({
     uf: z.string().trim().regex(/^[A-Za-z]{2}$/),
   }),
   method: z.enum(["card", "pix"]),
-  plan: z.enum(["tsa", "tea", "teste"]).default("tsa"),
+  plan: z.enum(["tsa", "tea"]).default("tsa"),
   consent: z.unknown().refine(isCurrentConsent, "Aceite os dois documentos na versão atual"),
 });
 
@@ -120,7 +119,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         billingTypes: [method === "pix" ? "PIX" : "CREDIT_CARD"],
         chargeTypes: method === "pix" ? ["DETACHED"] : ["DETACHED", "INSTALLMENT"],
-        ...(method === "card" ? { installment: { maxInstallmentCount: parsed.data.plan === "teste" ? 1 : MAX_INSTALLMENTS } } : {}),
+        ...(method === "card" ? { installment: { maxInstallmentCount: MAX_INSTALLMENTS } } : {}),
         minutesToExpire: 1440,
         customer: customerId,
         externalReference: ins.id,
