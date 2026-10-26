@@ -36,6 +36,7 @@ export default function TsaMentoriaPage() {
   const PLANS = {
     tsa: { name: "Mentoria AUMAKUA TSA 2027", card: "R$ 6.499,99", pix: "R$ 6.000,00" },
     tea: { name: "Mentoria AUMAKUA TEA 2027", card: "R$ 5.299,00", pix: "R$ 4.769,10" },
+    teste: { name: "Teste (temporário)", card: "R$ 5,00", pix: "R$ 5,00" },
   };
   const cur = PLANS[plan];
 

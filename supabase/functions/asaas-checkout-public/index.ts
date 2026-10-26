@@ -32,7 +32,7 @@ const Body = z.object({
     uf: z.string().trim().regex(/^[A-Za-z]{2}$/),
   }),
   method: z.enum(["card", "pix"]),
-  plan: z.enum(["tsa", "tea"]).default("tsa"),
+  plan: z.enum(["tsa", "tea", "teste"]).default("tsa"),
   consent: z.unknown().refine(isCurrentConsent, "Aceite os dois documentos na versão atual"),
 });
 
