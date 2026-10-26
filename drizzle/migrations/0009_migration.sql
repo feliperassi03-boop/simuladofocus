@@ -1,0 +1,2 @@
+ALTER TABLE public.checkout_document_acceptances DROP CONSTRAINT checkout_document_acceptances_plan_key_check;
+ALTER TABLE public.checkout_document_acceptances ADD CONSTRAINT checkout_document_acceptances_plan_key_check CHECK (plan_key = ANY (ARRAY['tsa'::text, 'tea'::text, 'teste'::text]));
