@@ -143,7 +143,7 @@ export default function TsaMentoriaPage() {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3 pb-1">
-                {(["tsa", "tea"] as const).map((p) => (
+                {(["tsa", "tea", "teste"] as const).map((p) => (
                   <button key={p} type="button" onClick={() => setPlan(p)}
                     className={`rounded-lg border p-3 text-left transition ${plan === p ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}>
                     <p className="text-sm font-display font-semibold break-words">{PLANS[p].name}</p>

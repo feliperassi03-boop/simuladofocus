@@ -120,7 +120,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         billingTypes: [method === "pix" ? "PIX" : "CREDIT_CARD"],
         chargeTypes: method === "pix" ? ["DETACHED"] : ["DETACHED", "INSTALLMENT"],
-        ...(method === "card" ? { installment: { maxInstallmentCount: MAX_INSTALLMENTS } } : {}),
+        ...(method === "card" ? { installment: { maxInstallmentCount: parsed.data.plan === "teste" ? 1 : MAX_INSTALLMENTS } } : {}),
         minutesToExpire: 1440,
         customer: customerId,
         externalReference: ins.id,
