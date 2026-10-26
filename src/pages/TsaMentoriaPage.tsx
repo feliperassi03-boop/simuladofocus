@@ -29,13 +29,14 @@ export default function TsaMentoriaPage() {
   const [phone, setPhone] = useState("");
   const [addr, setAddr] = useState({ cep: "", street: "", number: "", district: "", city: "", uf: "" });
   const [loading, setLoading] = useState<"card" | "pix" | null>(null);
-  const [plan, setPlan] = useState<"tsa" | "tea">("tsa");
+  const [plan, setPlan] = useState<"tsa" | "tea" | "teste">("tsa");
   const [reviewMethod, setReviewMethod] = useState<"card" | "pix" | null>(null);
   const [terms, setTerms] = useState(INITIAL_CONSENT.terms);
   const [privacy, setPrivacy] = useState(INITIAL_CONSENT.privacy);
   const PLANS = {
     tsa: { name: "Mentoria AUMAKUA TSA 2027", card: "R$ 6.499,99", pix: "R$ 6.000,00" },
     tea: { name: "Mentoria AUMAKUA TEA 2027", card: "R$ 5.299,00", pix: "R$ 4.769,10" },
+    teste: { name: "Teste (temporário)", card: "R$ 5,00", pix: "R$ 5,00" },
   };
   const cur = PLANS[plan];
 
@@ -142,7 +143,7 @@ export default function TsaMentoriaPage() {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3 pb-1">
-                {(["tsa", "tea"] as const).map((p) => (
+                {(["tsa", "tea", "teste"] as const).map((p) => (
                   <button key={p} type="button" onClick={() => setPlan(p)}
                     className={`rounded-lg border p-3 text-left transition ${plan === p ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}>
                     <p className="text-sm font-display font-semibold break-words">{PLANS[p].name}</p>
@@ -153,7 +154,7 @@ export default function TsaMentoriaPage() {
               <div className="grid gap-3 pt-2">
                 <Button onClick={() => review("card")} disabled={!!loading} className="h-auto py-3 flex-col">
                   <span className="flex items-center gap-2">{loading === "card" ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}Cartão de crédito — {cur.card}</span>
-                  <span className="text-xs opacity-80">à vista ou em até 3x</span>
+                  <span className="text-xs opacity-80">{plan === "teste" ? "à vista" : "à vista ou em até 3x"}</span>
                 </Button>
                 <Button onClick={() => review("pix")} disabled={!!loading} variant="secondary" className="h-auto py-3 flex-col">
                   <span className="flex items-center gap-2">{loading === "pix" ? <Loader2 className="h-4 w-4 animate-spin" /> : <QrCode className="h-4 w-4" />}Pix — {cur.pix}</span>
