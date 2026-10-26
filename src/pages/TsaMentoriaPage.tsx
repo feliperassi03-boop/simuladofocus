@@ -29,7 +29,7 @@ export default function TsaMentoriaPage() {
   const [phone, setPhone] = useState("");
   const [addr, setAddr] = useState({ cep: "", street: "", number: "", district: "", city: "", uf: "" });
   const [loading, setLoading] = useState<"card" | "pix" | null>(null);
-  const [plan, setPlan] = useState<"tsa" | "tea">("tsa");
+  const [plan, setPlan] = useState<"tsa" | "tea" | "teste">("tsa");
   const [reviewMethod, setReviewMethod] = useState<"card" | "pix" | null>(null);
   const [terms, setTerms] = useState(INITIAL_CONSENT.terms);
   const [privacy, setPrivacy] = useState(INITIAL_CONSENT.privacy);
