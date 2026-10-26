@@ -20,6 +20,14 @@ const Body = z.object({
   name: z.string().trim().min(3).max(120).optional(),
   cpf: z.string().regex(/^\d{11}$/).optional(),
   phone: z.string().regex(/^\d{10,11}$/).optional(),
+  address: z.object({
+    postalCode: z.string().regex(/^\d{8}$/),
+    street: z.string().trim().min(1).max(120),
+    number: z.string().trim().min(1).max(20),
+    district: z.string().trim().min(1).max(80),
+    city: z.string().trim().min(1).max(80),
+    uf: z.string().trim().regex(/^[A-Za-z]{2}$/),
+  }).optional(),
   method: z.enum(["card", "pix"]).default("card"),
   plan: z.enum(["tsa", "tea"]).default("tsa"),
   consent: z.unknown().optional(),
@@ -94,27 +102,39 @@ Deno.serve(async (req) => {
 
     // Cliente: reutiliza se já existir
     const phone = parsed.data.phone;
+    const address = parsed.data.address;
+    const customerAddress = address && {
+      postalCode: address.postalCode, address: address.street, addressNumber: address.number,
+      district: address.district, city: address.city, state: address.uf.toUpperCase(), country: "Brasil",
+    };
     let customerId: string | undefined = rows.find((r) => r.asaas_customer_id)?.asaas_customer_id;
     if (!customerId) {
       const found = await asaas(`/customers?cpfCnpj=${cpf}`);
       customerId = found?.data?.[0]?.id;
     }
     if (customerId) {
-      // Asaas exige telefone no cliente; atualiza se estiver faltando
+      // Asaas exige telefone e endereço no cliente; atualiza se estiver faltando
       const cur = await asaas(`/customers/${customerId}`).catch(() => null);
-      if (!cur?.phone) {
-        if (!phone) return json({ need_phone: true }, 200);
+      const missingPhone = !cur?.phone;
+      const missingAddress = !cur?.address;
+      if (missingPhone && !phone) return json({ need_phone: true }, 200);
+      if (missingAddress && !customerAddress) return json({ need_address: true }, 200);
+      if (missingPhone || missingAddress) {
         await asaas(`/customers/${customerId}`, {
           method: "POST",
-          body: JSON.stringify({ phone, mobilePhone: phone }),
+          body: JSON.stringify({
+            ...(missingPhone ? { phone, mobilePhone: phone } : {}),
+            ...(missingAddress ? customerAddress : {}),
+          }),
         });
       }
     }
     if (!customerId) {
       if (!phone) return json({ need_phone: true }, 200);
+      if (!customerAddress) return json({ need_address: true }, 200);
       const created = await asaas("/customers", {
         method: "POST",
-        body: JSON.stringify({ name, cpfCnpj: cpf, email, phone, mobilePhone: phone, externalReference: user.id }),
+        body: JSON.stringify({ name, cpfCnpj: cpf, email, phone, mobilePhone: phone, ...customerAddress, externalReference: user.id }),
       });
       customerId = created.id;
     }
