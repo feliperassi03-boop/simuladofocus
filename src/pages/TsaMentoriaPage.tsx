@@ -154,7 +154,7 @@ export default function TsaMentoriaPage() {
               <div className="grid gap-3 pt-2">
                 <Button onClick={() => review("card")} disabled={!!loading} className="h-auto py-3 flex-col">
                   <span className="flex items-center gap-2">{loading === "card" ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}Cartão de crédito — {cur.card}</span>
-                  <span className="text-xs opacity-80">à vista ou em até 3x</span>
+                  <span className="text-xs opacity-80">{plan === "teste" ? "à vista" : "à vista ou em até 3x"}</span>
                 </Button>
                 <Button onClick={() => review("pix")} disabled={!!loading} variant="secondary" className="h-auto py-3 flex-col">
                   <span className="flex items-center gap-2">{loading === "pix" ? <Loader2 className="h-4 w-4 animate-spin" /> : <QrCode className="h-4 w-4" />}Pix — {cur.pix}</span>
