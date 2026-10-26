@@ -26,7 +26,7 @@ import LegalDocumentPage from "./pages/LegalDocumentPage";
 const queryClient = new QueryClient();
 
 // Support direct legal-document URLs while preserving the app's hash routing.
-if (["/termos", "/privacidade", "/contrato"].includes(window.location.pathname)) {
+if (["/termos", "/privacidade"].includes(window.location.pathname)) {
   window.history.replaceState(null, "", `/#${window.location.pathname}`);
 }
 
@@ -79,7 +79,6 @@ const App = () => (
             <Route path="/tsa-mentoria" element={<TsaMentoriaPage />} />
             <Route path="/termos" element={<LegalDocumentPage document="termos" />} />
             <Route path="/privacidade" element={<LegalDocumentPage document="privacidade" />} />
-            <Route path="/contrato" element={<LegalDocumentPage document="contrato" />} />
             <Route path="/" element={<ProtectedRoute><HomeRedirect /></ProtectedRoute>} />
 
             <Route path="/provas" element={<StudentRoute><ProvasPage /></StudentRoute>} />
