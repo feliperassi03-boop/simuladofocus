@@ -64,6 +64,13 @@
       "when": 1792970309430,
       "tag": "0008_checkout_document_acceptances",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793019394057,
+      "tag": "0009_migration",
+      "breakpoints": true
     }
   ]
 }
