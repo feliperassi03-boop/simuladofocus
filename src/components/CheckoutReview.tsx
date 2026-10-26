@@ -26,6 +26,7 @@ export default function CheckoutReview(p: Props) {
         <label htmlFor="accept-terms">Li e aceito os <Link className="text-primary underline" to="/termos" target="_blank" rel="noopener noreferrer">Termos de Uso</Link></label></div>
       <div className="flex items-start gap-3"><Checkbox id="accept-privacy" checked={p.privacy} disabled={p.loading} onCheckedChange={(v) => p.onPrivacy(v === true)} aria-label="Li e estou ciente da Política de Privacidade" />
         <label htmlFor="accept-privacy">Li e estou ciente da <Link className="text-primary underline" to="/privacidade" target="_blank" rel="noopener noreferrer">Política de Privacidade</Link></label></div>
+      <p className="text-xs text-muted-foreground">Leia também o <Link className="text-primary underline" to="/contrato" target="_blank" rel="noopener noreferrer">Contrato de Prestação de Serviços Educacionais</Link>, que integra os Termos de Uso e a Política de Privacidade.</p>
     </div>
     <Button className="w-full" onClick={p.onPay} disabled={p.loading || !canProceedToPayment(p.terms, p.privacy)}>
       {p.loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ArrowRight className="mr-2 h-4 w-4" />}Ir para pagamento
