@@ -1,6 +1,6 @@
 # Roadmap
 
-- Em andamento: link separado de teste real de R$ 10,00 no cartão, sem alterar os planos comerciais; validar revisão e bloqueio de aceites.
+- Concluído: link separado no preview para teste real de R$ 10,00 no cartão; revisão e bloqueio de aceites verificados, 12 testes passaram, funções implantadas. Pagamento real depende do usuário; site publicado ainda não contém a tela de teste.
 
 - Concluído: revisão do pedido e dois aceites obrigatórios nas páginas de compra; páginas legais provisórias; registro servidor de identidade/data/versões/IP antes do Asaas. Nove testes passaram; revisão/edição/bloqueio e páginas legais verificados no navegador. Nenhuma cobrança real criada; gravação com IP real do comprador ainda não verificada de ponta a ponta.
 
