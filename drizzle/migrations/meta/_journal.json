@@ -71,6 +71,13 @@
       "when": 1793019394057,
       "tag": "0009_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1793663493364,
+      "tag": "0010_checkout_pre_registrations",
+      "breakpoints": true
     }
   ]
 }

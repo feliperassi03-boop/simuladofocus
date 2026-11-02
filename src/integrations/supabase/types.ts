@@ -134,6 +134,48 @@ export type Database = {
         }
         Relationships: []
       }
+      checkout_pre_registrations: {
+        Row: {
+          accepted_at: string
+          address: Json
+          buyer_email: string
+          buyer_name: string
+          cpf: string
+          id: string
+          ip_address: string
+          ip_source: string
+          phone: string
+          privacy_version: string
+          terms_version: string
+        }
+        Insert: {
+          accepted_at?: string
+          address: Json
+          buyer_email: string
+          buyer_name: string
+          cpf: string
+          id?: string
+          ip_address: string
+          ip_source: string
+          phone: string
+          privacy_version: string
+          terms_version: string
+        }
+        Update: {
+          accepted_at?: string
+          address?: Json
+          buyer_email?: string
+          buyer_name?: string
+          cpf?: string
+          id?: string
+          ip_address?: string
+          ip_source?: string
+          phone?: string
+          privacy_version?: string
+          terms_version?: string
+        }
+        Relationships: []
+      }
       exam_completions: {
         Row: {
           completed_at: string
