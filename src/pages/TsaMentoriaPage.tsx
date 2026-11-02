@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { CreditCard, QrCode, Loader2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import logoAsset from "@/assets/aumakua-logo.jpeg.asset.json";
 import CheckoutReview from "@/components/CheckoutReview";
 import { z } from "zod";
@@ -29,17 +29,10 @@ function ActiveTsaMentoriaPage() {
   const [cpf, setCpf] = useState("");
   const [phone, setPhone] = useState("");
   const [addr, setAddr] = useState({ cep: "", street: "", number: "", district: "", city: "", uf: "" });
-  const [loading, setLoading] = useState<"card" | "pix" | null>(null);
-  const [plan, setPlan] = useState<"tsa" | "tea">("tsa");
-  const [reviewMethod, setReviewMethod] = useState<"card" | "pix" | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [reviewing, setReviewing] = useState(false);
   const [terms, setTerms] = useState(INITIAL_CONSENT.terms);
   const [privacy, setPrivacy] = useState(INITIAL_CONSENT.privacy);
-  const PLANS = {
-    tsa: { name: "Mentoria AUMAKUA TSA 2027", card: "R$ 6.499,99", pix: "R$ 6.000,00" },
-    tea: { name: "Mentoria AUMAKUA TEA 2027", card: "R$ 5.299,00", pix: "R$ 4.769,10" },
-  };
-  const cur = PLANS[plan];
-
   const lookupCep = async (cep: string) => {
     if (cep.length !== 8) return;
     try {
@@ -62,21 +55,21 @@ function ActiveTsaMentoriaPage() {
     (phone.length === 10 || phone.length === 11) && addr.cep.length === 8 &&
     addr.street.trim() && addr.number.trim() && addr.district.trim() && addr.city.trim() && addr.uf.trim().length === 2;
 
-  const review = (method: "card" | "pix") => {
+  const review = () => {
     if (!formOk) {
       toast({ title: "Preencha todos os dados", variant: "destructive" });
       return;
     }
     setTerms(false);
     setPrivacy(false);
-    setReviewMethod(method);
+    setReviewing(true);
   };
 
-  const pay = async (method: "card" | "pix") => {
+  const pay = async () => {
     if (!formOk || !canProceedToPayment(terms, privacy)) return;
-    setLoading(method);
+    setLoading(true);
     const { data, error } = await supabase.functions.invoke("infinitepay-checkout-public", {
-      body: { plan, name: name.trim(), email: email.trim(), cpf, phone, address: { postalCode: addr.cep, street: addr.street.trim(), number: addr.number.trim(), district: addr.district.trim(), city: addr.city.trim(), uf: addr.uf.trim() }, method,
+      body: { name: name.trim(), email: email.trim(), cpf, phone, address: { postalCode: addr.cep, street: addr.street.trim(), number: addr.number.trim(), district: addr.district.trim(), city: addr.city.trim(), uf: addr.uf.trim() },
         consent: { terms, privacy, termsVersion: DOCUMENT_VERSIONS.termos, privacyVersion: DOCUMENT_VERSIONS.privacidade } },
     });
     const msg = (data as any)?.error || (error as any)?.context && (await (error as any).context.json().catch(() => null))?.error;
@@ -84,7 +77,7 @@ function ActiveTsaMentoriaPage() {
       window.location.href = data.payment_url;
       return;
     }
-    setLoading(null);
+    setLoading(false);
     toast({ title: "Não foi possível abrir o pagamento", description: msg || error?.message, variant: "destructive" });
   };
 
@@ -93,14 +86,14 @@ function ActiveTsaMentoriaPage() {
       <Card className="w-full max-w-lg">
         <CardHeader className="text-center space-y-3">
           <img src={logoAsset.url} alt="AUMAKUA" className="h-16 w-16 rounded-full mx-auto object-cover" />
-          <CardTitle className="font-display text-2xl break-words">{cur.name}</CardTitle>
+          <CardTitle className="font-display text-2xl break-words">Mentorias AUMAKUA 2027</CardTitle>
           <p className="text-sm text-muted-foreground">Acesso por 12 meses às provas, simulados e videoaulas.</p>
         </CardHeader>
         <CardContent>
-          {reviewMethod ? (
-            <CheckoutReview name={name.trim()} email={email.trim()} product={cur.name} value={cur[reviewMethod]} method={reviewMethod}
+          {reviewing ? (
+            <CheckoutReview name={name.trim()} email={email.trim()} externalSelection
               terms={terms} privacy={privacy} loading={!!loading} onTerms={setTerms} onPrivacy={setPrivacy}
-              onEdit={() => { setReviewMethod(null); setTerms(false); setPrivacy(false); }} onPay={() => pay(reviewMethod)} />
+              onEdit={() => { setReviewing(false); setTerms(false); setPrivacy(false); }} onPay={pay} />
           ) : (
             <div className="space-y-4">
               <div className="space-y-1"><Label>Nome completo</Label><Input value={name} onChange={(e) => setName(e.target.value)} maxLength={120} /></div>
@@ -132,25 +125,7 @@ function ActiveTsaMentoriaPage() {
                   <Input value={addr.uf} maxLength={2} onChange={(e) => setAddr((a) => ({ ...a, uf: e.target.value.toUpperCase() }))} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3 pb-1">
-                {(["tsa", "tea"] as const).map((p) => (
-                  <Button key={p} type="button" variant="outline" onClick={() => setPlan(p)}
-                    className={`h-auto block whitespace-normal rounded-lg border p-3 text-left transition ${plan === p ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}>
-                    <p className="text-sm font-display font-semibold break-words">{PLANS[p].name}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{PLANS[p].card} cartão · {PLANS[p].pix} Pix</p>
-                  </Button>
-                ))}
-              </div>
-              <div className="grid gap-3 pt-2">
-                <Button onClick={() => review("card")} disabled={!!loading} className="h-auto py-3 flex-col">
-                  <span className="flex items-center gap-2">{loading === "card" ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}Cartão de crédito — {cur.card}</span>
-                  <span className="text-xs opacity-80">à vista ou em até 3x</span>
-                </Button>
-                <Button onClick={() => review("pix")} disabled={!!loading} variant="secondary" className="h-auto py-3 flex-col">
-                  <span className="flex items-center gap-2">{loading === "pix" ? <Loader2 className="h-4 w-4 animate-spin" /> : <QrCode className="h-4 w-4" />}Pix — {cur.pix}</span>
-                  <span className="text-xs opacity-80">à vista</span>
-                </Button>
-              </div>
+              <Button onClick={review} disabled={loading} className="w-full"><ArrowRight className="mr-2 h-4 w-4" />Continuar</Button>
             </div>
           )}
         </CardContent>
