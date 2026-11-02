@@ -3,6 +3,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3";
 import { isCurrentConsent } from "../_shared/checkout-consent.ts";
 import { recordCheckoutConsent } from "../_shared/record-checkout-consent.ts";
+import { salesUnavailableResponse } from "../_shared/sales-status.ts";
 
 const ASAAS_URL = "https://api.asaas.com/v3"; // PRODUÇÃO
 type PlanKey = "tsa" | "tea";
@@ -56,6 +57,8 @@ async function asaas(path: string, init: RequestInit = {}) {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const unavailable = salesUnavailableResponse(corsHeaders);
+  if (unavailable) return unavailable;
   try {
     if (!Deno.env.get("ASAAS_API_KEY")) return json({ error: "Chave do Asaas não configurada" }, 500);
 

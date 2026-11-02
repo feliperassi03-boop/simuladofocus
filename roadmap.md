@@ -1,5 +1,7 @@
 # Roadmap
 
+- Concluído: novas compras por Pix e cartão bloqueadas nos dois checkouts publicados (HTTP 403 SALES_DISABLED); páginas sem botões de compra no preview; 13 testes passaram. Acessos e webhooks preservados; sessões de pagamento previamente emitidas pelo Asaas não foram canceladas.
+
 - Concluído: teste de R$ 10,00 retirado da página e bloqueado no checkout publicado (HTTP 400); proteção dos pagamentos antigos preservada. Onze testes passaram e revisão dos planos oficiais verificada sem cobrança real.
 
 - Concluído: revisão do pedido e dois aceites obrigatórios nas páginas de compra; páginas legais provisórias; registro servidor de identidade/data/versões/IP antes do Asaas. Nove testes passaram; revisão/edição/bloqueio e páginas legais verificados no navegador. Nenhuma cobrança real criada; gravação com IP real do comprador ainda não verificada de ponta a ponta.

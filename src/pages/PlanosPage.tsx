@@ -9,6 +9,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import CheckoutReview from "@/components/CheckoutReview";
+import SalesUnavailable from "@/components/SalesUnavailable";
+import { SALES_ENABLED } from "../../supabase/functions/_shared/sales-status";
 import { DOCUMENT_VERSIONS, INITIAL_CONSENT, canProceedToPayment } from "../../supabase/functions/_shared/checkout-consent";
 
 const PLANS_UI = {
@@ -34,6 +36,10 @@ const formatCep = (v: string) => {
 };
 
 export default function PlanosPage() {
+  return SALES_ENABLED ? <ActivePlanosPage /> : <SalesUnavailable />;
+}
+
+function ActivePlanosPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState<null | "card" | "pix">(null);
