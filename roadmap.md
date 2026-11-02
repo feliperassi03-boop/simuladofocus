@@ -1,5 +1,8 @@
 # Roadmap
 
+- Concluído: formulário público e aceites restaurados, registros de pedido pendente e documentos conferidos no banco, redirecionamento real à loja InfinitePay verificado sem pagamento; 16 testes passaram e build OK. Publicação da página pelo responsável ainda necessária; Asaas continua bloqueado.
+- Pendente: definir confirmação dos pagamentos InfinitePay para liberação do acesso; depende da orientação do responsável ou integração verificada do provedor.
+
 - Concluído: novas compras por Pix e cartão bloqueadas nos dois checkouts publicados (HTTP 403 SALES_DISABLED); páginas sem botões de compra no preview; 13 testes passaram. Acessos e webhooks preservados; sessões de pagamento previamente emitidas pelo Asaas não foram canceladas.
 
 - Concluído: teste de R$ 10,00 retirado da página e bloqueado no checkout publicado (HTTP 400); proteção dos pagamentos antigos preservada. Onze testes passaram e revisão dos planos oficiais verificada sem cobrança real.
