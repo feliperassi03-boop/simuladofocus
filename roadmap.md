@@ -1,6 +1,6 @@
 # Roadmap
 
-- Concluído: link separado no preview para teste real de R$ 10,00 no cartão; revisão e bloqueio de aceites verificados, 12 testes passaram, funções implantadas. Pagamento real depende do usuário; site publicado ainda não contém a tela de teste.
+- Concluído: teste de R$ 10,00 retirado da página e bloqueado no checkout publicado (HTTP 400); proteção dos pagamentos antigos preservada. Onze testes passaram e revisão dos planos oficiais verificada sem cobrança real.
 
 - Concluído: revisão do pedido e dois aceites obrigatórios nas páginas de compra; páginas legais provisórias; registro servidor de identidade/data/versões/IP antes do Asaas. Nove testes passaram; revisão/edição/bloqueio e páginas legais verificados no navegador. Nenhuma cobrança real criada; gravação com IP real do comprador ainda não verificada de ponta a ponta.
 
