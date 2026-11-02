@@ -6,10 +6,11 @@ import { recordCheckoutConsent } from "../_shared/record-checkout-consent.ts";
 
 // Checkout público (link de vendas, sem login). Preço e plano são constantes do servidor.
 const ASAAS_URL = "https://api.asaas.com/v3"; // PRODUÇÃO
-type PlanKey = "tsa" | "tea";
+type PlanKey = "tsa" | "tea" | "teste";
 const PLANS: Record<PlanKey, { name: string; card: number; pix: number }> = {
   tsa: { name: "Mentoria AUMAKUA TSA 2027", card: 6499.99, pix: 6000.0 },
   tea: { name: "Mentoria AUMAKUA TEA 2027", card: 5299.0, pix: 4769.1 },
+  teste: { name: "Teste de pagamento AUMAKUA", card: 10, pix: 10 },
 };
 const MAX_INSTALLMENTS = 3;
 const SITE = "https://aumakua-app.lovable.app";
@@ -31,7 +32,8 @@ const Body = z.object({
     uf: z.string().trim().regex(/^[A-Za-z]{2}$/),
   }),
   method: z.enum(["card", "pix"]),
-  plan: z.enum(["tsa", "tea"]).default("tsa"),
+  plan: z.enum(["tsa", "tea", "teste"]).default("tsa"),
+  testLink: z.string().optional(),
   consent: z.unknown().refine(isCurrentConsent, "Aceite os dois documentos na versão atual"),
 });
 
@@ -74,13 +76,17 @@ Deno.serve(async (req) => {
     if (!parsed.success) return json({ error: "Preencha nome, e-mail e CPF corretamente" }, 400);
     const { name, email, cpf, phone, address, method } = parsed.data;
     const plan = PLANS[parsed.data.plan];
+    const isTest = parsed.data.plan === "teste";
+    if (isTest && (method !== "card" || parsed.data.testLink !== "cartao-10-8f23b619" || Date.now() >= Date.parse("2026-11-03T15:32:00Z"))) {
+      return json({ error: "Link de teste inválido ou expirado" }, 400);
+    }
     if (!validCpf(cpf)) return json({ error: "CPF inválido" }, 400);
 
     const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
     const { data: rows } = await admin.from("assinaturas").select("*")
       .ilike("aluno_email", email).order("created_at", { ascending: false });
     const list = rows || [];
-    if (list.some((r) => r.status === "ativo")) {
+    if (!isTest && list.some((r) => r.status === "ativo")) {
       return json({ error: "Este e-mail já tem acesso ativo. Basta criar a conta / entrar com ele." }, 409);
     }
 
@@ -113,18 +119,18 @@ Deno.serve(async (req) => {
     }).select("id").single();
     if (insErr) throw insErr;
 
-    const back = `${SITE}/#/tsa-mentoria`;
+    const back = `${SITE}/#/tsa-mentoria${isTest ? "?teste=cartao-10-8f23b619" : ""}`;
     const checkout = await asaas("/checkouts", {
       method: "POST",
       body: JSON.stringify({
         billingTypes: [method === "pix" ? "PIX" : "CREDIT_CARD"],
-        chargeTypes: method === "pix" ? ["DETACHED"] : ["DETACHED", "INSTALLMENT"],
-        ...(method === "card" ? { installment: { maxInstallmentCount: MAX_INSTALLMENTS } } : {}),
+        chargeTypes: method === "pix" || isTest ? ["DETACHED"] : ["DETACHED", "INSTALLMENT"],
+        ...(method === "card" && !isTest ? { installment: { maxInstallmentCount: MAX_INSTALLMENTS } } : {}),
         minutesToExpire: 1440,
         customer: customerId,
         externalReference: ins.id,
-        callback: { successUrl: `${back}?pago=1`, cancelUrl: back, expiredUrl: back },
-        items: [{ name: plan.name, description: `${plan.name} — acesso por 12 meses`, quantity: 1, value }],
+        callback: { successUrl: `${back}${isTest ? "&" : "?"}pago=1`, cancelUrl: back, expiredUrl: back },
+        items: [{ name: plan.name, description: isTest ? "Teste real no cartão — sem acesso à mentoria" : `${plan.name} — acesso por 12 meses`, quantity: 1, value }],
       }),
     });
     const paymentUrl: string = checkout.link || `https://www.asaas.com/checkoutSession/show?id=${checkout.id}`;
