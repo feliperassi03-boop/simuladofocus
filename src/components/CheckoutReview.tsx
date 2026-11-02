@@ -5,7 +5,7 @@ import { Loader2, Pencil, ArrowRight } from "lucide-react";
 import { canProceedToPayment } from "../../supabase/functions/_shared/checkout-consent";
 
 type Props = {
-  name: string; email: string; product: string; value: string; method: "card" | "pix";
+  name: string; email: string; product?: string; value?: string; method?: "card" | "pix"; externalSelection?: boolean;
   terms: boolean; privacy: boolean; loading: boolean;
   onTerms: (checked: boolean) => void; onPrivacy: (checked: boolean) => void;
   onEdit: () => void; onPay: () => void;
@@ -15,9 +15,9 @@ export default function CheckoutReview(p: Props) {
   return <div className="space-y-5">
     <h2 className="font-display text-xl font-semibold">Revise seu pedido</h2>
     <dl className="space-y-3 text-sm break-words">
-      {[["Nome", p.name], ["E-mail", p.email], ["Produto", `${p.product} — acesso de 12 meses`],
+      {[["Nome", p.name], ["E-mail", p.email], ...(p.externalSelection ? [] : [["Produto", `${p.product} — acesso de 12 meses`],
         ["Pagamento", p.method === "pix" ? "Pix à vista" : "Cartão de crédito, à vista ou em até 3x"],
-        ["Valor", p.value], ["Cupom aplicado", "Nenhum"]].map(([label, value]) =>
+        ["Valor", p.value], ["Cupom aplicado", "Nenhum"]])].map(([label, value]) =>
         <div key={label}><dt className="text-muted-foreground">{label}</dt><dd className="font-medium">{value}</dd></div>)}
     </dl>
     <Button variant="outline" onClick={p.onEdit} disabled={p.loading}><Pencil className="mr-2 h-4 w-4" />Editar dados</Button>
