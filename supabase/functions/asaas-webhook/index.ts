@@ -34,6 +34,12 @@ Deno.serve(async (req) => {
   }
   if (!row) { console.log("assinatura não encontrada", evt.event, refs, checkoutIds); return ok(); }
 
+  // A test payment must never grant a discounted mentorship entitlement.
+  if (row.plano === "Teste de pagamento AUMAKUA") {
+    const { error } = await admin.from("assinaturas").update({ status: PAID.has(evt.event) ? "pago_teste" : "estornado" }).eq("id", row.id);
+    return error ? ok({ error: "Falha ao registrar teste" }, 500) : ok();
+  }
+
   if (PAID.has(evt.event)) {
     if (row.status === "ativo") return ok(); // parcelas seguintes não renovam
     const exp = new Date();

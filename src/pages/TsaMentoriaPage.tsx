@@ -22,6 +22,8 @@ const fmtCep = (d: string) => d.replace(/(\d{5})(\d{1,3})$/, "$1-$2");
 export default function TsaMentoriaPage() {
   const [params] = useSearchParams();
   const paid = params.get("pago") === "1";
+  const testLink = params.get("teste");
+  const isTest = testLink === "cartao-10-8f23b619";
   const { toast } = useToast();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -37,7 +39,7 @@ export default function TsaMentoriaPage() {
     tsa: { name: "Mentoria AUMAKUA TSA 2027", card: "R$ 6.499,99", pix: "R$ 6.000,00" },
     tea: { name: "Mentoria AUMAKUA TEA 2027", card: "R$ 5.299,00", pix: "R$ 4.769,10" },
   };
-  const cur = PLANS[plan];
+  const cur = isTest ? { name: "Teste de pagamento AUMAKUA", card: "R$ 10,00", pix: "R$ 10,00" } : PLANS[plan];
 
   const lookupCep = async (cep: string) => {
     if (cep.length !== 8) return;
@@ -75,7 +77,7 @@ export default function TsaMentoriaPage() {
     if (!formOk || !canProceedToPayment(terms, privacy)) return;
     setLoading(method);
     const { data, error } = await supabase.functions.invoke("asaas-checkout-public", {
-      body: { plan, name: name.trim(), email: email.trim(), cpf, phone, address: { postalCode: addr.cep, street: addr.street.trim(), number: addr.number.trim(), district: addr.district.trim(), city: addr.city.trim(), uf: addr.uf.trim() }, method,
+      body: { plan: isTest ? "teste" : plan, testLink: isTest ? testLink : undefined, name: name.trim(), email: email.trim(), cpf, phone, address: { postalCode: addr.cep, street: addr.street.trim(), number: addr.number.trim(), district: addr.district.trim(), city: addr.city.trim(), uf: addr.uf.trim() }, method,
         consent: { terms, privacy, termsVersion: DOCUMENT_VERSIONS.termos, privacyVersion: DOCUMENT_VERSIONS.privacidade } },
     });
     const msg = (data as any)?.error || (error as any)?.context && (await (error as any).context.json().catch(() => null))?.error;
@@ -93,21 +95,21 @@ export default function TsaMentoriaPage() {
         <CardHeader className="text-center space-y-3">
           <img src={logoAsset.url} alt="AUMAKUA" className="h-16 w-16 rounded-full mx-auto object-cover" />
           <CardTitle className="font-display text-2xl break-words">{cur.name}</CardTitle>
-          <p className="text-sm text-muted-foreground">Acesso por 12 meses às provas, simulados e videoaulas.</p>
+          <p className="text-sm text-muted-foreground">{isTest ? "Cobrança real de R$ 10,00 no cartão, à vista. Não inclui acesso à mentoria." : "Acesso por 12 meses às provas, simulados e videoaulas."}</p>
         </CardHeader>
         <CardContent>
           {paid ? (
             <div className="text-center space-y-4">
               <CheckCircle2 className="h-12 w-12 mx-auto text-primary" />
               <h2 className="font-display text-xl">Pagamento recebido!</h2>
-              <p className="text-sm text-muted-foreground">
+              {isTest ? <p className="text-sm text-muted-foreground">Teste de pagamento concluído. A confirmação será enviada pelo Asaas.</p> : <><p className="text-sm text-muted-foreground">
                 Agora crie sua conta na plataforma usando <strong>o mesmo e-mail que você informou na compra</strong>.
                 Se o pagamento foi por cartão ou Pix, a liberação costuma levar poucos minutos.
               </p>
-              <Button asChild className="w-full"><Link to="/auth">Criar minha conta</Link></Button>
+              <Button asChild className="w-full"><Link to="/auth">Criar minha conta</Link></Button></>}
             </div>
           ) : reviewMethod ? (
-            <CheckoutReview name={name.trim()} email={email.trim()} product={cur.name} value={cur[reviewMethod]} method={reviewMethod}
+            <CheckoutReview name={name.trim()} email={email.trim()} product={cur.name} value={cur[reviewMethod]} method={reviewMethod} isTest={isTest}
               terms={terms} privacy={privacy} loading={!!loading} onTerms={setTerms} onPrivacy={setPrivacy}
               onEdit={() => { setReviewMethod(null); setTerms(false); setPrivacy(false); }} onPay={() => pay(reviewMethod)} />
           ) : (
@@ -141,7 +143,7 @@ export default function TsaMentoriaPage() {
                   <Input value={addr.uf} maxLength={2} onChange={(e) => setAddr((a) => ({ ...a, uf: e.target.value.toUpperCase() }))} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3 pb-1">
+              {!isTest && <div className="grid grid-cols-2 gap-3 pb-1">
                 {(["tsa", "tea"] as const).map((p) => (
                   <button key={p} type="button" onClick={() => setPlan(p)}
                     className={`rounded-lg border p-3 text-left transition ${plan === p ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}>
@@ -149,16 +151,16 @@ export default function TsaMentoriaPage() {
                     <p className="text-xs text-muted-foreground mt-1">{PLANS[p].card} cartão · {PLANS[p].pix} Pix</p>
                   </button>
                 ))}
-              </div>
+              </div>}
               <div className="grid gap-3 pt-2">
                 <Button onClick={() => review("card")} disabled={!!loading} className="h-auto py-3 flex-col">
                   <span className="flex items-center gap-2">{loading === "card" ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}Cartão de crédito — {cur.card}</span>
-                  <span className="text-xs opacity-80">à vista ou em até 3x</span>
+                  <span className="text-xs opacity-80">{isTest ? "à vista" : "à vista ou em até 3x"}</span>
                 </Button>
-                <Button onClick={() => review("pix")} disabled={!!loading} variant="secondary" className="h-auto py-3 flex-col">
+                {!isTest && <Button onClick={() => review("pix")} disabled={!!loading} variant="secondary" className="h-auto py-3 flex-col">
                   <span className="flex items-center gap-2">{loading === "pix" ? <Loader2 className="h-4 w-4 animate-spin" /> : <QrCode className="h-4 w-4" />}Pix — {cur.pix}</span>
                   <span className="text-xs opacity-80">à vista</span>
-                </Button>
+                </Button>}
               </div>
             </div>
           )}
