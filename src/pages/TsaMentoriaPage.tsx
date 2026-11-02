@@ -1,16 +1,13 @@
 import { useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle2, CreditCard, QrCode, Loader2 } from "lucide-react";
+import { CreditCard, QrCode, Loader2 } from "lucide-react";
 import logoAsset from "@/assets/aumakua-logo.jpeg.asset.json";
 import CheckoutReview from "@/components/CheckoutReview";
-import SalesUnavailable from "@/components/SalesUnavailable";
-import { SALES_ENABLED } from "../../supabase/functions/_shared/sales-status";
 import { z } from "zod";
 import { DOCUMENT_VERSIONS, INITIAL_CONSENT, canProceedToPayment } from "../../supabase/functions/_shared/checkout-consent";
 
@@ -22,12 +19,10 @@ const fmtPhone = (d: string) =>
 const fmtCep = (d: string) => d.replace(/(\d{5})(\d{1,3})$/, "$1-$2");
 
 export default function TsaMentoriaPage() {
-  return SALES_ENABLED ? <ActiveTsaMentoriaPage /> : <SalesUnavailable />;
+  return <ActiveTsaMentoriaPage />;
 }
 
 function ActiveTsaMentoriaPage() {
-  const [params] = useSearchParams();
-  const paid = params.get("pago") === "1";
   const { toast } = useToast();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -80,7 +75,7 @@ function ActiveTsaMentoriaPage() {
   const pay = async (method: "card" | "pix") => {
     if (!formOk || !canProceedToPayment(terms, privacy)) return;
     setLoading(method);
-    const { data, error } = await supabase.functions.invoke("asaas-checkout-public", {
+    const { data, error } = await supabase.functions.invoke("infinitepay-checkout-public", {
       body: { plan, name: name.trim(), email: email.trim(), cpf, phone, address: { postalCode: addr.cep, street: addr.street.trim(), number: addr.number.trim(), district: addr.district.trim(), city: addr.city.trim(), uf: addr.uf.trim() }, method,
         consent: { terms, privacy, termsVersion: DOCUMENT_VERSIONS.termos, privacyVersion: DOCUMENT_VERSIONS.privacidade } },
     });
@@ -102,17 +97,7 @@ function ActiveTsaMentoriaPage() {
           <p className="text-sm text-muted-foreground">Acesso por 12 meses às provas, simulados e videoaulas.</p>
         </CardHeader>
         <CardContent>
-          {paid ? (
-            <div className="text-center space-y-4">
-              <CheckCircle2 className="h-12 w-12 mx-auto text-primary" />
-              <h2 className="font-display text-xl">Pagamento recebido!</h2>
-              <p className="text-sm text-muted-foreground">
-                Agora crie sua conta na plataforma usando <strong>o mesmo e-mail que você informou na compra</strong>.
-                Se o pagamento foi por cartão ou Pix, a liberação costuma levar poucos minutos.
-              </p>
-              <Button asChild className="w-full"><Link to="/auth">Criar minha conta</Link></Button>
-            </div>
-          ) : reviewMethod ? (
+          {reviewMethod ? (
             <CheckoutReview name={name.trim()} email={email.trim()} product={cur.name} value={cur[reviewMethod]} method={reviewMethod}
               terms={terms} privacy={privacy} loading={!!loading} onTerms={setTerms} onPrivacy={setPrivacy}
               onEdit={() => { setReviewMethod(null); setTerms(false); setPrivacy(false); }} onPay={() => pay(reviewMethod)} />
@@ -149,11 +134,11 @@ function ActiveTsaMentoriaPage() {
               </div>
               <div className="grid grid-cols-2 gap-3 pb-1">
                 {(["tsa", "tea"] as const).map((p) => (
-                  <button key={p} type="button" onClick={() => setPlan(p)}
-                    className={`rounded-lg border p-3 text-left transition ${plan === p ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}>
+                  <Button key={p} type="button" variant="outline" onClick={() => setPlan(p)}
+                    className={`h-auto block whitespace-normal rounded-lg border p-3 text-left transition ${plan === p ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}>
                     <p className="text-sm font-display font-semibold break-words">{PLANS[p].name}</p>
                     <p className="text-xs text-muted-foreground mt-1">{PLANS[p].card} cartão · {PLANS[p].pix} Pix</p>
-                  </button>
+                  </Button>
                 ))}
               </div>
               <div className="grid gap-3 pt-2">
