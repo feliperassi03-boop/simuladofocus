@@ -17,6 +17,7 @@ describe("Aceite antes do pagamento", () => {
     expect(isCurrentConsent(consent)).toBe(true);
     expect(isCurrentConsent({ ...consent, termsVersion: "antiga" })).toBe(false);
     expect(isCurrentConsent({ ...consent, privacyVersion: "antiga" })).toBe(false);
+    expect(isCurrentConsent({ ...consent, termsVersion: "2026-10-26-v2", privacyVersion: "2026-10-26-v2" })).toBe(false);
     expect(isCurrentConsent({ ...consent, privacy: false })).toBe(false);
     expect(isCurrentConsent(undefined)).toBe(false);
   });
@@ -33,7 +34,7 @@ describe("Aceite antes do pagamento", () => {
       expect(row.buyer_name).toBe("Comprador Teste");
       expect(row.buyer_email).toBe("teste@example.invalid");
       expect(row.ip_address).toBe("192.0.2.1");
-      expect(row.document_version).toBe("2026-10-26-v2");
+      expect(row.document_version).toBe("2026-11-02-v3");
       expect(new Date(String(row.accepted_at)).getTime()).toBeGreaterThanOrEqual(before);
     }
   });

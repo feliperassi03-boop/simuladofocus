@@ -1,5 +1,7 @@
 # Roadmap
 
+- Concluído: três documentos novos disponíveis para leitura com links aos PDFs originais, versões dos aceites atualizadas para 2026-11-02-v3; funções implantadas, aceite antigo rejeitado (HTTP 400), 10 testes passaram e páginas/PDFs verificados. Registros antigos e regras de compra preservados; publicar a página para visitantes. Os arquivos fornecidos ainda contêm campos de privacidade não preenchidos e divergências de prazo/cancelamento, preservados sem revisão jurídica.
+
 - Concluído: formulário público e aceites restaurados, registros de pedido pendente e documentos conferidos no banco, redirecionamento real à loja InfinitePay verificado sem pagamento; 16 testes passaram e build OK. Publicação da página pelo responsável ainda necessária; Asaas continua bloqueado.
 - Pendente: definir confirmação dos pagamentos InfinitePay para liberação do acesso; depende da orientação do responsável ou integração verificada do provedor.
 

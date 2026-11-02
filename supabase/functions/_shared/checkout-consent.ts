@@ -1,6 +1,6 @@
 export const DOCUMENT_VERSIONS = {
-  termos: "2026-10-26-v2",
-  privacidade: "2026-10-26-v2",
+  termos: "2026-11-02-v3",
+  privacidade: "2026-11-02-v3",
 } as const;
 
 export const INITIAL_CONSENT = { terms: false, privacy: false };
