@@ -2,9 +2,8 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3";
 import { isCurrentConsent } from "../_shared/checkout-consent.ts";
-import { recordCheckoutConsent } from "../_shared/record-checkout-consent.ts";
-import { PUBLIC_PLAN_KEYS } from "../_shared/public-plans.ts";
-import { INFINITEPAY_PLANS, recordInfinitepayOrder } from "../_shared/infinitepay-checkout.ts";
+import { recordPreRegistration } from "../_shared/record-pre-registration.ts";
+import { INFINITEPAY_PAYMENT_URL } from "../_shared/infinitepay-checkout.ts";
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
   status, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -19,7 +18,6 @@ const Body = z.object({
     number: z.string().trim().min(1).max(20), district: z.string().trim().min(1).max(80),
     city: z.string().trim().min(1).max(80), uf: z.string().trim().regex(/^[A-Za-z]{2}$/),
   }),
-  method: z.enum(["card", "pix"]), plan: z.enum(PUBLIC_PLAN_KEYS),
   consent: z.unknown().refine(isCurrentConsent, "Aceite os dois documentos na versão atual"),
 });
 function validCpf(cpf: string) {
@@ -50,11 +48,8 @@ Deno.serve(async (req) => {
       .ilike("aluno_email", buyer.email).eq("status", "ativo").limit(1);
     if (error) throw new Error("Não foi possível conferir seu cadastro. Tente novamente.");
     if (active?.length) return json({ error: "Este e-mail já tem acesso ativo. Entre com ele na plataforma." }, 409);
-    await recordCheckoutConsent(admin, req, {
-      name: buyer.name, email: buyer.email, plan: buyer.plan,
-      method: buyer.method, value: INFINITEPAY_PLANS[buyer.plan][buyer.method],
-    });
-    return json(await recordInfinitepayOrder(admin, buyer));
+    await recordPreRegistration(admin, req, buyer);
+    return json({ payment_url: INFINITEPAY_PAYMENT_URL });
   } catch (e) {
     console.error("InfinitePay registration failed", e instanceof Error ? e.message : "unknown error");
     return json({ error: e instanceof Error ? e.message : "Não foi possível preparar o pagamento." }, 500);
