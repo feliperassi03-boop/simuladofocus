@@ -9,15 +9,14 @@ type Props = {
   terms: boolean; privacy: boolean; loading: boolean;
   onTerms: (checked: boolean) => void; onPrivacy: (checked: boolean) => void;
   onEdit: () => void; onPay: () => void;
-  isTest?: boolean;
 };
 
 export default function CheckoutReview(p: Props) {
   return <div className="space-y-5">
     <h2 className="font-display text-xl font-semibold">Revise seu pedido</h2>
     <dl className="space-y-3 text-sm break-words">
-      {[["Nome", p.name], ["E-mail", p.email], ["Produto", `${p.product} — ${p.isTest ? "sem acesso à mentoria" : "acesso de 12 meses"}`],
-        ["Pagamento", p.method === "pix" ? "Pix à vista" : p.isTest ? "Cartão de crédito, à vista" : "Cartão de crédito, à vista ou em até 3x"],
+      {[["Nome", p.name], ["E-mail", p.email], ["Produto", `${p.product} — acesso de 12 meses`],
+        ["Pagamento", p.method === "pix" ? "Pix à vista" : "Cartão de crédito, à vista ou em até 3x"],
         ["Valor", p.value], ["Cupom aplicado", "Nenhum"]].map(([label, value]) =>
         <div key={label}><dt className="text-muted-foreground">{label}</dt><dd className="font-medium">{value}</dd></div>)}
     </dl>

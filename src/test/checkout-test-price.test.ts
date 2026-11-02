@@ -1,15 +1,15 @@
 import { describe, expect, it } from "vitest";
-import checkout from "../../supabase/functions/asaas-checkout-public/index.ts?raw";
+import { z } from "zod";
+import { PUBLIC_PLAN_KEYS } from "../../supabase/functions/_shared/public-plans";
 import webhook from "../../supabase/functions/asaas-webhook/index.ts?raw";
 
-describe("Compra temporária de teste", () => {
-  it("cobra exatamente R$ 10,00 no cartão", () => {
-    const value = checkout.match(/teste:\s*\{[^}]*card:\s*([\d.]+)/)?.[1];
-    expect(Number(value)).toBe(10);
-  });
-  it("recusa Pix e limita o teste ao link temporário", () => {
-    expect(checkout).toContain('isTest && (method !== "card"');
-    expect(checkout).toContain('2026-11-03T15:32:00Z');
+describe("Remoção da compra temporária de teste", () => {
+  it("recusa o plano de teste de R$ 10,00 e aceita somente os planos oficiais", () => {
+    const plan = z.enum(PUBLIC_PLAN_KEYS);
+    expect(plan.safeParse("teste").success).toBe(false);
+    expect(PUBLIC_PLAN_KEYS).toEqual(["tsa", "tea"]);
+    expect(plan.safeParse("tsa").success).toBe(true);
+    expect(plan.safeParse("tea").success).toBe(true);
   });
   it("não libera mentoria pelo pagamento de teste", () => {
     const branch = webhook.slice(webhook.indexOf('if (row.plano === "Teste de pagamento AUMAKUA")'), webhook.indexOf('if (PAID.has(evt.event))'));
