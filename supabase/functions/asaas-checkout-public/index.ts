@@ -4,6 +4,7 @@ import { z } from "npm:zod@3";
 import { isCurrentConsent } from "../_shared/checkout-consent.ts";
 import { recordCheckoutConsent } from "../_shared/record-checkout-consent.ts";
 import { PUBLIC_PLAN_KEYS } from "../_shared/public-plans.ts";
+import { salesUnavailableResponse } from "../_shared/sales-status.ts";
 
 // Checkout público (link de vendas, sem login). Preço e plano são constantes do servidor.
 const ASAAS_URL = "https://api.asaas.com/v3"; // PRODUÇÃO
@@ -70,6 +71,8 @@ async function asaas(path: string, init: RequestInit = {}) {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Método inválido" }, 405);
+  const unavailable = salesUnavailableResponse(corsHeaders);
+  if (unavailable) return unavailable;
   try {
     const parsed = Body.safeParse(await req.json().catch(() => ({})));
     if (!parsed.success) return json({ error: "Preencha nome, e-mail e CPF corretamente" }, 400);

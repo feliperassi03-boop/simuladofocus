@@ -9,6 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { CheckCircle2, CreditCard, QrCode, Loader2 } from "lucide-react";
 import logoAsset from "@/assets/aumakua-logo.jpeg.asset.json";
 import CheckoutReview from "@/components/CheckoutReview";
+import SalesUnavailable from "@/components/SalesUnavailable";
+import { SALES_ENABLED } from "../../supabase/functions/_shared/sales-status";
 import { z } from "zod";
 import { DOCUMENT_VERSIONS, INITIAL_CONSENT, canProceedToPayment } from "../../supabase/functions/_shared/checkout-consent";
 
@@ -20,6 +22,10 @@ const fmtPhone = (d: string) =>
 const fmtCep = (d: string) => d.replace(/(\d{5})(\d{1,3})$/, "$1-$2");
 
 export default function TsaMentoriaPage() {
+  return SALES_ENABLED ? <ActiveTsaMentoriaPage /> : <SalesUnavailable />;
+}
+
+function ActiveTsaMentoriaPage() {
   const [params] = useSearchParams();
   const paid = params.get("pago") === "1";
   const { toast } = useToast();

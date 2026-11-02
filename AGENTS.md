@@ -1,5 +1,7 @@
 # Project rules
 
+- Both checkout functions enforce the shared sales-status guard before any database or Asaas operation; purchase pages use the same flag. Why: paused sales must also reject direct requests and cached pages without disrupting historical payment webhooks.
+
 - Asaas API calls happen only in the backend functions (`asaas-subscribe`, `asaas-checkout-public`, `asaas-webhook`); plan names/prices live in server-side `PLANS` maps and public plan keys are restricted by the shared server allowlist. Removed test purchases retain the webhook no-entitlement guard for historical events. Why: browser input must not control prices or create discounted entitlements.
 - Asaas payment confirmations are handled only by the `asaas-webhook` function, authenticated by the `asaas-access-token` header against a stored secret. Why: access must only be granted from verified server-side events.
 - Public sales checkout (no login) runs only in the `asaas-checkout-public` function; the webhook adds the paid e-mail to `allowed_emails` so the buyer can sign up. Why: buyers have no account before paying.
