@@ -11,283 +11,1092 @@ export interface LegalDoc {
 }
 
 export const TERMOS: LegalDoc = {
-  title: "Termos de Uso e Condições Gerais de Contratação",
-  blocks: [
-    { type: "p", text: "Ao navegar e/ou se cadastrar na nossa plataforma, o ALUNO declara estar ciente dos direitos e obrigações decorrentes do presente TERMO e das Políticas de Privacidade que, juntos, compõem a integralidade do contrato celebrado entre as PARTES." },
-    { type: "p", text: "As Políticas, ainda que apresentadas em textos separados, devem ser analisadas e aceitas em conjunto, pois compõem a integralidade do acordo firmado entre as PARTES." },
-    { type: "p", text: "O presente TERMO regula as condições de licença de uso, em caráter não exclusivo, das ferramentas tecnológicas contidas na plataforma utilizada pela AUMAKUA durante o consumo." },
-    { type: "p", text: "As ferramentas tecnológicas são licenciadas no estado em que se encontram, podendo ser modificadas, substituídas ou removidas da Plataforma a qualquer momento, sem aviso prévio." },
-    { type: "p", text: "O uso das ferramentas disponibilizadas pela PLATAFORMA em desacordo com os TERMOS poderá implicar a suspensão do acesso à conta ou o cancelamento do cadastro do ALUNO, conforme regras estipuladas, sem exclusão de outras sanções, conforme será detalhado." },
-    { type: "p", text: "Versão 1.0 — vigente a partir de 23.10.2026. Leia integralmente antes de contratar." },
-    { type: "p", text: "Ao final do processo de compra, você receberá por e-mail cópia destes Termos em formato que permite conservação e reprodução (Decreto nº 7.962/2013, art. 4º, IV)." },
-    { type: "h2", text: "Sumário do contrato" },
-    { type: "table", headers: ["Item", "Condição"], rows: [
-      ["Serviço", "Curso preparatório online para as provas de Título Superior em Anestesiologia (1ª fase) e de Título de Especialista em Anestesiologia"],
-      ["Mentoria TSA 1ª Fase 2027", "Valor cheio: R$ 6.499,99; Pix à vista: R$ 6.000,00; Cartão de crédito: à vista ou em até 3x de R$ 2.166,66 (sem juros)."],
-      ["Mentoria TSA 1ª Fase 2027 – Compras em janeiro/2027", "Valor cheio: R$ 6.999,00; Pix à vista: R$ 6.299,10; Cartão de crédito: Em até 3 vezes de R$ 2.333,00 (sem juros)."],
-      ["Mentoria TEA 2027", "Valor cheio: R$ 5.299,00; Pix à vista: R$ 4.769,10; Cartão de crédito: Em até 3 vezes de R$ 1.766,33 sem juros"],
-      ["Mentoria TEA – Compras em janeiro/2027", "Valor cheio: R$ 5.999,00; Pix à vista: R$ 5.399,10; Cartão de Crédito: Em até 3 vezes de R$ 1.999,67 sem juros"],
-      ["Prazo de acesso", "12 (doze) meses contados da liberação do acesso"],
-      ["Arrependimento", "7 dias, reembolso integral, sem justificativa (cláusula 6)"],
-      ["Garantia de aprovação", "Não há"],
-      ["Atendimento", "E-mail: aumakua147@gmail.com — resposta em até 5 dias"],
-      ["Restrições relevantes", "Uso pessoal e intransferível; proibida gravação e compartilhamento (cláusulas 7 e 8)"],
-    ]},
-    { type: "h2", text: "Cláusula 1 — Identificação do fornecedor e canais de atendimento" },
-    { type: "p", text: "1.1. O curso é ofertado por AUMAKUA LTDA - TREINAMENTO EM DESENVOLVIMENTO PROFISSIONAL E GERENCIAL, pessoa jurídica de direito privado, devidamente inscrita no CNPJ sob o nº 65.259.441/0001-58, com endereço na Rua 08, nº s/n, Qd. 01; Lt. 23; Jardim Alfaville, Bela Vista de Goiás-GO, CEP: 75240000, e endereço eletrônico aumakua147@gmail.com, doravante denominada “FORNECEDORA”." },
-    { type: "p", text: "1.2. O conteúdo acadêmico é de responsabilidade técnica do Dr. Felipe Bufaiçal Rassi Carneiro, médico inscrito no CRM/GO sob o nº 27.935, RQE nº 17.060 (Anestesiologia - Resolução CFM nº 2.336/2023)." },
-    { type: "p", text: "1.3. Canais de atendimento: e-mail: aumakua147@gmail.com e formulário disponível na plataforma. A FORNECEDORA responderá a dúvidas, reclamações, pedidos de cancelamento e de arrependimento em até 5 (cinco) dias, confirmando de imediato o recebimento da demanda." },
-    { type: "h2", text: "Cláusula 2 — Definições" },
-    { type: "p", text: "2.1. Para estes Termos, considera-se:" },
-    { type: "ol", items: [
-      "ALUNO: pessoa física que contrata o curso e se cadastra na Plataforma.",
-      "PLATAFORMA: ambiente virtual Lovable (aumakua-app.lovable.app), pelo qual o conteúdo é disponibilizado.",
-      "CONTEÚDO: videoaulas, aulas ao vivo e suas gravações, apostilas, mapas mentais, questões comentadas, simulados e qualquer material didático do curso.",
-      "CONTA: credenciais pessoais (login e senha) que dão acesso ao CONTEÚDO.",
-      "COMUNIDADE: fóruns, chats, grupos e espaços de comentário em que ALUNOS publicam conteúdo próprio.",
-      "PROVAS: exames para obtenção dos títulos de especialista em anestesiologia e superior em anestesiologia, aplicados pela Sociedade Brasileira de Anestesiologia.",
-    ]},
-    { type: "h2", text: "Cláusula 3 — Objeto e natureza do serviço" },
-    { type: "p", text: "3.1. O objeto destes Termos de Uso é a prestação de serviço educacional livre, na modalidade a distância, de preparação para as provas de: 1- Título Superior em Anestesiologia (1ª fase) e 2- Título de Especialista em Anestesiologia, com o conteúdo programático, a carga horária estimada e o cronograma descritos na página de oferta, que integra estes Termos." },
-    { type: "p", text: "3.2. O curso é livre: NÃO se trata de curso de pós-graduação, NÃO é reconhecido pelo Ministério da Educação, NÃO confere título de especialista nem Registro de Qualificação de Especialista (RQE) e NÃO substitui os requisitos de elegibilidade exigidos no edital da PROVA. O certificado eventualmente emitido atesta apenas a conclusão do curso." },
-    { type: "p", text: "3.3. Não há garantia de aprovação. O resultado nas PROVAS depende de fatores alheios à FORNECEDORA, como dedicação do ALUNO, critérios da banca e conteúdo do edital. Qualquer dado de desempenho de ex-alunos divulgado pela FORNECEDORA indicará a base de cálculo e o período, e ficará disponível para verificação." },
-    { type: "p", text: "3.4. A FORNECEDORA declara que: (a) o curso não é promovido, endossado nem vinculado à Sociedade Brasileira de Anestesiologia, à Associação Médica Brasileira ou ao Conselho Federal de Medicina; (b) o professor responsável não integra, nem integrou nos últimos 5 (cinco) anos, comissão examinadora ou de elaboração da PROVA; e (c) o CONTEÚDO não utiliza questões ou informação privilegiada sobre a PROVA. Questões de provas anteriores são usadas apenas quando publicamente divulgadas, com indicação da fonte." },
-    { type: "p", text: "3.5. O CONTEÚDO tem finalidade exclusivamente educacional e de preparação para os exames. Não constitui consulta, parecer, orientação terapêutica individualizada ou protocolo assistencial, e não substitui o juízo clínico do ALUNO no exercício da Medicina." },
-    { type: "p", text: "3.6. Alterações de edital da PROVA serão acompanhadas por atualização razoável do CONTEÚDO durante o prazo de acesso, quando tecnicamente pertinentes, sem custo adicional." },
-    { type: "h2", text: "Cláusula 4 — Aceite, contratação e capacidade" },
-    { type: "p", text: "4.1. A contratação se aperfeiçoa com: (a) o preenchimento do cadastro; (b) a marcação, pelo ALUNO, da caixa de aceite destes Termos de Uso e de ciência da Política de Privacidade, que não virão pré-marcados; e (c) a confirmação do pagamento. A FORNECEDORA confirmará imediatamente o recebimento da aceitação da oferta." },
-    { type: "p", text: "4.2. Antes da finalização, a Plataforma exibirá o sumário do contrato e permitirá ao ALUNO identificar e corrigir erros de preenchimento." },
-    { type: "p", text: "4.3. O curso destina-se a médicos regularmente inscritos em Conselho Regional de Medicina, ou a médicos em programa de residência, maiores e capazes. A FORNECEDORA poderá solicitar o número do CRM para conferência, exclusivamente para essa finalidade." },
-    { type: "p", text: "4.4. As informações cadastrais são de responsabilidade do ALUNO, que deve mantê-las atualizadas." },
-    { type: "h2", text: "Cláusula 5 — Preço, pagamento e documento fiscal" },
-    { type: "p", text: "5.1. O preço, as formas de pagamento, o número de parcelas, os juros e encargos eventualmente incidentes e o custo efetivo total do parcelamento são informados de forma destacada na página de oferta e no checkout, antes da conclusão da compra." },
-    { type: "p", text: "5.2. Não há cobrança de taxa de matrícula, material ou emissão de certificado além do preço anunciado." },
-    { type: "p", text: "5.3. Quando o pagamento for processado por intermediador (plataforma de terceiros), o intermediador atuará apenas como meio de pagamento. A responsabilidade perante o ALUNO pela prestação do serviço educacional é da FORNECEDORA." },
-    { type: "p", text: "5.4. O documento fiscal será emitido na forma da legislação aplicável e enviado ao e-mail previamente cadastrado pelo aluno." },
-    { type: "p", text: "5.5. Promoções e cupons valem pelo prazo e nas condições divulgados, e não geram direito à restituição de diferença a quem contratou em período anterior." },
-    { type: "h2", text: "Cláusula 6 — Direito de arrependimento" },
-    { type: "p", text: "6.1. O ALUNO pode desistir da contratação, sem necessidade de justificativa e sem qualquer ônus, no prazo de 7 (sete) dias corridos contados da liberação do acesso (início do curso). O direito de arrependimento independe da quantidade de CONTEÚDO acessado nesse período." },
-    { type: "p", text: "6.2. O pedido pode ser feito: (a) pela mesma ferramenta usada na contratação (botão “Solicitar reembolso” na área do ALUNO ou na Plataforma); ou (b) por e-mail para aumakua147@gmail.com. A FORNECEDORA enviará confirmação imediata do recebimento do pedido." },
-    { type: "p", text: "6.3. Exercido o arrependimento, os valores pagos serão restituídos integralmente e monetariamente atualizados, inclusive taxas de processamento. No pagamento por cartão de crédito, a FORNECEDORA ou a PLATAFORMA comunicará imediatamente a instituição financeira ou a administradora do cartão para que a transação não seja lançada na fatura ou seja estornada. No PIX, a devolução ocorrerá em até 7 (sete) dias úteis na conta indicada pelo ALUNO." },
-    { type: "p", text: "6.5. O arrependimento extingue o acesso ao CONTEÚDO e os contratos acessórios, sem ônus para o ALUNO." },
-    { type: "h2", text: "Cláusula 7 — Acesso, conta e prazo" },
-    { type: "p", text: "7.1. O acesso será liberado após a confirmação do pagamento e do início do curso que vigorará por 12 (doze) meses, findos os quais se encerra automaticamente, sem renovação ou cobrança automática, salvo nova contratação expressa." },
-    { type: "p", text: "7.2. A CONTA é pessoal e intransferível. É vedado ceder, emprestar, compartilhar ou comercializar credenciais de acesso ao curso. O ALUNO responde pela guarda de sua senha e deve comunicar imediatamente qualquer uso não autorizado." },
-    { type: "p", text: "7.3. Para proteger o CONTEÚDO, a Plataforma limitará o número de dispositivos (um login por CPF) e poderá aplicar marca d’água com dados de identificação do ALUNO nos vídeos e arquivos." },
-    { type: "p", text: "7.3.1. Eventual tentativa de dois ou mais acessos simultâneos com o mesmo login e senha à ÁREA DO ALUNO poderá ensejar o bloqueio de seu acesso." },
-    { type: "p", text: "7.4. O aluno poderá baixar os artigos de literatura que serão liberados a partir do 8º (oitavo) dia contado do início do curso. Durante esse período, todo o CONTEÚDO permanece disponível para consulta online." },
-    { type: "p", text: "7.5. A FORNECEDORA empregará meios razoáveis para manter a Plataforma disponível, mas poderá haver interrupções para manutenção, preferencialmente comunicadas com antecedência. Indisponibilidade superior a 72 (setenta e duas) horas consecutivas, imputável à FORNECEDORA ou à Plataforma, prorrogará o prazo de acesso pelo período equivalente, sem prejuízo dos demais direitos do ALUNO." },
-    { type: "p", text: "7.6. Aulas ao vivo ocorrerão nas datas do cronograma. Remarcações serão comunicadas com ao menos 24 (vinte e quatro) horas de antecedência, e a gravação ficará disponível na Plataforma durante o prazo de acesso." },
-    { type: "p", text: "7.7. Requisitos técnicos mínimos (navegador, conexão, sistema operacional) são informados na página de oferta." },
-    { type: "h2", text: "Cláusula 8 — Propriedade intelectual" },
-    { type: "p", text: "8.1. O CONTEÚDO é obra intelectual protegida pela Lei nº 9.610/1998, de titularidade da FORNECEDORA e de seu representante legal que o licenciaram. A contratação concede ao ALUNO apenas licença de uso pessoal, não exclusiva, intransferível e revogável nos casos destes Termos, restrita ao prazo de acesso." },
-    { type: "p", text: "8.2. Sem autorização prévia e expressa da FORNECEDORA, é vedado: (a) gravar, capturar tela, baixar por meio não disponibilizado pela Plataforma ou reproduzir o CONTEÚDO, total ou parcialmente; (b) distribuir, vender, publicar ou disponibilizar o CONTEÚDO a terceiros, inclusive em grupos de mensagens e redes sociais; (c) utilizar o CONTEÚDO para ministrar cursos, aulas ou mentorias; (d) remover marca d’água ou mecanismos de proteção." },
-    { type: "p", text: "8.3. A violação sujeita o infrator à suspensão da CONTA (cláusula 13), à apreensão e indenização previstas nos arts. 102 a 104 da Lei nº 9.610/1998 e às sanções penais do art. 184 do Código Penal." },
-    { type: "p", text: "8.4. Marcas, nomes e logotipos do curso pertencem à FORNECEDORA. Marcas de terceiros eventualmente mencionadas pertencem a seus titulares." },
-    { type: "p", text: "8.5. Questões de provas anteriores e trechos de diretrizes clínicas são citados para fins de estudo, com indicação da fonte e do autor (Lei nº 9.610/1998, art. 46, III)." },
-    { type: "h2", text: "Cláusula 9 — Conduta do ALUNO, ética médica e sigilo" },
-    { type: "p", text: "9.1. O ALUNO, como médico, permanece submetido ao Código de Ética Médica (Resolução CFM nº 2.217/2018) também nos espaços do curso." },
-    { type: "p", text: "9.2. É vedado ao ALUNO publicar na COMUNIDADE, ou enviar ao professor, caso clínico, exame, imagem ou documento que permita identificar paciente, ainda que com autorização deste (Código de Ética Médica, arts. 73 e 75). Casos para discussão devem ser integralmente anonimizados, com supressão de nome, iniciais, datas, local de atendimento, tatuagens, rosto e qualquer elemento identificador." },
-    { type: "p", text: "9.3. O conteúdo eventualmente publicado em desacordo com o item 9.2 será removido sem aviso prévio, por envolver dado pessoal sensível de terceiro (Lei nº 13.709/2018, arts. 5º, II, e 11)." },
-    { type: "p", text: "9.4. O professor não responderá, no âmbito do curso, a pedidos de conduta para paciente concreto, que caracterizem consulta ou orientação assistencial. A discussão de casos terá caráter exclusivamente didático." },
-    { type: "p", text: "9.5. Na COMUNIDADE, são vedados: ofensas, discriminação, assédio, propaganda comercial, divulgação de serviços médicos em desacordo com a Resolução CFM nº 2.336/2023, compartilhamento de material pirata e conteúdo ilícito." },
-    { type: "p", text: "9.6. O ALUNO que utilizar depoimento sobre o curso, ou a FORNECEDORA que divulgar depoimento de ALUNO, observarão a veracidade e a autorização expressa do autor, vedada a sua edição para alterar o sentido." },
-    { type: "h2", text: "Cláusula 10 — Conteúdo publicado por ALUNOS e remoção" },
-    { type: "p", text: "10.1. O ALUNO é responsável pelo conteúdo que publicar na COMUNIDADE e declara deter os direitos necessários sobre ele." },
-    { type: "p", text: "10.2. A FORNECEDORA não realiza controle prévio das publicações, mas removerá ou tornará indisponível, em prazo razoável e sem necessidade de ordem judicial, o conteúdo manifestamente ilícito que lhe for notificado ou de que tiver ciência, especialmente o que viole os itens 9.2 e 9.5, direitos autorais, intimidade ou dados pessoais de terceiros." },
-    { type: "p", text: "10.3. Nas hipóteses de alegada ofensa à honra, a remoção poderá aguardar ordem judicial específica, ressalvada a faculdade de a FORNECEDORA remover o conteúdo que viole estes Termos." },
-    { type: "p", text: "10.4. Notificações devem ser enviadas ao e-mail aumakua147@gmail.com, com identificação do conteúdo (link ou captura) e o motivo da reclamação. O autor do conteúdo removido será informado do motivo e poderá apresentar contestação pelo mesmo canal." },
-    { type: "h2", text: "Cláusula 11 — Proteção de dados pessoais" },
-    { type: "p", text: "11.1. O tratamento de dados pessoais é detalhado na Política de Privacidade, que integra estes Termos e prevalece sobre este resumo. A FORNECEDORA atua como controladora; a Plataforma e o intermediador de pagamento atuam como operadores ou controladores independentes, conforme o caso (Lei nº 13.709/2018, art. 5º, VI e VII)." },
-    { type: "p", text: "11.2. Dados tratados e bases legais (Lei nº 13.709/2018, art. 7º):" },
-    { type: "table", headers: ["Finalidade", "Dados", "Base legal"], rows: [
-      ["Cadastro, acesso e prestação do curso", "Nome, CPF, e-mail, telefone, CRM, dados de progresso", "Execução de contrato (art. 7º, V)"],
-      ["Emissão de documento fiscal e guarda contábil", "Nome, CPF, endereço, valor pago", "Obrigação legal (art. 7º, II)"],
-      ["Guarda de registros de acesso", "IP, data e hora de acesso", "Obrigação legal (art. 7º, II; Lei nº 12.965/2014, art. 15)"],
-      ["Prevenção de fraude e proteção do CONTEÚDO", "IP, dispositivo, sessões simultâneas, marca d’água", "Legítimo interesse (art. 7º, IX) e exercício regular de direitos (art. 7º, VI)"],
-      ["Envio de ofertas e novidades", "Nome, e-mail, telefone", "Consentimento (art. 7º, I), revogável a qualquer tempo"],
-      ["Uso de nome e depoimento em divulgação", "Nome, imagem, depoimento", "Consentimento específico e destacado (art. 8º, § 4º)"],
-    ]},
-    { type: "p", text: "11.3. A FORNECEDORA não solicita nem trata dados pessoais sensíveis do ALUNO e não admite o envio de dados de pacientes (item 9.2). Dados sensíveis recebidos indevidamente serão eliminados." },
-    { type: "p", text: "11.4. Os registros de acesso à aplicação serão mantidos sob sigilo, em ambiente controlado e seguro, pelo prazo de 6 (seis) meses, e somente fornecidos mediante ordem judicial." },
-    { type: "p", text: "11.5. Encerrada a relação, os dados serão eliminados, ressalvada a conservação para cumprimento de obrigação legal ou regulatória e para exercício regular de direitos, pelos prazos legais." },
-    { type: "p", text: "11.6. Se a Plataforma ou serviços de armazenamento estiverem localizados fora do Brasil, a transferência internacional observará o art. 33 da Lei nº 13.709/2018 e a regulamentação da ANPD." },
-    { type: "p", text: "11.7. O ALUNO pode exercer, gratuitamente, os direitos do art. 18 da Lei nº 13.709/2018 (confirmação, acesso, correção, anonimização, portabilidade, eliminação, informação sobre compartilhamento e revogação do consentimento) pelo canal aumakua147@gmail.com." },
-    { type: "p", text: "11.8. Por se tratar de agente de tratamento de pequeno porte, a FORNECEDORA está dispensada de indicar encarregado, mas mantém o canal acima para comunicação com titulares (Resolução CD/ANPD nº 2/2022)." },
-    { type: "p", text: "11.9. A FORNECEDORA adota medidas de segurança técnicas e administrativas aptas a proteger os dados e comunicará à ANPD e aos titulares incidente de segurança que possa acarretar risco ou dano relevante (Lei nº 13.709/2018, arts. 46 e 48)." },
-    { type: "h2", text: "Cláusula 12 — Responsabilidade" },
-    { type: "p", text: "12.1. A FORNECEDORA responde pelos danos causados por defeitos na prestação do serviço e por informações insuficientes ou inadequadas, nos termos do CDC, observadas as excludentes previstas legalmente." },
-    { type: "p", text: "12.2. Sem prejuízo do item 12.1, a FORNECEDORA não responde por: (a) resultado na PROVA, por se tratar de obrigação de meio (item 3.3); (b) decisões clínicas tomadas pelo ALUNO no exercício profissional (item 3.5); (c) falhas na conexão ou nos equipamentos do ALUNO; (d) atos de terceiros que obtenham acesso à CONTA por culpa exclusiva do ALUNO na guarda de suas credenciais." },
-    { type: "h2", text: "Cláusula 13 — Suspensão, rescisão e cancelamento" },
-    { type: "p", text: "13.1. Cancelamento pelo ALUNO após o prazo de arrependimento. O ALUNO pode cancelar o curso a qualquer tempo pelos canais do item 1.3. Nesse caso, será restituído o valor proporcional ao prazo de acesso não utilizado, deduzida multa rescisória de 10% (dez por cento) sobre o valor incidente relativamente às aulas ou meses restantes." },
-    { type: "p", text: "13.2. Suspensão pela FORNECEDORA. Diante de indícios de violação das cláusulas 7.2, 8.2 ou 9, a FORNECEDORA notificará o ALUNO, indicando a conduta, e lhe concederá 5 (cinco) dias para manifestação. Em caso de distribuição em curso do CONTEÚDO ou de publicação de dado de paciente, a suspensão poderá ser imediata, com notificação simultânea." },
-    { type: "p", text: "13.3. Rescisão por infração. Confirmada a violação grave, o contrato poderá ser rescindido, com bloqueio definitivo da CONTA. O ALUNO terá direito à restituição calculada como no item 13.1, da qual poderão ser compensados, mediante apuração, os danos comprovadamente causados pela infração." },
-    { type: "p", text: "13.4. Descontinuação pela FORNECEDORA. Se o curso for descontinuado antes do fim do prazo de acesso, o ALUNO será avisado com ao menos 30 (trinta) dias de antecedência e receberá restituição proporcional ao período não fruído, sem dedução de multa." },
-    { type: "h2", text: "Cláusula 14 — Alterações destes Termos" },
-    { type: "p", text: "14.1. A FORNECEDORA poderá atualizar estes Termos para adequação legal, regulatória ou operacional, comunicando o ALUNO por e-mail e na Plataforma com antecedência mínima de 30 (trinta) dias, com destaque das cláusulas alteradas." },
-    { type: "p", text: "14.2. As alterações não modificarão, durante o prazo de acesso já contratado, o preço, o prazo, o conteúdo programático essencial nem as condições de cancelamento, salvo em benefício do ALUNO." },
-    { type: "p", text: "14.3. O ALUNO que não concordar com a alteração poderá cancelar o contrato, aplicando-se o item 13.1 sem a dedução de multa." },
-    { type: "p", text: "14.4. As versões anteriores destes Termos ficarão disponíveis na Plataforma para consulta." },
-    { type: "h2", text: "Cláusula 15 — Disposições finais e foro" },
-    { type: "p", text: "15.1. Estes Termos regem-se pela legislação brasileira, em especial pelo Código de Defesa do Consumidor, pelo Decreto nº 7.962/2013, pela Lei nº 12.965/2014 (Marco Civil da Internet), pela Lei nº 13.709/2018 (LGPD) e pela Lei nº 9.610/1998." },
-    { type: "p", text: "15.2. Havendo dúvida ou ambiguidade, as cláusulas serão interpretadas da maneira mais favorável ao ALUNO." },
-    { type: "p", text: "15.3. A nulidade de qualquer cláusula não invalida as demais (CDC, art. 51, § 2º)." },
-    { type: "p", text: "15.4. A tolerância de qualquer das partes quanto ao descumprimento não implica renúncia ou novação." },
-    { type: "p", text: "15.5. Antes de medida judicial, as partes poderão buscar solução pelos canais do item 1.3 ou pela plataforma consumidor.gov.br, sem que isso seja condição para o ajuizamento de ação." },
-    { type: "p", text: "15.6. Fica eleito o foro do domicílio do ALUNO para dirimir questões decorrentes destes Termos, podendo o ALUNO optar pelo foro do domicílio da FORNECEDORA." },
-    { type: "p", text: "Bela Vista de Goiás, 26 de outubro de 2026." },
-    { type: "p", text: "AUMAKUA LTDA - TREINAMENTO EM DESENVOLVIMENTO PROFISSIONAL E GERENCIAL, CNPJ sob o nº 65.259.441/0001-58." },
-  ],
+  "title": "TERMOS DE USO E CONDIÇÕES GERAIS DE CONTRATAÇÃO",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Ao navegar e/ou se cadastrar na nossa plataforma, o ALUNO declara estar ciente dos direitos e obrigações decorrentes do presente TERMO e das Políticas de Privacidade que, juntos, compõem a integralidade do contrato celebrado em as PARTES."
+    },
+    {
+      "type": "p",
+      "text": "As Políticas, ainda que apresentadas em textos separados, devem ser analisadas e aceitas em conjunto, pois compõem a integralidade do acordo firmado entre as PARTES."
+    },
+    {
+      "type": "p",
+      "text": "O presente TERMO regula as condições de licença de uso, em caráter não exclusivo, das ferramentas tecnológicas contidas na plataforma utilizada pela AUMAKUA durante o consumo."
+    },
+    {
+      "type": "p",
+      "text": "As ferramentas tecnológicas são licenciadas no estado em que se encontram, podendo ser modificadas, substituídas ou removidas da Plataforma a qualquer momento, sem aviso prévio."
+    },
+    {
+      "type": "p",
+      "text": "O uso das ferramentas disponibilizadas pela PLATAFORMA em desacordo com os TERMOS poderá implicar a suspensão do acesso à conta ou o cancelamento do cadastro do ALUNO, conforme regras estipuladas, sem exclusão de outras sanções, conforme será detalhado."
+    },
+    {
+      "type": "p",
+      "text": "Versão [1.0] — vigente a partir de 23.10.2026. Leia integralmente antes de contratar. Ao final do processo de compra, você receberá por e-mail cópia destes Termos em formato que permite conservação e reprodução (Decreto nº 7.962/2013, art. 4º, IV)."
+    },
+    {
+      "type": "h2",
+      "text": "Sumário do contrato:"
+    },
+    {
+      "type": "table",
+      "headers": [
+        "Item",
+        "Condição"
+      ],
+      "rows": [
+        [
+          "Serviço",
+          "Curso preparatório online para as provas de Título Superior em Anestesiologia (1 ª fase) e de Título de Especialista em Anestesiologia"
+        ],
+        [
+          "Mentoria TSA 1 ª Fase 2027",
+          "Valor cheio: R$ 6.499,99; Pix à vista: R$ 6.000,00; Cartão de crédito: Em até 3 vezes de R$ 2.166,66 (sem juros)."
+        ],
+        [
+          "Mentoria TSA 1 ª Fase 2027 – Compras em janeiro/2027",
+          "Valor cheio: R$ 6.999,00; Pix à vista: R$ 6.300,00; Cartão de crédito: Em até 3 vezes de R$ 2.333,00 (sem juros)."
+        ],
+        [
+          "Mentoria TEA 2027",
+          "Valor cheio: R$ 5.299,00; Pix à vista: 4.769,10; Cartão de crédito: Em até 3 vezes de R$ 1.766,33 sem juros"
+        ],
+        [
+          "Mentoria TEA – Compras em janeiro/2027",
+          "Valor cheio: R$ 5.999,00; Pix à vista: R$ 5.399,10; Cartão de Crédito: Em até 3 vezes de R$ 1.999,67 sem juros"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "headers": [
+        "Item",
+        "Condição"
+      ],
+      "rows": [
+        [
+          "Prazo de acesso",
+          "12 (doze) meses contados da liberação do acesso"
+        ],
+        [
+          "Arrependimento",
+          "7 dias, reembolso integral, sem justificativa (cláusula 6)"
+        ],
+        [
+          "Garantia de aprovação",
+          "Não há"
+        ],
+        [
+          "Atendimento",
+          "E-mail: aumakua147@gmail.com — resposta em até 5 dias"
+        ],
+        [
+          "Restrições relevantes",
+          "Uso pessoal e intransferível; proibida gravação e compartilhamento (cláusulas 7 e 8)"
+        ]
+      ]
+    },
+    {
+      "type": "h2",
+      "text": "Cláusula 1 — Identificação do fornecedor e canais de atendimento:"
+    },
+    {
+      "type": "p",
+      "text": "1.1. O curso é ofertado por AUMAKUA LTDA - TREINAMENTO EM DESENVOLVIMENTO PROFISSIONAL E GERENCIAL, pessoa jurídica de direito privado, devidamente inscrita no CNPJ sob o nº 65.259.441/0001-58, com endereço na Rua 08, nº s/n, Qd. 01; Lt. 23; Jardim Alfaville, Bela Vista de Goiás-GO, CEP: 75240000, e endereço eletrônico aumakua147@gmail.com doravante denominada \"FORNECEDORA\"."
+    },
+    {
+      "type": "p",
+      "text": "1.2. O conteúdo acadêmico é de responsabilidade técnica do Dr. Felipe Bufaiçal Rassi Carneiro, médico inscrito no CRM/GO sob o nº 27.935, RQE nº 17.060 (Anestesiologia - Resolução CFM nº 2.336/2023)."
+    },
+    {
+      "type": "p",
+      "text": "1.3. Canais de atendimento: e-mail: aumakua147@gmail.com e formulário disponível na plataforma. A FORNECEDORA, responderá a dúvidas, reclamações, pedidos de cancelamento e de arrependimento em até 5 (cinco) dias, confirmando de imediato o recebimento da demanda."
+    },
+    {
+      "type": "h2",
+      "text": "Cláusula 2 — Definições:"
+    },
+    {
+      "type": "p",
+      "text": "2.1. Para estes Termos, considera-se:"
+    },
+    {
+      "type": "ol",
+      "items": [
+        "ALUNO: pessoa física que contrata o curso e se cadastra na Plataforma.",
+        "PLATAFORMA: ambiente virtual Lovable (aumakua-app.lovable.app), pelo qual o conteúdo é disponibilizado.",
+        "CONTEÚDO: videoaulas, aulas ao vivo e suas gravações, questões comentadas, simulados e qualquer material didático do curso.",
+        "CONTA: credenciais pessoais (login e senha) que dão acesso ao CONTEÚDO.",
+        "COMUNIDADE: fóruns, chats, grupos e espaços de comentário em que ALUNOS publicam conteúdo próprio.",
+        "PROVAS: exames para obtenção dos títulos de especialista em anestesiologia e superior em anestesiologia, aplicados pela Sociedade Brasileira de Anestesiologia."
+      ]
+    },
+    {
+      "type": "h2",
+      "text": "Cláusula 3 — Objeto e natureza do serviço."
+    },
+    {
+      "type": "p",
+      "text": "3.1. O objeto destes Termos de Uso é a prestação de serviço educacional livre, na modalidade a distância, de preparação para as provas de: 1- Título Superior em"
+    },
+    {
+      "type": "p",
+      "text": "Anestesiologia (1a fase) e 2- Título de Especialista em Anestesiologia, com o conteúdo programático, a carga horária estimada e o cronograma descritos na página de oferta, que integra estes Termos."
+    },
+    {
+      "type": "p",
+      "text": "3.2. O curso é livre: NÃO se trata de curso de pós-graduação, NÃO é reconhecido pelo Ministério da Educação, NÃO confere título de especialista nem Registro de Qualificação de Especialista (RQE) e NÃO substitui os requisitos de elegibilidade exigidos no edital da PROVA. O certificado eventualmente emitido atesta apenas a conclusão do curso."
+    },
+    {
+      "type": "p",
+      "text": "3.3. Não há garantia de aprovação. O resultado nas PROVAS depende de fatores alheios à FORNECEDORA, como dedicação do ALUNO, critérios da banca e conteúdo do edital. Qualquer dado de desempenho de ex-alunos divulgado pela FORNECEDORA indicará a base de cálculo e o período, e ficará disponível para verificação."
+    },
+    {
+      "type": "p",
+      "text": "3.4. A FORNECEDORA declara que: (a) o curso não é promovido, endossado nem vinculado à Sociedade Brasileira de Anestesiologia, à Associação Médica Brasileira ou ao Conselho Federal de Medicina; (b) o professor responsável não integra, nem integrou nos últimos 5 (cinco) anos, comissão examinadora ou de elaboração da PROVA; e (c) o CONTEÚDO não utiliza questões ou informação privilegiada sobre a PROVA. Questões de provas anteriores são usadas apenas quando publicamente divulgadas, com indicação da fonte."
+    },
+    {
+      "type": "p",
+      "text": "3.5. O CONTEÚDO tem finalidade exclusivamente educacional e de preparação para os exames. Não constitui consulta, parecer, orientação terapêutica individualizada ou protocolo assistencial, e não substitui o juízo clínico do ALUNO no exercício da Medicina."
+    },
+    {
+      "type": "p",
+      "text": "3.6. Alterações de edital da PROVA serão acompanhadas por atualização razoável do CONTEÚDO durante o prazo de acesso, quando tecnicamente pertinentes, sem custo adicional."
+    },
+    {
+      "type": "h2",
+      "text": "Cláusula 4 — Aceite, contratação e capacidade."
+    },
+    {
+      "type": "p",
+      "text": "4.1. A contratação se aperfeiçoa com: (a) o preenchimento do cadastro; (b) a marcação, pelo ALUNO, da caixa de aceite destes Termos de Uso e de ciência da Política de Privacidade, que não virão pré-marcados; e (c) a confirmação do pagamento. A FORNECEDORA confirmará imediatamente o recebimento da aceitação da oferta."
+    },
+    {
+      "type": "p",
+      "text": "4.2. Antes da finalização, a Plataforma exibirá o sumário do contrato e permitirá ao ALUNO identificar e corrigir erros de preenchimento."
+    },
+    {
+      "type": "p",
+      "text": "4.3. O curso destina-se a médicos regularmente inscritos em Conselho Regional de Medicina, ou a médicos em programa de residência, maiores e capazes. A FORNECEDORA poderá solicitar o número do CRM para conferência, exclusivamente para essa finalidade."
+    },
+    {
+      "type": "p",
+      "text": "4.4. As informações cadastrais são de responsabilidade do ALUNO, que deve mantê-las atualizadas."
+    },
+    {
+      "type": "h2",
+      "text": "Cláusula 5 — Preço, pagamento e documento fiscal"
+    },
+    {
+      "type": "p",
+      "text": "5.1. O preço, as formas de pagamento, o número de parcelas, os juros e encargos eventualmente incidentes e o custo efetivo total do parcelamento são informados de forma destacada na página de oferta e no checkout, antes da conclusão da compra."
+    },
+    {
+      "type": "p",
+      "text": "5.2. Não há cobrança de taxa de matrícula, material ou emissão de certificado além do preço anunciado."
+    },
+    {
+      "type": "p",
+      "text": "5.3. Os pagamentos são processados pela InfinitePay, que atua apenas como meio de pagamento. A responsabilidade perante o ALUNO pela prestação do serviço educacional é da FORNECEDORA."
+    },
+    {
+      "type": "p",
+      "text": "5.4. O documento fiscal será emitido na forma da legislação aplicável e enviado ao e-mail previamente cadastrado pelo aluno."
+    },
+    {
+      "type": "p",
+      "text": "5.5. Promoções e cupons valem pelo prazo e nas condições divulgados, e não geram direito à restituição de diferença a quem contratou em período anterior."
+    },
+    {
+      "type": "h2",
+      "text": "Cláusula 6 — Direito de arrependimento"
+    },
+    {
+      "type": "p",
+      "text": "6.1. O ALUNO pode desistir da contratação, sem necessidade de justificativa e sem qualquer ônus, no prazo de 7 (sete) dias corridos contados da liberação do acesso (início do curso). O direito de arrependimento independe da quantidade de CONTEÚDO acessado nesse período."
+    },
+    {
+      "type": "p",
+      "text": "6.2. O pedido pode ser feito: (a) pela mesma ferramenta usada na contratação (botão \"Solicitar reembolso\" na área do ALUNO ou na Plataforma); ou (b) por e-mail para aumakua147@gmail.com A FORNECEDORA enviará confirmação imediata do recebimento do pedido."
+    },
+    {
+      "type": "p",
+      "text": "6.3. Exercido o arrependimento, os valores pagos serão restituídos integralmente e monetariamente atualizados, inclusive taxas de processamento. No pagamento por cartão de crédito, a FORNECEDORA solicitará imediatamente à InfinitePay o cancelamento da transação, para que a administradora não a lance na fatura ou a estorne; se não for viável, a restituição será feita por Pix. No PIX, a devolução ocorrerá em até 7 (sete) dias úteis na conta indicada pelo ALUNO."
+    },
+    {
+      "type": "p",
+      "text": "6.5. O arrependimento extingue o acesso ao CONTEÚDO e os contratos acessórios, sem ônus para o ALUNO."
+    },
+    {
+      "type": "h2",
+      "text": "Cláusula 7 — Acesso, conta e prazo"
+    },
+    {
+      "type": "p",
+      "text": "7.1. O acesso será liberado após a confirmação do pagamento e do início do curso que vigorará por 12 (doze) meses, findos os quais se encerra automaticamente, sem renovação ou cobrança automática, salvo nova contratação expressa."
+    },
+    {
+      "type": "p",
+      "text": "7.2. A CONTA é pessoal e intransferível. É vedado ceder, emprestar, compartilhar ou comercializar credenciais de acesso ao curso. O ALUNO responde pela guarda de sua senha e deve comunicar imediatamente qualquer uso não autorizado."
+    },
+    {
+      "type": "p",
+      "text": "7.3. Para proteger o CONTEÚDO, a Plataforma limitará o número de dispositivos (um login por CPF) e poderá aplicar marca d'água com dados de identificação do ALUNO nos vídeos e arquivos."
+    },
+    {
+      "type": "p",
+      "text": "7.3.1. Eventual tentativa de dois ou mais acessos simultâneos com o mesmo login e senha à ÁREA DO ALUNO poderá ensejar o bloqueio de seu acesso."
+    },
+    {
+      "type": "p",
+      "text": "7.4. O aluno poderá baixar os artigos de literatura que serão liberados a partir do 8º (oitavo) dia contado do início do curso. Durante esse período, todo o CONTEÚDO permanece disponível para consulta online."
+    },
+    {
+      "type": "p",
+      "text": "7.5. A FORNECEDORA empregará meios razoáveis para manter a Plataforma disponível, mas poderá haver interrupções para manutenção, preferencialmente comunicadas com antecedência. Indisponibilidade superior a 72 (setenta e duas) horas consecutivas, imputável à FORNECEDORA ou à Plataforma, prorrogará o prazo de acesso pelo período equivalente, sem prejuízo dos demais direitos do ALUNO."
+    },
+    {
+      "type": "p",
+      "text": "7.6. Aulas ao vivo ocorrerão nas datas do cronograma. Remarcações serão comunicadas com ao menos 24 (vinte e quatro) horas de antecedência, e a gravação ficará disponível na Plataforma durante o prazo de acesso."
+    },
+    {
+      "type": "p",
+      "text": "7.7. Requisitos técnicos mínimos (navegador, conexão, sistema operacional) são informados na página de oferta."
+    },
+    {
+      "type": "h2",
+      "text": "Cláusula 8 — Propriedade intelectual"
+    },
+    {
+      "type": "p",
+      "text": "8.1. O CONTEÚDO é obra intelectual protegida pela Lei nº 9.610/1998, de titularidade da FORNECEDORA e de seu representante legal que o licenciaram. A contratação concede ao ALUNO apenas licença de uso pessoal, não exclusiva, intransferível e revogável nos casos destes Termos, restrita ao prazo de acesso."
+    },
+    {
+      "type": "p",
+      "text": "8.2. Sem autorização prévia e expressa da FORNECEDORA, é vedado: (a) gravar, capturar tela, baixar por meio não disponibilizado pela Plataforma ou reproduzir o CONTEÚDO, total ou parcialmente; (b) distribuir, vender, publicar ou disponibilizar o CONTEÚDO a terceiros, inclusive em grupos de mensagens e redes sociais; (c) utilizar o CONTEÚDO para ministrar cursos, aulas ou mentorias; (d) remover marca d'água ou mecanismos de proteção."
+    },
+    {
+      "type": "p",
+      "text": "8.3. A violação sujeita o infrator à suspensão da CONTA (cláusula 13), à apreensão e indenização previstas nos arts. 102 a 104 da Lei nº 9.610/1998 e às sanções penais do art. 184 do Código Penal."
+    },
+    {
+      "type": "p",
+      "text": "8.4. Marcas, nomes e logotipos do curso pertencem à FORNECEDORA. Marcas de terceiros eventualmente mencionadas pertencem a seus titulares."
+    },
+    {
+      "type": "p",
+      "text": "8.5. Questões de provas anteriores e trechos de diretrizes clínicas são citados para fins de estudo, com indicação da fonte e do autor (Lei nº 9.610/1998, art. 46, III)."
+    },
+    {
+      "type": "h2",
+      "text": "Cláusula 9 — Conduta do ALUNO, ética médica e sigilo"
+    },
+    {
+      "type": "p",
+      "text": "9.1. O ALUNO, como médico, permanece submetido ao Código de Ética Médica (Resolução CFM nº 2.217/2018) também nos espaços do curso."
+    },
+    {
+      "type": "p",
+      "text": "9.2. É vedado ao ALUNO publicar na COMUNIDADE, ou enviar ao professor, caso clínico, exame, imagem ou documento que permita identificar paciente, ainda que com autorização deste (Código de Ética Médica, arts. 73 e 75). Casos para discussão devem ser integralmente anonimizados, com supressão de nome, iniciais, datas, local de atendimento, tatuagens, rosto e qualquer elemento identificador."
+    },
+    {
+      "type": "p",
+      "text": "9.3. O conteúdo eventualmente publicado em desacordo com o item 9.2 será removido sem aviso prévio, por envolver dado pessoal sensível de terceiro (Lei nº 13.709/2018, arts. 5º, II, e 11)."
+    },
+    {
+      "type": "p",
+      "text": "9.4. O professor não responderá, no âmbito do curso, a pedidos de conduta para paciente concreto, que caracterizem consulta ou orientação assistencial. A discussão de casos terá caráter exclusivamente didático."
+    },
+    {
+      "type": "p",
+      "text": "9.5. Na COMUNIDADE, são vedados: ofensas, discriminação, assédio, propaganda comercial, divulgação de serviços médicos em desacordo com a Resolução CFM nº 2.336/2023, compartilhamento de material pirata e conteúdo ilícito."
+    },
+    {
+      "type": "p",
+      "text": "9.6. O ALUNO que utilizar depoimento sobre o curso, ou a FORNECEDORA que divulgar depoimento de ALUNO, observarão a veracidade e a autorização expressa do autor, vedada a sua edição para alterar o sentido."
+    },
+    {
+      "type": "h2",
+      "text": "Cláusula 10 — Conteúdo publicado por ALUNOS e remoção"
+    },
+    {
+      "type": "p",
+      "text": "10.1. O ALUNO é responsável pelo conteúdo que publicar na COMUNIDADE e declara deter os direitos necessários sobre ele."
+    },
+    {
+      "type": "p",
+      "text": "10.2. A FORNECEDORA não realiza controle prévio das publicações, mas removerá ou tornará indisponível, em prazo razoável e sem necessidade de ordem judicial, o conteúdo manifestamente ilícito que lhe for notificado ou de que tiver ciência, especialmente o que viole os itens 9.2 e 9.5, direitos autorais, intimidade ou dados pessoais de terceiros."
+    },
+    {
+      "type": "p",
+      "text": "10.3. Nas hipóteses de alegada ofensa à honra, a remoção poderá aguardar ordem judicial específica, ressalvada a faculdade de a FORNECEDORA remover o conteúdo que viole estes Termos."
+    },
+    {
+      "type": "p",
+      "text": "10.4. Notificações devem ser enviadas ao e-mail aumakua147@gmail.com, com identificação do conteúdo (link ou captura) e o motivo da reclamação. O autor do conteúdo removido será informado do motivo e poderá apresentar contestação pelo mesmo canal."
+    },
+    {
+      "type": "h2",
+      "text": "Cláusula 11 — Proteção de dados pessoais"
+    },
+    {
+      "type": "p",
+      "text": "11.1. O tratamento de dados pessoais é detalhado na Política de Privacidade, que integra estes Termos e prevalece sobre este resumo. A FORNECEDORA atua como controlladora; a Plataforma e o intermediador de pagamento atuam como operadores ou controladores independentes, conforme o caso (Lei nº 13.709/2018, art. 5º, VI e VII)."
+    },
+    {
+      "type": "p",
+      "text": "11.2. Dados tratados e bases legais (Lei nº 13.709/2018, art. 7º):"
+    },
+    {
+      "type": "table",
+      "headers": [
+        "Finalidade",
+        "Dados",
+        "Base legal"
+      ],
+      "rows": [
+        [
+          "Cadastro, acesso e prestação do curso",
+          "Nome, CPF, e-mail, telefone, CRM, dados de progresso",
+          "Execução de contrato (art. 7º, V)"
+        ],
+        [
+          "Emissão de documento fiscal e guarda contábil",
+          "Nome, CPF, endereço, valor pago",
+          "Obrigação legal (art. 7º, II)"
+        ],
+        [
+          "Guarda de registros de acesso",
+          "IP, data e hora de acesso",
+          "Obrigação legal (art. 7º, II; Lei nº 12.965/2014, art. 15)"
+        ],
+        [
+          "Prevenção de fraude e proteção do CONTEÚDO",
+          "IP, dispositivo, sessões simultâneas, marca d’água",
+          "Legítimo interesse (art. 7º, IX) e exercício regular de direitos (art. 7º, VI)"
+        ],
+        [
+          "Envio de ofertas e novidades",
+          "Nome, e-mail, telefone",
+          "Consentimento (art. 7º, I), revogável a qualquer tempo"
+        ],
+        [
+          "Uso de nome e depoimento em divulgação",
+          "Nome, imagem, depoimento",
+          "Consentimento específico e destacado (art. 8º, § 4º)"
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "11.3. A FORNECEDORA não solicita nem trata dados pessoais sensíveis do ALUNO e não admite o envio de dados de pacientes (item 9.2). Dados sensíveis recebidos indevidamente serão eliminados."
+    },
+    {
+      "type": "p",
+      "text": "11.4. Os registros de acesso à aplicação serão mantidos sob sigilo, em ambiente controlado e seguro, pelo prazo de 6 (seis) meses, e somente fornecidos mediante ordem judicial."
+    },
+    {
+      "type": "p",
+      "text": "11.5. Encerrada a relação, os dados serão eliminados, ressalvada a conservação para cumprimento de obrigação legal ou regulatória e para exercício regular de direitos, pelos prazos legais."
+    },
+    {
+      "type": "p",
+      "text": "11.6. Se a Plataforma ou serviços de armazenamento estiverem localizados fora do Brasil, a transferência internacional observará o art. 33 da Lei nº 13.709/2018 e a regulamentação da ANPD."
+    },
+    {
+      "type": "p",
+      "text": "11.7. O ALUNO pode exercer, gratuitamente, os direitos do art. 18 da Lei nº 13.709/2018 (confirmação, acesso, correção, anonimização, portabilidade, eliminação, informação sobre compartilhamento e revogação do consentimento) pelo canal aumakua147@gmail.com."
+    },
+    {
+      "type": "p",
+      "text": "11.8. Por se tratar de agente de tratamento de pequeno porte, a FORNECEDORA está dispensada de indicar encarregado, mas mantém o canal acima para comunicação com titulares (Resolução CD/ANPD nº 2/2022)."
+    },
+    {
+      "type": "p",
+      "text": "11.9. A FORNECEDORA adota medidas de segurança técnicas e administrativas aptas a proteger os dados e comunicará à ANPD e aos titulares incidente de segurança que possa acarretar risco ou dano relevante (Lei nº 13.709/2018, arts. 46 e 48)."
+    },
+    {
+      "type": "h2",
+      "text": "Cláusula 12 — Responsabilidade"
+    },
+    {
+      "type": "p",
+      "text": "12.1. A FORNECEDORA responde pelos danos causados por defeitos na prestação do serviço e por informações insuficientes ou inadequadas, nos termos do CDC observadas as excludentes previstas legalmente."
+    },
+    {
+      "type": "p",
+      "text": "12.2. Sem prejuízo do item 12.1, a FORNECEDORA não responde por: (a) resultado na PROVA, por se tratar de obrigação de meio (item 3.3); (b) decisões clínicas tomadas pelo ALUNO no exercício profissional (item 3.5); (c) falhas na conexão ou nos equipamentos do ALUNO; (d) atos de terceiros que obtenham acesso à CONTA por culpa exclusiva do ALUNO na guarda de suas credenciais."
+    },
+    {
+      "type": "h2",
+      "text": "Cláusula 13 — Suspensão, rescisão e cancelamento"
+    },
+    {
+      "type": "p",
+      "text": "13.1. Cancelamento pelo ALUNO após o prazo de arrependimento. O ALUNO pode cancelar o curso a qualquer tempo pelos canais do item 1.3. Nesse caso, será restituído o valor proporcional ao prazo de acesso não utilizado, deduzida multa rescisória de 10% (dez por cento) sobre o valor incidente relativamente às aulas ou meses restantes."
+    },
+    {
+      "type": "p",
+      "text": "13.2. Suspensão pela FORNECEDORA. Diante de indícios de violação das cláusulas 7.2, 8.2 ou 9, a FORNECEDORA notificará o ALUNO, indicando a conduta, e lhe concederá 5 (cinco) dias para manifestação. Em caso de distribuição em curso do CONTEÚDO ou de publicação de dado de paciente, a suspensão poderá ser imediata, com notificação simultânea."
+    },
+    {
+      "type": "p",
+      "text": "13.3. Rescisão por infração. Confirmada a violação grave, o contrato poderá ser rescindido, com bloqueio definitivo da CONTA. O ALUNO terá direito à restituição calculada como no item 13.1, da qual poderão ser compensados, mediante apuração, os danos comprovadamente causados pela infração."
+    },
+    {
+      "type": "p",
+      "text": "13.4. Descontinuação pela FORNECEDORA. Se o curso for descontinuado antes do fim do prazo de acesso, o ALUNO será avisado com ao menos 30 (trinta) dias de antecedência e receberá restituição proporcional ao período não fruído, sem dedução de multa."
+    },
+    {
+      "type": "h2",
+      "text": "Cláusula 14 — Alterações destes Termos"
+    },
+    {
+      "type": "p",
+      "text": "14.1. A FORNECEDORA poderá atualizar estes Termos para adequação legal, regulatória ou operacional, comunicando o ALUNO por e-mail e na Plataforma com antecedência mínima de 30 (trinta) dias, com destaque das cláusulas alteradas."
+    },
+    {
+      "type": "p",
+      "text": "14.2. As alterações não modificarão, durante o prazo de acesso já contratado, o preço, o prazo, o conteúdo programático essencial nem as condições de cancelamento, salvo em benefício do ALUNO."
+    },
+    {
+      "type": "p",
+      "text": "14.3. O ALUNO que não concordar com a alteração poderá cancelar o contrato, aplicando-se o item 13.1 sem a dedução de multa."
+    },
+    {
+      "type": "p",
+      "text": "14.4. As versões anteriores destes Termos ficarão disponíveis na Plataforma para consulta."
+    },
+    {
+      "type": "h2",
+      "text": "Cláusula 15 — Disposições finais e foro."
+    },
+    {
+      "type": "p",
+      "text": "15.1. Estes Termos regem-se pela legislação brasileira, em especial pelo Código de Defesa do Consumidor, pelo Decreto nº 7.962/2013, pela Lei nº 12.965/2014 (Marco Civil da Internet), pela Lei nº 13.709/2018 (LGPD) e pela Lei nº 9.610/1998."
+    },
+    {
+      "type": "p",
+      "text": "15.2. Havendo dúvida ou ambiguidade, as cláusulas serão interpretadas da maneira mais favorável ao ALUNO."
+    },
+    {
+      "type": "p",
+      "text": "15.3. A nulidade de qualquer cláusula não invalida as demais (CDC, art. 51, § 2º)."
+    },
+    {
+      "type": "p",
+      "text": "15.4. A tolerância de qualquer das partes quanto ao descumprimento não implica renúncia ou novação."
+    },
+    {
+      "type": "p",
+      "text": "15.5. Antes de medida judicial, as partes poderão buscar solução pelos canais do item 1.3 ou pela plataforma consumidor.gov.br, sem que isso seja condição para o ajuizamento de ação."
+    },
+    {
+      "type": "p",
+      "text": "15.6. Fica eleito o foro do domicílio do ALUNO para dirimir questões decorrentes destes Termos, podendo o ALUNO optar pelo foro do domicílio da FORNECEDORA."
+    },
+    {
+      "type": "p",
+      "text": "Bela Vista de Goiás, 26 de outubro de 2026"
+    },
+    {
+      "type": "p",
+      "text": "AUMAKUA LTDA - TREINAMENTO EM DESENVOLVIMENTO PROFISSIONAL E GERENCIAL, CNPJ sob o nº 65.259.441/0001-58."
+    }
+  ]
 };
 
 export const PRIVACIDADE: LegalDoc = {
-  title: "Política de Privacidade e Proteção de Dados Pessoais",
-  blocks: [
-    { type: "p", text: "Versão 1.0, vigente a partir de 26.10.2026. Esta Política integra os Termos de Uso do curso e explica, de forma clara, quais dados pessoais são tratados, por que, com quem os compartilhamos, por quanto tempo os guardamos e como você exerce seus direitos (Lei nº 13.709/2018, arts. 6º, VI, e 9º; Lei nº 12.965/2014, art. 7º, VIII e XI)." },
-    { type: "p", text: "Resumo em 6 pontos:" },
-    { type: "ul", items: [
-      "São tratados apenas os dados necessários para vender, entregar e proteger o curso.",
-      "Não vendemos dados pessoais.",
-      "Não tratamos dados de saúde do aluno e proibimos o envio de dados de pacientes.",
-      "Só enviamos ofertas se você autorizar, e você pode cancelar com um clique.",
-      "Guardamos os registros de acesso por 6 meses, como exige o Marco Civil da Internet.",
-      "Você pode acessar, corrigir, portar ou eliminar seus dados pelo e-mail: aumakua147@gmail.com",
-    ]},
-    { type: "h2", text: "1. Quem é a controladora e como falar conosco" },
-    { type: "p", text: "1.1. A controladora dos dados pessoais é AUMAKUA LTDA - TREINAMENTO EM DESENVOLVIMENTO PROFISSIONAL E GERENCIAL, pessoa jurídica de direito privado, devidamente inscrita no CNPJ sob o nº 65.259.441/0001-58, com endereço na Rua 08, nº s/n, Qd. 01; Lt. 23; Jardim Alfaville, Bela Vista de Goiás-GO, CEP: 75240000, e endereço eletrônico aumakua147@gmail.com, doravante denominada “nós”." },
-    { type: "p", text: "1.2. Canal do titular: aumakua147@gmail.com. Por esse canal você pode tirar dúvidas, exercer direitos e reportar incidentes. Como agente de tratamento de pequeno porte, estamos dispensados de indicar encarregado, mas mantemos este canal com a mesma função." },
-    { type: "h2", text: "2. A quem esta Política se aplica" },
-    { type: "p", text: "2.1. Esta Política se aplica a: (a) alunos matriculados; (b) interessados que preenchem formulários, participam de aulas abertas ou se inscrevem em listas de e-mail; e (c) visitantes do site e dos perfis oficiais do curso, quanto aos dados que nós mesmos coletamos." },
-    { type: "p", text: "2.2. As redes sociais, plataformas de pagamento e plataformas de cursos de terceiros têm políticas próprias, que regem os dados que elas coletam por conta própria (seção 6)." },
-    { type: "p", text: "2.3. O curso é destinado a médicos e não é direcionado a crianças ou adolescentes. Se recebermos dados de menor de 18 anos, eles serão eliminados." },
-    { type: "h2", text: "3. Definições" },
-    { type: "p", text: "3.1. Os termos abaixo têm o sentido previsto na Lei nº 13.709/2018, art. 5º:" },
-    { type: "ul", items: [
-      "Dado pessoal: informação relacionada a pessoa natural identificada ou identificável.",
-      "Dado pessoal sensível: dado sobre origem racial ou étnica, convicção religiosa, opinião política, filiação sindical ou organização religiosa, filosófica ou política, saúde, vida sexual, genética ou biometria.",
-      "Tratamento: toda operação com dados pessoais, como coleta, uso, armazenamento, compartilhamento e eliminação.",
-      "Operador: quem trata dados em nome do controlador, como provedores de hospedagem e de e-mail.",
-      "Anonimização: uso de meios técnicos razoáveis para que o dado perca a possibilidade de associação a uma pessoa.",
-      "Registros de acesso a aplicações: data e hora de uso de uma aplicação a partir de determinado IP (Lei nº 12.965/2014, art. 5º, VIII).",
-    ]},
-    { type: "h2", text: "4. Quais dados tratamos, para quê e com qual base legal" },
-    { type: "p", text: "4.1. A AUMAKUA CURSOS coleta, trata e armazena as seguintes informações (Lei nº 13.709/2018, arts. 6º, I a III, e 7º):" },
-    { type: "ul", items: [
-      "informações fornecidas pelo ALUNO (nome, CPF, endereço, e-mail e telefone, data de nascimento, escolaridade – entre outros solicitados no momento do cadastro ou posteriormente), via preenchimento dos formulários;",
-      "informações fornecidas pelo ALUNO nos contatos diretos com a AUMAKUA CURSOS, via e-mail, telefone, redes sociais, entre outros;",
-      "informações de navegação nos nossos sites (são coletadas informações como endereço IP, localização geográfica, tipo de navegador, duração da visita e páginas visitadas, dados de conexão, histórico de compras); e",
-      "informações quando você opta por classificar títulos, definir suas preferências pessoais, configurações (inclusive preferências configuradas na seção “Meus Dados”) ou, de outra forma, quando fornece informações à plataforma.",
-    ]},
-    { type: "table", headers: ["Finalidade", "Dados", "Origem", "Base legal (LGPD)"], rows: [
-      ["Cadastro, matrícula e acesso ao curso", "Nome, CPF, e-mail, telefone, senha (criptografada)", "Você", "Execução de contrato e procedimentos preliminares (art. 7º, V)"],
-      ["Conferência de que o aluno é médico", "Número e UF do CRM, especialidade ou residência em curso", "Você e consulta pública ao CRM", "Execução de contrato (art. 7º, V)"],
-      ["Prestação do serviço e acompanhamento pedagógico", "Progresso nas aulas, respostas a questões e simulados, dúvidas enviadas", "Uso da plataforma", "Execução de contrato (art. 7º, V)"],
-      ["Pagamento e prevenção de fraude na compra", "Dados da transação, forma de pagamento, últimos 4 dígitos do cartão (dados completos ficam só com o intermediador)", "Intermediador de pagamento", "Execução de contrato (art. 7º, V) e proteção do crédito (art. 7º, X)"],
-      ["Emissão de nota fiscal e obrigações contábeis", "Nome, CPF, endereço, valor pago", "Você", "Obrigação legal (art. 7º, II)"],
-      ["Guarda de registros de acesso", "IP, data, hora e fuso horário de acesso", "Uso da plataforma", "Obrigação legal (art. 7º, II; Lei nº 12.965/2014, art. 15)"],
-      ["Proteção do conteúdo contra pirataria", "IP, tipo de dispositivo, sessões simultâneas, marca d’água com nome e CPF parcial", "Uso da plataforma", "Legítimo interesse (art. 7º, IX) e exercício regular de direitos (art. 7º, VI)"],
-      ["Atendimento, reclamações e pedidos de reembolso", "Nome, e-mail, conteúdo da mensagem", "Você", "Execução de contrato (art. 7º, V) e obrigação legal (art. 7º, II; Decreto nº 7.962/2013, art. 4º, V)"],
-      ["Comunidade e fóruns do curso", "Nome de exibição, foto de perfil (opcional), publicações", "Você", "Execução de contrato (art. 7º, V)"],
-      ["Avisos sobre o próprio curso (cronograma, aulas ao vivo, mudanças de edital)", "E-mail, telefone", "Você", "Execução de contrato (art. 7º, V)"],
-      ["Envio de ofertas de novos cursos e conteúdos promocionais", "Nome, e-mail, telefone/WhatsApp", "Você", "Consentimento (art. 7º, I)"],
-      ["Medição de audiência e anúncios", "Cookies e identificadores não essenciais", "Navegação no site", "Consentimento (art. 7º, I)"],
-      ["Divulgação de depoimentos e aprovações", "Nome, imagem, depoimento, resultado na prova", "Você", "Consentimento específico e destacado (art. 8º, § 4º; Código Civil, art. 20)"],
-      ["Defesa em processos judiciais, administrativos ou arbitrais", "Dados necessários à defesa", "Registros internos", "Exercício regular de direitos (art. 7º, VI)"],
-    ]},
-    { type: "p", text: "4.2. Legítimo interesse. Quando usamos essa base, ponderamos nosso interesse em proteger o conteúdo contra suas expectativas legítimas e seus direitos fundamentais. Limitamos os dados ao estritamente necessário e mantemos o registro dessa avaliação à disposição da ANPD (Lei nº 13.709/2018, art. 10, §§ 1º a 3º)." },
-    { type: "p", text: "4.3. Consentimento. O consentimento é colhido de forma separada e não pré-marcada. A matrícula nunca depende dele. Você pode revogá-lo a qualquer tempo, de forma gratuita e facilitada, sem prejuízo do tratamento já realizado (Lei nº 13.709/2018, art. 8º, §§ 4º e 5º)." },
-    { type: "p", text: "4.4. Decisões automatizadas. Não tomamos decisões baseadas unicamente em tratamento automatizado que afetem seus interesses. Os bloqueios por compartilhamento de conta passam por revisão humana antes de se tornarem definitivos (Lei nº 13.709/2018, art. 20; Termos de Uso, cláusula 13.2)." },
-    { type: "h2", text: "5. Dados que não tratamos e dados de pacientes" },
-    { type: "p", text: "5.1. Não solicitamos dados pessoais sensíveis do aluno. Não pedimos informações de saúde, religião, origem racial ou étnica, nem opinião política." },
-    { type: "p", text: "5.2. É proibido enviar dados de pacientes. Os alunos não podem publicar na comunidade, nem enviar ao professor, caso clínico, exame, laudo, imagem ou documento que identifique ou permita identificar um paciente. A proibição vale ainda que haja autorização do paciente (Código de Ética Médica, arts. 73 e 75; Termos de Uso, cláusula 9.2). Casos para discussão devem ser integralmente anonimizados." },
-    { type: "p", text: "5.3. O dado de paciente enviado em desacordo com o item 5.2 será removido e eliminado assim que identificado, sem aviso prévio. Trata-se de dado pessoal sensível de terceiro para cujo tratamento não existe base legal no curso (Lei nº 13.709/2018, arts. 11 e 16). O aluno que enviou o dado responde pela violação." },
-    { type: "p", text: "5.4. Não armazenamos os dados completos do cartão de crédito. Eles são tratados diretamente pela intermediadora de pagamento." },
-    { type: "h2", text: "6. Com quem compartilhamos dados" },
-    { type: "p", text: "6.1. Não vendemos nem alugamos dados pessoais. Compartilhamos apenas o necessário, com as categorias abaixo:" },
-    { type: "table", headers: ["Destinatário", "Papel", "Finalidade", "Dados"], rows: [
-      ["Plataforma de cursos [nome]", "Operador / controlador independente, conforme os termos da plataforma", "Hospedagem do conteúdo, área do aluno, comunidade", "Cadastro, progresso, publicações, registros de acesso"],
-      ["Intermediador de pagamento [nome]", "Controlador independente", "Processamento do pagamento, antifraude, estornos", "Dados da transação e de pagamento"],
-      ["Ferramenta de e-mail e mensagens [nome]", "Operador", "Avisos do curso e, se houver consentimento, ofertas", "Nome, e-mail, telefone"],
-      ["Serviço de aulas ao vivo [nome]", "Operador", "Transmissão e gravação das aulas", "Nome de exibição, e-mail, interações no chat"],
-      ["Hospedagem e armazenamento em nuvem [nome]", "Operador", "Armazenamento seguro de dados e cópias de segurança", "Dados descritos na seção 4"],
-      ["Contador", "Operador", "Escrituração e obrigações fiscais", "Dados fiscais da venda"],
-      ["Advogados", "Controlador para a finalidade de defesa", "Assessoria e defesa de direitos", "Dados necessários ao caso"],
-      ["Autoridades públicas", "Destinatários por dever legal", "Cumprimento de ordem judicial ou requisição legal", "Os dados requisitados, nos limites da ordem"],
-    ]},
-    { type: "p", text: "6.2. Os operadores tratam dados apenas conforme nossas instruções e devem adotar medidas de segurança compatíveis com esta Política (Lei nº 13.709/2018, arts. 39 e 46)." },
-    { type: "p", text: "6.3. Os registros de acesso só serão fornecidos mediante ordem judicial. Dados cadastrais podem ser fornecidos às autoridades administrativas com competência legal para requisitá-los (Lei nº 12.965/2014, arts. 10, §§ 1º e 3º, e 22)." },
-    { type: "p", text: "6.4. Comunidade. O nome de exibição, a foto de perfil e as publicações feitas nos fóruns ficam visíveis aos demais alunos. Não publique ali dados seus que não queira compartilhar com a turma." },
-    { type: "h2", text: "7. Transferência internacional" },
-    { type: "p", text: "7.1. Alguns fornecedores listados na seção 6 mantêm servidores fora do Brasil, em especial [países, por exemplo, Estados Unidos]." },
-    { type: "p", text: "7.2. A transferência ocorre apenas nas hipóteses do art. 33 da Lei nº 13.709/2018, preferencialmente mediante cláusulas-padrão contratuais aprovadas pela ANPD, conforme o regulamento de transferência internacional da Autoridade." },
-    { type: "p", text: "7.3. Você pode solicitar, pelo canal do titular, a identificação dos países de destino e do mecanismo de transferência usado." },
-    { type: "h2", text: "8. Cookies e tecnologias semelhantes" },
-    { type: "p", text: "8.1. Cookies são pequenos arquivos gravados no seu navegador. Usamos três categorias:" },
-    { type: "table", headers: ["Categoria", "Para que serve", "Base legal", "Pode recusar?"], rows: [
-      ["Necessários", "Login, segurança da sessão, carrinho de compra, preferências de cookies", "Execução de contrato e legítimo interesse", "Não; sem eles o site não funciona"],
-      ["Analíticos", "Medir visitas e desempenho das páginas [ferramenta]", "Consentimento", "Sim"],
-      ["Publicidade", "Exibir anúncios do curso em outros sites e redes [ferramentas]", "Consentimento", "Sim"],
-    ]},
-    { type: "p", text: "8.2. No primeiro acesso, exibimos um aviso que permite aceitar ou recusar os cookies não necessários com o mesmo esforço, sem caixas pré-marcadas. A escolha pode ser alterada a qualquer tempo em [link “Preferências de cookies”]." },
-    { type: "p", text: "8.3. Você também pode bloquear ou apagar cookies nas configurações do navegador. Isso pode afetar o funcionamento do site." },
-    { type: "h2", text: "9. Por quanto tempo guardamos os dados" },
-    { type: "p", text: "9.1. Guardamos os dados apenas pelo tempo necessário à finalidade ou pelo prazo exigido em lei. Depois disso, eles são eliminados ou anonimizados (Lei nº 13.709/2018, arts. 15 e 16):" },
-    { type: "table", headers: ["Dados", "Prazo de guarda", "Fundamento"], rows: [
-      ["Dados de paciente enviados indevidamente", "Eliminação imediata após identificação", "Ausência de base legal (LGPD, art. 11)"],
-      ["Registros de acesso à aplicação", "6 meses", "Lei nº 12.965/2014, art. 15"],
-      ["Cookies analíticos e de publicidade", "Até 6 meses ou até a revogação do consentimento", "Consentimento (LGPD, art. 7º, I)"],
-      ["Lista de ofertas (interessados e alunos)", "Até a revogação do consentimento ou 12 meses sem interação", "Consentimento (LGPD, art. 7º, I)"],
-      ["Cadastro, progresso e histórico do aluno", "Durante o acesso e por 5 anos após o seu término", "Prazo prescricional do CDC, art. 27; exercício regular de direitos (LGPD, art. 7º, VI)"],
-      ["Atendimentos, reclamações e pedidos de reembolso", "5 anos após o encerramento", "Idem"],
-      ["Dados fiscais e contábeis da venda", "5 anos contados do primeiro dia do exercício seguinte", "Código Tributário Nacional, arts. 173 e 174"],
-      ["Publicações na comunidade", "Durante o acesso; após o término, anonimizadas ou eliminadas", "Execução de contrato (LGPD, art. 7º, V)"],
-      ["Depoimentos e uso de imagem", "Até a revogação do consentimento; peças já veiculadas são retiradas dos canais sob nosso controle", "LGPD, art. 8º, § 5º"],
-    ]},
-    { type: "p", text: "9.2. Se houver processo judicial ou administrativo em curso, os dados necessários à defesa serão guardados até o seu encerramento definitivo." },
-    { type: "h2", text: "10. Segurança e incidentes" },
-    { type: "p", text: "10.1. Adotamos medidas técnicas e administrativas proporcionais ao nosso porte para proteger os dados contra acessos não autorizados, perda, alteração ou vazamento (Lei nº 13.709/2018, arts. 46 e 50). Entre elas:" },
-    { type: "ul", items: [
-      "conexão criptografada (HTTPS) e senhas armazenadas com criptografia;",
-      "autenticação em dois fatores nas contas administrativas;",
-      "acesso aos dados restrito a quem precisa deles para trabalhar;",
-      "escolha de fornecedores com compromissos contratuais de segurança;",
-      "cópias de segurança periódicas;",
-      "moderação da comunidade para remover dados de pacientes.",
-    ]},
-    { type: "p", text: "10.2. Nenhum sistema é totalmente imune a incidentes. Se ocorrer incidente de segurança que possa acarretar risco ou dano relevante aos titulares, comunicaremos a ANPD e os titulares afetados no prazo e na forma da regulamentação da Autoridade. A comunicação informará os dados envolvidos, os riscos e as medidas adotadas (Lei nº 13.709/2018, art. 48)." },
-    { type: "p", text: "10.3. Também cabe a você proteger sua conta: use senha forte e exclusiva e não compartilhe suas credenciais (Termos de Uso, cláusula 7.2)." },
-    { type: "h2", text: "11. Seus direitos e como exercê-los" },
-    { type: "p", text: "11.1. Você tem, a qualquer tempo e gratuitamente, os seguintes direitos (Lei nº 13.709/2018, arts. 18 e 20):" },
-    { type: "ul", items: [
-      "confirmação de que tratamos seus dados;",
-      "acesso aos dados;",
-      "correção de dados incompletos, inexatos ou desatualizados;",
-      "anonimização, bloqueio ou eliminação de dados desnecessários, excessivos ou tratados em desconformidade com a lei;",
-      "portabilidade dos dados a outro fornecedor;",
-      "eliminação dos dados tratados com base no consentimento, ressalvadas as hipóteses de guarda do art. 16;",
-      "informação sobre as entidades com as quais compartilhamos dados;",
-      "informação sobre a possibilidade de não consentir e sobre as consequências da negativa;",
-      "revogação do consentimento;",
-      "oposição a tratamento baseado em outra hipótese legal, quando houver descumprimento da lei;",
-      "revisão de decisão tomada unicamente com base em tratamento automatizado.",
-    ]},
-    { type: "p", text: "11.2. Como pedir: envie e-mail para aumakua147@gmail.com informando o direito que deseja exercer. Para proteger seus dados, poderemos pedir confirmação de identidade, limitada ao necessário." },
-    { type: "p", text: "11.3. Prazo de resposta: a confirmação de existência e o acesso em formato simplificado são fornecidos imediatamente. A declaração completa, com origem, critérios e finalidades, é fornecida em até 15 dias (Lei nº 13.709/2018, art. 19). Se não pudermos atender o pedido, indicaremos os motivos de fato ou de direito." },
-    { type: "h2", text: "12. Comunicações, depoimentos e uso de imagem" },
-    { type: "p", text: "12.1. Avisos do curso (cronograma, aulas ao vivo, mudanças de edital, cobrança, reembolso) são enviados enquanto durar o contrato, por serem parte do serviço." },
-    { type: "p", text: "12.2. Ofertas e conteúdos promocionais só são enviados com seu consentimento. Todo e-mail promocional traz link de descadastro, e no WhatsApp basta responder “SAIR”. O descadastro não afeta o seu acesso ao curso." },
-    { type: "p", text: "12.3. Aulas ao vivo podem ser gravadas e disponibilizadas aos alunos da turma. Sua imagem e sua voz só aparecem na gravação se você ativar câmera ou microfone. Perguntas pelo chat aparecem com o nome de exibição que você escolher." },
-    { type: "p", text: "12.4. Depoimentos, fotos e divulgação de aprovação dependem de autorização específica, por escrito, que indicará os canais e o prazo de uso. Não editamos depoimentos para alterar o sentido. A divulgação observa as regras de publicidade médica (Resolução CFM nº 2.336/2023) e a vedação de publicidade enganosa (CDC, art. 37, § 1º)." },
-    { type: "h2", text: "13. Alterações desta Política" },
-    { type: "p", text: "13.1. Esta Política pode ser atualizada para refletir mudanças legais, regulatórias ou de fornecedores. A versão vigente e a data da última atualização ficam sempre no topo do documento, e as versões anteriores ficam disponíveis em [link]." },
-    { type: "p", text: "13.2. Mudanças relevantes serão comunicadas aos alunos por e-mail e na plataforma com 30 dias de antecedência, com destaque do que mudou. Se a mudança de finalidade depender de consentimento, ele será colhido novamente (Lei nº 13.709/2018, arts. 8º, § 6º, e 9º, § 2º)." },
-    { type: "h2", text: "14. Legislação aplicável e autoridade competente" },
-    { type: "p", text: "14.1. Esta Política é regida pela legislação brasileira, em especial pela Lei nº 13.709/2018 (LGPD), pela Lei nº 12.965/2014 (Marco Civil da Internet) e seu regulamento (Decreto nº 8.771/2016), pelo Código de Defesa do Consumidor, pelo Decreto nº 7.962/2013 e pelas resoluções da ANPD." },
-    { type: "p", text: "14.2. A autoridade responsável por fiscalizar o cumprimento da LGPD é a Autoridade Nacional de Proteção de Dados: www.gov.br/anpd." },
-    { type: "p", text: "14.3. Para controvérsias decorrentes desta Política, aplica-se o foro do domicílio do aluno." },
-    { type: "p", text: "Bela Vista de Goiás, 26 de outubro de 2026." },
-    { type: "p", text: "AUMAKUA LTDA - TREINAMENTO EM DESENVOLVIMENTO PROFISSIONAL E GERENCIAL, CNPJ sob o nº 65.259.441/0001-58." },
-  ],
+  "title": "POLÍTICA DE PRIVACIDADE E PROTEÇÃO DE DADOS PESSOAIS",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Versão 1.0, vigente a partir de 26.10.2026. Esta Política integra os Termos de Uso do curso e explica, de forma clara, quais dados pessoais são tratados, por que, com quem os compartilhamos, por quanto tempo os guardamos e como você exerce seus direitos (Lei nº 13.709/2018, arts. 6º, VI, e 9º; Lei nº 12.965/2014, art. 7º, VIII e XI)."
+    },
+    {
+      "type": "h2",
+      "text": "Resumo em 6 pontos:"
+    },
+    {
+      "type": "ul",
+      "items": [
+        "São tratados apenas os dados necessários para vender, entregar e proteger o curso.",
+        "Não vendemos dados pessoais.",
+        "Não tratamos dados de saúde do aluno e proibimos o envio de dados de pacientes.",
+        "Só enviamos ofertas se você autorizar, e você pode cancelar com um clique.",
+        "Guardamos os registros de acesso por 6 meses, como exige o Marco Civil da Internet.",
+        "Você pode acessar, corrigir, portar ou eliminar seus dados pelo e-mail: aumakua147@gmail.com"
+      ]
+    },
+    {
+      "type": "h2",
+      "text": "1. Quem é a controladora e como falar conosco:"
+    },
+    {
+      "type": "p",
+      "text": "1.1. A controladora dos dados pessoais é AUMAKUA LTDA - TREINAMENTO EM DESENVOLVIMENTO PROFISSIONAL E GERENCIAL, pessoa jurídica de direito privado, devidamente inscrita no CNPJ sob o nº 65.259.441/0001-58, com endereço na Rua 08, nº s/n, Qd. 01; Lt. 23; Jardim Alfaville, Bela Vista de Goiás-GO, CEP: 75240000, e endereço eletrônico aumakua147@gmail.com doravante denominada \"nós\"."
+    },
+    {
+      "type": "p",
+      "text": "1.2. Canal do titular: aumakua147@gmail.com Por esse canal você pode tirar dúvidas, exercer direitos e reportar incidentes. Como agente de tratamento de pequeno porte, estamos dispensados de indicar encarregado, mas mantemos este canal com a mesma função."
+    },
+    {
+      "type": "h2",
+      "text": "2. A quem esta Política se aplica:"
+    },
+    {
+      "type": "p",
+      "text": "2.1. Esta Política se aplica a: (a) alunos matriculados; (b) interessados que preenchem formulários, participam de aulas abertas ou se inscrevem em listas de e-mail; e (c) visitantes do site e dos perfis oficiais do curso, quanto aos dados que nós mesmos coletamos."
+    },
+    {
+      "type": "p",
+      "text": "2.2. As redes sociais, plataformas de pagamento e plataformas de cursos de terceiros têm políticas próprias, que regem os dados que elas coletam por conta própria (seção 6)."
+    },
+    {
+      "type": "p",
+      "text": "2.3. O curso é destinado a médicos e não é direcionado a crianças ou adolescentes. Se recebermos dados de menor de 18 anos, eles serão eliminados."
+    },
+    {
+      "type": "h2",
+      "text": "3. Definições:"
+    },
+    {
+      "type": "p",
+      "text": "3.1. Os termos abaixo têm o sentido previsto na Lei nº 13.709/2018, art. 5º:"
+    },
+    {
+      "type": "ul",
+      "items": [
+        "Dado pessoal: informação relacionada a pessoa natural identificada ou identificável."
+      ]
+    },
+    {
+      "type": "ul",
+      "items": [
+        "Dado pessoal sensível: dado sobre origem racial ou étnica, convicção religiosa, opinião política, filiação sindical ou organização religiosa, filosófica ou política, saúde, vida sexual, genética ou biometria."
+      ]
+    },
+    {
+      "type": "ul",
+      "items": [
+        "Tratamento: toda operação com dados pessoais, como coleta, uso, armazenamento, compartilhamento e eliminação."
+      ]
+    },
+    {
+      "type": "ul",
+      "items": [
+        "Operador: quem trata dados em nome do controlador, como provedores de hospedagem e de e-mail."
+      ]
+    },
+    {
+      "type": "ul",
+      "items": [
+        "Anonimização: uso de meios técnicos razoáveis para que o dado perca a possibilidade de associação a uma pessoa."
+      ]
+    },
+    {
+      "type": "ul",
+      "items": [
+        "Registros de acesso a aplicações: data e hora de uso de uma aplicação a partir de determinado IP (Lei nº 12.965/2014, art. 5º, VIII)."
+      ]
+    },
+    {
+      "type": "h2",
+      "text": "4. Quais dados tratamos, para quê e com qual base legal:"
+    },
+    {
+      "type": "p",
+      "text": "4.1. A AUMAKUA CURSOS coleta, trata e armazena as seguintes informações (Lei nº 13.709/2018, arts. 6º, I a III, e 7º):"
+    },
+    {
+      "type": "ul",
+      "items": [
+        "informações fornecidas pelo ALUNO (nome, CPF, endereço, e-mail e telefone, data de nascimento, escolaridade – entre outros solicitados no momento do cadastro ou posteriormente), via preenchimento dos formulários.",
+        "informações fornecidas pelo ALUNO nos contatos diretos com a AUMAKUA CURSOS, via e-mail, telefone, redes sociais, entre outros;",
+        "informações de navegação nos nossos sites (são coletadas informações como endereço IP, localização geográfica, tipo de navegador, duração da visita e páginas visitadas, dados de conexão, histórico de compras); e",
+        "informações quando você opta por classificar títulos, definir suas preferências pessoais, configurações (inclusive preferências configuradas na seção “Meus Dados”) ou, de outra forma, quando fornece informações ao Estratégia Educacional."
+      ]
+    },
+    {
+      "type": "table",
+      "headers": [
+        "Finalidade",
+        "Dados",
+        "Origem",
+        "Base legal (LGPD)"
+      ],
+      "rows": [
+        [
+          "Cadastro, matrícula e acesso ao curso",
+          "Nome, CPF, e-mail, telefone, senha (criptografada)",
+          "Você",
+          "Execução de contrato e procedimentos preliminares (art. 7º, V)"
+        ],
+        [
+          "Conferência de que o aluno é médico",
+          "Número e UF do CRM, especialidade ou residência em curso",
+          "Você consulta pública ao CRM",
+          "Execução de contrato (art. 7º, V)"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "headers": [
+        "Finalidade",
+        "Dados",
+        "Origem",
+        "Base legal (LGPD)"
+      ],
+      "rows": [
+        [
+          "Prestação do serviço e acompanhamento pedagógico",
+          "Progresso nas aulas, respostas a questões e simulados, dúvidas enviadas",
+          "Uso da plataforma",
+          "Execução de contrato (art. 7º, V)"
+        ],
+        [
+          "Pagamento e prevenção de fraude na compra",
+          "Dados da transação, forma de pagamento, últimos 4 dígitos do cartão (dados completos ficam só com o intermediador)",
+          "Intermediador de pagamento",
+          "Execução de contrato (art. 7º, V) e proteção do crédito (art. 7º, X)"
+        ],
+        [
+          "Emissão de nota fiscal e obrigações contábeis",
+          "Nome, CPF, endereço, valor pago",
+          "Você",
+          "Obrigação legal (art. 7º, II)"
+        ],
+        [
+          "Guarda de registros de acesso",
+          "IP, data, hora e fuso horário de acesso",
+          "Uso da plataforma",
+          "Obrigação legal (art. 7º, II; Lei nº 12.965/2014, art. 15)"
+        ],
+        [
+          "Proteção do conteúdo contra pirataria",
+          "IP, tipo de dispositivo, sessões simultâneas, marca d’água com nome e CPF parcial",
+          "Uso da plataforma",
+          "Legítimo interesse (art. 7º, IX) e exercício regular de direitos (art. 7º, VI)"
+        ],
+        [
+          "Atendimento, reclamações e pedidos de reembolso",
+          "Nome, e-mail, conteúdo da mensagem",
+          "Você",
+          "Execução de contrato (art. 7º, V) e obrigação legal (art. 7º, II; Decreto nº 7.962/2013, art. 4º, V)"
+        ],
+        [
+          "Comunidade e fóruns do curso",
+          "Nome de exibição, foto de perfil (opcional), publicações",
+          "Você",
+          "Execução de contrato (art. 7º, V)"
+        ],
+        [
+          "Avisos sobre o próprio curso (cronograma, aulas ao vivo, mudanças de edital)",
+          "E-mail, telefone",
+          "Você",
+          "Execução de contrato (art. 7º, V)"
+        ],
+        [
+          "Envio de ofertas de novos cursos e conteúdos promocionais",
+          "Nome, e-mail, telefone/WhatsApp",
+          "Você",
+          "Consentimento (art. 7º, I)"
+        ],
+        [
+          "Medição de audiência e anúncios",
+          "Cookies e identificadores não essenciais",
+          "Navegação no site",
+          "Consentimento (art. 7º, I)"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "headers": [
+        "Finalidade",
+        "Dados",
+        "Origem",
+        "Base legal (LGPD)"
+      ],
+      "rows": [
+        [
+          "Divulgação de depoimentos e aprovações",
+          "Nome, imagem, depoimento, resultado na prova",
+          "Você",
+          "Consentimento específico e destacado (art. 8º, § 4º; Código Civil, art. 20)"
+        ],
+        [
+          "Defesa em processos judiciais, administrativos ou arbitrais",
+          "Dados necessários à defesa",
+          "Registros internos",
+          "Exercício regular de direitos (art. 7º, VI)"
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "4.2. Legítimo interesse. Quando usamos essa base, ponderamos nosso interesse em proteger o conteúdo contra suas expectativas legítimas e seus direitos fundamentais. Limitamos os dados ao estritamente necessário e mantemos o registro dessa avaliação à disposição da ANPD (Lei nº 13.709/2018, art. 10, §§ 1º a 3º)."
+    },
+    {
+      "type": "p",
+      "text": "4.3. Consentimento. O consentimento é colhido de forma separada e não pré-marcada. A matrícula nunca depende dele. Você pode revogá-lo a qualquer tempo, de forma gratuita e facilitada, sem prejuízo do tratamento já realizado (Lei nº 13.709/2018, art. 8º, §§ 4º e 5º)."
+    },
+    {
+      "type": "p",
+      "text": "4.4. Decisões automatizadas. Não tomamos decisões baseadas unicamente em tratamento automatizado que afetem seus interesses. Os bloqueios por compartilhamento de conta passam por revisão humana antes de se tornarem definitivos (Lei nº 13.709/2018, art. 20; Termos de Uso, cláusula 13.2)."
+    },
+    {
+      "type": "h2",
+      "text": "5. Dados que não tratamos e dados de pacientes."
+    },
+    {
+      "type": "p",
+      "text": "5.1. Não solicitamos dados pessoais sensíveis do aluno. Não pedimos informações de saúde, religião, origem racial ou étnica, nem opinião política."
+    },
+    {
+      "type": "p",
+      "text": "5.2. É proibido enviar dados de pacientes. Os alunos não podem publicar na comunidade, nem enviar ao professor, caso clínico, exame, laudo, imagem ou documento que identifique ou permita identificar um paciente. A proibição vale ainda que haja autorização do paciente (Código de Ética Médica, arts. 73 e 75; Termos de Uso, cláusula 9.2). Casos para discussão devem ser integralmente anonimizados."
+    },
+    {
+      "type": "p",
+      "text": "5.3. O dado de paciente enviado em desacordo com o item 5.2 será removido e eliminado assim que identificado, sem aviso prévio. Trata-se de dado pessoal sensível de terceiro para cujo tratamento não existe base legal no curso (Lei nº 13.709/2018, arts. 11 e 16). O aluno que enviou o dado responde pela violação."
+    },
+    {
+      "type": "p",
+      "text": "5.4. Não armazenamos os dados completos do cartão de crédito. Eles são tratados diretamente pela intermediadora de pagamento."
+    },
+    {
+      "type": "h2",
+      "text": "6. Com quem compartilhamos dados:"
+    },
+    {
+      "type": "p",
+      "text": "6.1. Não vendemos nem alugamos dados pessoais. Compartilhamos apenas o necessário, com as categorias abaixo:"
+    },
+    {
+      "type": "table",
+      "headers": [
+        "Destinatário",
+        "Papel",
+        "Finalidade",
+        "Dados"
+      ],
+      "rows": [
+        [
+          "Plataforma de cursos [nome]",
+          "[Operador / controlador independente, conforme os termos da plataforma]",
+          "Hospedagem do conteúdo, área do aluno, comunidade",
+          "Cadastro, progresso, publicações, registros de acesso"
+        ],
+        [
+          "Intermediador de pagamento InfinitePay",
+          "Controlador independente",
+          "Processamento do pagamento, antifraude, estornos",
+          "Dados da transação e de pagamento"
+        ],
+        [
+          "Ferramenta de e-mail e mensagens [nome]",
+          "Operador",
+          "Avisos do curso e, se houver consentimento, ofertas",
+          "Nome, e-mail, telefone"
+        ],
+        [
+          "Serviço de aulas ao vivo [nome]",
+          "Operador",
+          "Transmissão e gravação das aulas",
+          "Nome de exibição, e-mail, interações no chat"
+        ],
+        [
+          "Hospedagem e armazenamento em nuvem [nome]",
+          "Operador",
+          "Armazenamento seguro de dados e cópias de segurança",
+          "Dados descritos na seção 4"
+        ],
+        [
+          "Contador",
+          "Operador",
+          "Escrituração e obrigações fiscais",
+          "Dados fiscais da venda"
+        ],
+        [
+          "Advogados",
+          "Controlador para a finalidade de defesa",
+          "Assessoria e defesa de direitos",
+          "Dados necessários ao caso"
+        ],
+        [
+          "Autoridades públicas",
+          "Destinatários por dever legal",
+          "Cumprimento de ordem judicial ou requisição legal",
+          "Os dados requisitados, nos limites da ordem"
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "6.2. Os operadores tratam dados apenas conforme nossas instruções e devem adotar medidas de segurança compatíveis com esta Política (Lei nº 13.709/2018, arts. 39 e 46)."
+    },
+    {
+      "type": "p",
+      "text": "6.3. Os registros de acesso só serão fornecidos mediante ordem judicial. Dados cadastrais podem ser fornecidos às autoridades administrativas com competência legal para requisitá-los (Lei nº 12.965/2014, arts. 10, §§ 1º e 3º, e 22)."
+    },
+    {
+      "type": "p",
+      "text": "6.4. Comunidade. O nome de exibição, a foto de perfil e as publicações feitas nos fóruns ficam visíveis aos demais alunos. Não publique ali dados seus que não queira compartilhar com a turma."
+    },
+    {
+      "type": "h2",
+      "text": "7. Transferência internacional"
+    },
+    {
+      "type": "p",
+      "text": "7.1. Alguns fornecedores listados na seção 6 tratam dados fora do Brasil, em especial a Lovable, plataforma do curso, sediada em Estocolmo, na Suécia."
+    },
+    {
+      "type": "p",
+      "text": "7.2. A transferência ocorre apenas nas hipóteses do art. 33 da Lei nº 13.709/2018, preferencialmente mediante cláusulas-padrão contratuais aprovadas pela ANPD, conforme o regulamento de transferência internacional da Autoridade."
+    },
+    {
+      "type": "p",
+      "text": "7.3. Você pode solicitar, pelo canal do titular, a identificação dos países de destino e do mecanismo de transferência usado."
+    },
+    {
+      "type": "h2",
+      "text": "8. Cookies e tecnologias semelhantes:"
+    },
+    {
+      "type": "p",
+      "text": "8.1. Cookies são pequenos arquivos gravados no seu navegador. Usamos três categorias:"
+    },
+    {
+      "type": "table",
+      "headers": [
+        "Categoria",
+        "Para que serve",
+        "Base legal",
+        "Pode recusar?"
+      ],
+      "rows": [
+        [
+          "Necessários",
+          "Login, segurança da sessão, carrinho de compra, preferência de cookies",
+          "Execução de contrato e legítimo interesse",
+          "Não; sem eles o site não funciona"
+        ],
+        [
+          "Analíticos",
+          "Medir visitas e desempenho das páginas [ferramenta]",
+          "Consentimento",
+          "Sim"
+        ],
+        [
+          "Publicidade",
+          "Exibir anúncios do curso em outros sites e redes [ferramentas]",
+          "Consentimento",
+          "Sim"
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "8.2. No primeiro acesso, exibimos um aviso que permite aceitar ou recusar os cookies não necessários com o mesmo esforço, sem caixas pré-marcadas. A escolha pode ser alterada a qualquer tempo em [link \"Preferências de cookies\"]."
+    },
+    {
+      "type": "p",
+      "text": "8.3. Você também pode bloquear ou apagar cookies nas configurações do navegador. Isso pode afetar o funcionamento do site."
+    },
+    {
+      "type": "h2",
+      "text": "9. Por quanto tempo guardamos os dados:"
+    },
+    {
+      "type": "p",
+      "text": "9.1. Guardamos os dados apenas pelo tempo necessário à finalidade ou pelo prazo exigido em lei. Depois disso, eles são eliminados ou anonimizados (Lei nº 13.709/2018, arts. 15 e 16):"
+    },
+    {
+      "type": "table",
+      "headers": [
+        "Dados",
+        "Prazo de guarda",
+        "Fundamento"
+      ],
+      "rows": [
+        [
+          "Dados de paciente enviados indevidamente",
+          "Eliminação imediata após identificação",
+          "Ausência de base legal (LGPD, art. 11)"
+        ],
+        [
+          "Registros de acesso à aplicação",
+          "6 meses",
+          "Lei nº 12.965/2014, art. 15"
+        ],
+        [
+          "Cookies analíticos e de publicidade",
+          "Até 6 meses ou até a revogação do consentimento",
+          "Consentimento (LGPD, art. 7º, I)"
+        ],
+        [
+          "Lista de ofertas (interessados e alunos)",
+          "Até a revogação do consentimento ou 12 meses sem interação",
+          "Consentimento (LGPD, art. 7º, I)"
+        ],
+        [
+          "Cadastro, progresso e histórico do aluno",
+          "Durante o acesso e por 5 anos após o seu término",
+          "Prazo prescricional do CDC, art. 27; exercício regular de direitos (LGPD, art. 7º, VI)"
+        ],
+        [
+          "Atendimentos, reclamações e pedidos de reembolso",
+          "5 anos após o encerramento",
+          "Idem"
+        ],
+        [
+          "Dados fiscais e contábeis da venda",
+          "5 anos contados do primeiro dia do exercício seguinte",
+          "Código Tributário Nacional, arts. 173 e 174"
+        ],
+        [
+          "Publicações na comunidade",
+          "Durante o acesso; após o término, anonimizadas ou eliminadas",
+          "Execução de contrato (LGPD, art. 7º, V)"
+        ],
+        [
+          "Depoimentos e uso de imagem",
+          "Até a revogação do consentimento; peças já veiculadas são retiradas dos canais sob nosso controle",
+          "LGPD, art. 8º, § 5º"
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "9.2. Se houver processo judicial ou administrativo em curso, os dados necessários à defesa serão guardados até o seu encerramento definitivo."
+    },
+    {
+      "type": "h2",
+      "text": "10. Segurança e incidentes."
+    },
+    {
+      "type": "p",
+      "text": "10.1. Adotamos medidas técnicas e administrativas proporcionais ao nosso porte para proteger os dados contra acessos não autorizados, perda, alteração ou vazamento (Lei n° 13.709/2018, arts. 46 e 50). Entre elas:"
+    },
+    {
+      "type": "ul",
+      "items": [
+        "conexão criptografada (HTTPS) e senhas armazenadas com criptografia;",
+        "autenticação em dois fatores nas contas administrativas;",
+        "acesso aos dados restrito a quem precisa deles para trabalhar;",
+        "escolha de fornecedores com compromissos contratuais de segurança;"
+      ]
+    },
+    {
+      "type": "ul",
+      "items": [
+        "cópias de segurança periódicas;",
+        "moderação da comunidade para remover dados de pacientes."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "10.2. Nenhum sistema é totalmente imune a incidentes. Se ocorrer incidente de segurança que possa acarretar risco ou dano relevante aos titulares, comunicaremos a ANPD e os titulares afetados no prazo e na forma da regulamentação da Autoridade. A comunicação informará os dados envolvidos, os riscos e as medidas adotadas (Lei nº 13.709/2018, art. 48)."
+    },
+    {
+      "type": "p",
+      "text": "10.3. Também cabe a você proteger sua conta: use senha forte e exclusiva e não compartilhe suas credenciais (Termos de Uso, cláusula 7.2)."
+    },
+    {
+      "type": "h2",
+      "text": "11. Seus direitos e como exercê-los"
+    },
+    {
+      "type": "p",
+      "text": "11.1. Você tem, a qualquer tempo e gratuitamente, os seguintes direitos (Lei nº 13.709/2018, arts. 18 e 20):"
+    },
+    {
+      "type": "ul",
+      "items": [
+        "confirmação de que tratamos seus dados;",
+        "acesso aos dados;",
+        "correção de dados incompletos, inexatos ou desatualizados;",
+        "anonimização, bloqueio ou eliminação de dados desnecessários, excessivos ou tratados em desconformidade com a lei;",
+        "portabilidade dos dados a outro fornecedor;",
+        "eliminação dos dados tratados com base no consentimento, ressalvadas as hipóteses de guarda do art. 16;",
+        "informação sobre as entidades com as quais compartilhamos dados;",
+        "informação sobre a possibilidade de não consentir e sobre as consequências da negativa;",
+        "revogação do consentimento;",
+        "oposição a tratamento baseado em outra hipótese legal, quando houver descumprimento da lei;",
+        "revisão de decisão tomada unicamente com base em tratamento automatizado."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "11.2. Como pedir: envie e-mail para aumakua147@gmail.com informando o direito que deseja exercer. Para proteger seus dados, poderemos pedir confirmação de identidade, limitada ao necessário."
+    },
+    {
+      "type": "p",
+      "text": "11.3. Prazo de resposta: a confirmação de existência e o acesso em formato simplificado são fornecidos imediatamente. A declaração completa, com origem, critérios e finalidades, é fornecida em até 15 dias (Lei nº 13.709/2018, art. 19). Se não pudermos atender o pedido, indicaremos os motivos de fato ou de direito."
+    },
+    {
+      "type": "h2",
+      "text": "12. Comunicações, depoimentos e uso de imagem"
+    },
+    {
+      "type": "p",
+      "text": "12.1. Avisos do curso (cronograma, aulas ao vivo, mudanças de edital, cobrança, reembolso) são enviados enquanto durar o contrato, por serem parte do serviço."
+    },
+    {
+      "type": "p",
+      "text": "12.2. Ofertas e conteúdos promocionais só são enviados com seu consentimento. Todo e-mail promocional traz link de descadastro, e no WhatsApp basta responder \"SAIR\". O descadastro não afeta o seu acesso ao curso."
+    },
+    {
+      "type": "p",
+      "text": "12.3. Aulas ao vivo podem ser gravadas e disponibilizadas aos alunos da turma. Sua imagem e sua voz só aparecem na gravação se você ativar câmera ou microfone. Perguntas pelo chat aparecem com o nome de exibição que você escolher."
+    },
+    {
+      "type": "p",
+      "text": "12.4. Depoimentos, fotos e divulgação de aprovação dependem de autorização específica, por escrito, que indicará os canais e o prazo de uso. Não editamos depoimentos para alterar o sentido. A divulgação observa as regras de publicidade médica (Resolução CFM nº 2.336/2023) e a vedação de publicidade enganosa (CDC, art. 37, § 1º)."
+    },
+    {
+      "type": "h2",
+      "text": "13. Alterações desta Política"
+    },
+    {
+      "type": "p",
+      "text": "13.1. Esta Política pode ser atualizada para refletir mudanças legais, regulatórias ou de fornecedores. A versão vigente e a data da última atualização ficam sempre no topo do documento, e as versões anteriores ficam disponíveis em [link]."
+    },
+    {
+      "type": "p",
+      "text": "13.2. Mudanças relevantes serão comunicadas aos alunos por e-mail e na plataforma com 30 dias de antecedência, com destaque do que mudou. Se a mudança de finalidade depender de consentimento, ele será colhido novamente (Lei nº 13.709/2018, arts. 8º, § 6º, e 9º, § 2º)."
+    },
+    {
+      "type": "h2",
+      "text": "14. Legislação aplicável e autoridade competente"
+    },
+    {
+      "type": "p",
+      "text": "14.1. Esta Política é regida pela legislação brasileira, em especial pela Lei nº 13.709/2018 (LGPD), pela Lei nº 12.965/2014 (Marco Civil da Internet) e seu regulamento (Decreto nº 8.771/2016), pelo Código de Defesa do Consumidor, pelo Decreto nº 7.962/2013 e pelas resoluções da ANPD."
+    },
+    {
+      "type": "p",
+      "text": "14.2. A autoridade responsável por fiscalizar o cumprimento da LGPD é a Autoridade Nacional de Proteção de Dados: www.gov.br/anpd."
+    },
+    {
+      "type": "p",
+      "text": "14.3. Para controvérsias decorrentes desta Política, aplica-se o foro do domicílio do aluno."
+    },
+    {
+      "type": "p",
+      "text": "Bela Vista de Goiás, 26 de outubro de 2026"
+    },
+    {
+      "type": "p",
+      "text": "AUMAKUA LTDA - TREINAMENTO EM DESENVOLVIMENTO PROFISSIONAL E GERENCIAL, CNPJ sob o nº 65.259.441/0001-58."
+    }
+  ]
 };
 
 export const CONTRATO: LegalDoc = {
@@ -333,13 +1142,13 @@ export const CONTRATO: LegalDoc = {
     { type: "h2", text: "Cláusula 4 — Preço e forma de pagamento" },
     { type: "p", text: "4.1. Pelo serviço, o CONTRATANTE pagará o preço escolhido no momento da matrícula, entre as condições abaixo:" },
     { type: "ul", items: [
-      "Mentoria TSA 1ª Fase 2027. Valor cheio: R$ 6.499,99; Pix à vista: R$ 6.000,00; Cartão de crédito: R$ 6.499,99 à vista ou em até 3 vezes (sem juros).",
-      "Mentoria TSA 1ª Fase 2027 – Compras em janeiro/2027. Valor cheio: R$ 6.999,00; Pix à vista: R$ 6.299,10; Cartão de crédito: Em até 3 vezes de R$ 2.333,00 (sem juros).",
+      "Mentoria TSA 1ª Fase 2027. Valor cheio: R$ 6.499,99; Pix à vista: R$ 6.000,00; Cartão de crédito: Em até 3 vezes de R$ 2.166,66 (sem juros).",
+      "Mentoria TSA 1ª Fase 2027 – Compras em janeiro/2027. Valor cheio: R$ 6.999,00; Pix à vista: R$ 6.300,00; Cartão de crédito: Em até 3 vezes de R$ 2.333,00 (sem juros).",
       "Mentoria TEA 2027. Valor cheio: R$ 5.299,00; Pix à vista: R$ 4.769,10; Cartão de crédito: Em até 3 vezes de R$ 1.766,33 sem juros.",
       "Mentoria TEA – Compras em janeiro/2027. Valor cheio: R$ 5.999,00; Pix à vista: R$ 5.399,10; Cartão de Crédito: Em até 3 vezes de R$ 1.999,67 sem juros.",
     ]},
-    { type: "p", text: "NOTA: O parcelamento no cartão de crédito é realizado EXCLUSIVAMENTE pela plataforma de pagamento e a operadora de cartão de crédito do CONTRATANTE." },
-    { type: "p", text: "4.1.1. Em caso de reembolso: No Pix: sem taxa de estorno. A cobrança precisa ter sido paga há pelo menos 90 (noventa) dias, sendo necessário ter saldo disponível na plataforma de pagamento, no valor da devolução. Cartão de crédito: a cobrança dever ter até 365 (trezentos e sessenta e cinco) dias. Não há cobrança de taxa em caso de estorno total, mas não em caso de estorno parcial. O crédito aparece em até 5 dias úteis ou na próxima fatura. O prazo exato depende da administradora do cartão." },
+    { type: "p", text: "NOTA: O parcelamento no cartão de crédito é realizado EXCLUSIVAMENTE pela InfinitePay e pela operadora de cartão de crédito do CONTRATANTE." },
+    { type: "p", text: "4.1.1. Em caso de reembolso: No Pix: a devolução é feita pela InfinitePay em até 90 (noventa) dias do pagamento; após esse prazo, ou se não for possível, o valor será restituído por transferência Pix para conta indicada pelo CONTRATANTE, em até 7 (sete) dias úteis. Cartão de crédito: a CONTRATADA solicitará à InfinitePay o cancelamento da transação, com estorno na fatura conforme a administradora; reembolsos parciais ou cancelamentos inviáveis pela InfinitePay serão feitos por Pix, em até 7 (sete) dias úteis. Tarifas: no arrependimento (cláusula 8) e nas hipóteses das cláusulas 9.3, 9.5 e 9.6, as tarifas da InfinitePay não são repassadas ao CONTRATANTE; nos demais cancelamentos por ele solicitados, são deduzidas do valor a restituir." },
     { type: "p", text: "4.4. O preço inclui todo o conteúdo descrito na cláusula 3. Não há taxa de matrícula, de material ou de certificado." },
     { type: "p", text: "4.5. O preço é fixo durante todo o prazo de acesso e não sofrerá reajuste." },
     { type: "h2", text: "Cláusula 5 — Obrigações da CONTRATADA" },
@@ -373,11 +1182,11 @@ export const CONTRATO: LegalDoc = {
     { type: "h2", text: "Cláusula 8 — Direito de arrependimento" },
     { type: "p", text: "8.1. O CONTRATANTE pode desistir do Contrato em 7 dias corridos, sem justificativa e sem qualquer ônus, contados do início do curso. Neste caso, o direito de arrependimento independe do volume de conteúdo acessado." },
     { type: "p", text: "8.2. O pedido pode ser feito pela mesma ferramenta usada na contratação ou pelo e-mail aumakua147@gmail.com, com confirmação imediata de recebimento." },
-    { type: "p", text: "8.3. Os valores pagos serão devolvidos integralmente e monetariamente atualizados. No cartão, a CONTRATADA comunicará imediatamente a administradora para que a transação não seja lançada ou seja estornada. No PIX, a devolução ocorrerá em até 7 (sete) dias úteis, na conta indicada pelo CONTRATANTE." },
+    { type: "p", text: "8.3. Os valores pagos serão devolvidos integralmente e monetariamente atualizados. No cartão, a CONTRATADA solicitará imediatamente à InfinitePay o cancelamento da transação, para que a administradora não a lance na fatura ou a estorne. No PIX, a devolução ocorrerá em até 7 (sete) dias úteis, na conta indicada pelo CONTRATANTE." },
     { type: "p", text: "8.4. O arrependimento extingue os contratos acessórios sem ônus para o CONTRATANTE." },
     { type: "h2", text: "Cláusula 9 — Cancelamento, rescisão e resolução" },
     { type: "p", text: "9.1. Cancelamento pelo CONTRATANTE após os 7 dias, contados da data do início do curso, tendo direito à restituição integral (100%) dos valores pagos." },
-    { type: "p", text: "9.2. Decorrido o prazo de 7 (sete) dias previsto no item anterior, as condições de cancelamento e estorno seguirão as diretrizes específicas abaixo:" },
+    { type: "p", text: "9.2. Decorrido o prazo de 7 (sete) dias previsto no item anterior, o cancelamento e o estorno seguirão as diretrizes abaixo, deduzidas as tarifas da cláusula 4.1.1:" },
     { type: "ul", items: [
       "Até 7 dias corridos do início do curso – estorno total do valor da compra, nos termos do Código de Defesa do Consumidor;",
       "Entre 8 e 30 dias corridos – estorno parcial, descontando-se o valor proporcional aos dias de acesso – o cálculo considerará os dias corridos de acesso ao conteúdo;",
