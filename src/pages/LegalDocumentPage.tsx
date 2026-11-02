@@ -1,10 +1,15 @@
 import { DOCUMENT_VERSIONS } from "../../supabase/functions/_shared/checkout-consent";
 import { CONTRATO, PRIVACIDADE, TERMOS, type LegalBlock, type LegalDoc } from "../content/legalDocuments";
+import termosPdf from "@/assets/aumakua-termos-2026-11-02.pdf.asset.json";
+import privacidadePdf from "@/assets/aumakua-privacidade-2026-11-02.pdf.asset.json";
+import contratoPdf from "@/assets/aumakua-contrato-2026-11-02.pdf.asset.json";
+import { Button } from "@/components/ui/button";
+import { FileDown } from "lucide-react";
 
-const DOCS: Record<string, { doc: LegalDoc; version: string }> = {
-  termos: { doc: TERMOS, version: DOCUMENT_VERSIONS.termos },
-  privacidade: { doc: PRIVACIDADE, version: DOCUMENT_VERSIONS.privacidade },
-  contrato: { doc: CONTRATO, version: DOCUMENT_VERSIONS.termos },
+const DOCS: Record<string, { doc: LegalDoc; version: string; pdf: string }> = {
+  termos: { doc: TERMOS, version: DOCUMENT_VERSIONS.termos, pdf: termosPdf.url },
+  privacidade: { doc: PRIVACIDADE, version: DOCUMENT_VERSIONS.privacidade, pdf: privacidadePdf.url },
+  contrato: { doc: CONTRATO, version: DOCUMENT_VERSIONS.termos, pdf: contratoPdf.url },
 };
 
 function Block({ block }: { block: LegalBlock }) {
@@ -30,6 +35,7 @@ export default function LegalDocumentPage({ document }: { document: "termos" | "
   return <main className="min-h-screen bg-background text-foreground px-6 py-12">
     <div className="max-w-2xl mx-auto space-y-4">
       <h1 className="font-display text-2xl font-bold">{entry.doc.title}</h1>
+      <Button asChild variant="outline"><a href={entry.pdf} target="_blank" rel="noopener noreferrer"><FileDown className="mr-2 h-4 w-4" />Abrir PDF original</a></Button>
       {entry.doc.blocks.map((block, i) => <Block key={i} block={block} />)}
       <p className="text-xs text-muted-foreground">Versão: {entry.version}</p>
     </div>

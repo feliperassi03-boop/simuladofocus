@@ -1,5 +1,7 @@
 # Project rules
 
+- Legal pages preserve the supplied wording in structured reading blocks and link the original immutable PDF assets; new uploads bump shared consent versions without rewriting past acceptance rows. Why: buyers can conserve the exact document and earlier legal evidence stays intact.
+
 - Both legacy Asaas checkout functions enforce the shared disabled-sales guard before any database or Asaas operation. The public purchase form instead uses the separate InfinitePay registration function. Why: restoring new-provider purchases must not reopen legacy Asaas charges.
 
 - Asaas API calls happen only in the backend functions (`asaas-subscribe`, `asaas-checkout-public`, `asaas-webhook`); plan names/prices live in server-side `PLANS` maps and public plan keys are restricted by the shared server allowlist. Removed test purchases retain the webhook no-entitlement guard for historical events. Why: browser input must not control prices or create discounted entitlements.
