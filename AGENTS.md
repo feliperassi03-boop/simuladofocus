@@ -1,5 +1,7 @@
 # Project rules
 
+- Home-screen installation uses a manifest and logo-derived public icons only, without app-shell service workers or offline caching. Why: standalone launch should not introduce stale preview caches or promise offline access.
+
 - Legal pages preserve the supplied wording in structured reading blocks and link the original immutable PDF assets; new uploads bump shared consent versions without rewriting past acceptance rows. Why: buyers can conserve the exact document and earlier legal evidence stays intact.
 
 - Both legacy Asaas checkout functions enforce the shared disabled-sales guard before any database or Asaas operation. The public purchase form instead uses the separate InfinitePay registration function. Why: restoring new-provider purchases must not reopen legacy Asaas charges.

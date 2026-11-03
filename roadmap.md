@@ -1,5 +1,7 @@
 # Roadmap
 
+- Em andamento: instalação na tela inicial com nome AUMAKUA, ícones da logo, suporte ao iPhone e abertura standalone; sem modo offline.
+
 - Concluído: escolha de mentoria e pagamento removida do formulário público; dados e aceites são registrados sem presumir plano/preço, e seleção acontece só na InfinitePay. Fluxo real e registros conferidos, 8 testes passaram; publicar a página.
 
 - Concluído: três documentos novos disponíveis para leitura com links aos PDFs originais, versões dos aceites atualizadas para 2026-11-02-v3; funções implantadas, aceite antigo rejeitado (HTTP 400), 10 testes passaram e páginas/PDFs verificados. Registros antigos e regras de compra preservados; publicar a página para visitantes. Os arquivos fornecidos ainda contêm campos de privacidade não preenchidos e divergências de prazo/cancelamento, preservados sem revisão jurídica.
