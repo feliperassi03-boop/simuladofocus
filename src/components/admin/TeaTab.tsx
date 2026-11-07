@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2, X, Search, Copy, Play, Wrench, Save } from "lucide-react";
+import { normalizeImportLines } from "@/lib/question-import";
 
 interface TeaQuestion {
   id: string;
@@ -90,7 +91,7 @@ export default function TeaTab() {
   const [manageSearch, setManageSearch] = useState("");
 
   const handleQuickImport = () => {
-    const raw = quickImport.replace(/\r\n/g, "\n").trim();
+    const raw = normalizeImportLines(quickImport);
     if (!raw) return;
 
     // Aceita tópicos numerados (1, 2, 3) ou por letras (A, B, C).
