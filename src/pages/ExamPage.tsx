@@ -12,6 +12,9 @@ import { normalizeQuestionText } from "@/lib/utils";
 import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock, User, MessageSquareText, Home, BookOpen, Eye, EyeOff } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
 import DoubtDialog from "@/components/DoubtDialog";
+import aumakuaEagle from "@/assets/aumakua-eagle.png";
+
+const EAGLE_EXAM_IDS = new Set(["ef94bcd5-7f7d-4348-a251-7be464488132"]);
 import {
   AlertDialog,
   AlertDialogAction,
@@ -443,6 +446,9 @@ export default function ExamPage() {
           <Card className="shadow-elevated mb-6">
             <CardHeader>
               <div className="flex items-start justify-between gap-3 flex-wrap">
+                {id && EAGLE_EXAM_IDS.has(id) && (
+                  <img src={aumakuaEagle} alt="AUMAKUA" className="w-12 h-auto sm:w-14 shrink-0 mt-1" />
+                )}
                 <CardTitle className="font-display text-xl leading-relaxed flex-1 min-w-0">
                   {normalizeQuestionText(currentQuestion.question_text)}
                 </CardTitle>
@@ -781,6 +787,9 @@ export default function ExamPage() {
         <Card className="shadow-elevated mb-6">
           <CardHeader>
             <div className="flex items-start justify-between gap-3 flex-wrap">
+              {id && EAGLE_EXAM_IDS.has(id) && (
+                <img src={aumakuaEagle} alt="AUMAKUA" className="w-12 h-auto sm:w-14 shrink-0 mt-1" />
+              )}
               <CardTitle className="font-display text-xl leading-relaxed flex-1 min-w-0">
                 {normalizeQuestionText(currentQuestion?.question_text)}
               </CardTitle>
