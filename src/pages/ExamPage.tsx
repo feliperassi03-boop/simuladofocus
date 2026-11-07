@@ -446,7 +446,7 @@ export default function ExamPage() {
           <Card className="shadow-elevated mb-6">
             <CardHeader>
               <div className="flex items-start justify-between gap-3 flex-wrap">
-                {id && EAGLE_EXAM_IDS.has(id) && (
+                {examId && EAGLE_EXAM_IDS.has(examId) && (
                   <img src={aumakuaEagle} alt="AUMAKUA" className="w-12 h-auto sm:w-14 shrink-0 mt-1" />
                 )}
                 <CardTitle className="font-display text-xl leading-relaxed flex-1 min-w-0">
@@ -787,7 +787,7 @@ export default function ExamPage() {
         <Card className="shadow-elevated mb-6">
           <CardHeader>
             <div className="flex items-start justify-between gap-3 flex-wrap">
-              {id && EAGLE_EXAM_IDS.has(id) && (
+              {examId && EAGLE_EXAM_IDS.has(examId) && (
                 <img src={aumakuaEagle} alt="AUMAKUA" className="w-12 h-auto sm:w-14 shrink-0 mt-1" />
               )}
               <CardTitle className="font-display text-xl leading-relaxed flex-1 min-w-0">
