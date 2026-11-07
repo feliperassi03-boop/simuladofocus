@@ -23,6 +23,7 @@ import VideoaulasTab from "@/components/admin/VideoaulasTab";
 import AtfResultsTab from "@/components/admin/AtfResultsTab";
 import { useVideoConverter } from "@/hooks/useVideoConverter";
 import { normalizeQuestionText } from "@/lib/utils";
+import { parseQuestionImport } from "@/lib/question-import";
 
 interface Question {
   id: string;
@@ -259,65 +260,18 @@ export default function AdminPage() {
   };
 
   const handleQuickImport = () => {
-    const text = quickImport.replace(/\r/g, "").trim();
-    if (!text) return;
-
-    const lines = text.split("\n");
-    // Strict line-start matchers — each block is delimited by the *line* it starts on
-    const altLineRe = /^\s*([A-Da-d])\s*[\)\.\-]\s*(.*)$/;
-    const answerLineRe = /^\s*(?:resposta|gabarito)\b[^A-Za-z\n]*(?:letra\s+)?([A-Da-d])\b.*$/i;
-
-    let block: "enunciado" | "alt" | "comentario" = "enunciado";
-    let currentAlt = "";
-    const enunciadoLines: string[] = [];
-    const alts: Record<string, string[]> = { A: [], B: [], C: [], D: [] };
-    const comentarioLines: string[] = [];
-    let gabarito = "";
-
-    for (const raw of lines) {
-      const line = raw;
-
-      // 1) Answer line — strict separator. Consumes the whole line; never part of any alt or comment.
-      const ans = line.match(answerLineRe);
-      if (ans && block !== "comentario") {
-        gabarito = ans[1].toUpperCase();
-        block = "comentario";
-        continue;
-      }
-
-      // 2) Alternative start line
-      const alt = block !== "comentario" ? line.match(altLineRe) : null;
-      if (alt) {
-        currentAlt = alt[1].toUpperCase();
-        block = "alt";
-        if (alt[2]) alts[currentAlt].push(alt[2]);
-        continue;
-      }
-
-      // 3) Continuation lines
-      if (block === "enunciado") enunciadoLines.push(line);
-      else if (block === "alt" && currentAlt) alts[currentAlt].push(line);
-      else if (block === "comentario") comentarioLines.push(line);
-    }
-
-    if (!alts.A.length || !alts.B.length || !alts.C.length || !alts.D.length) {
+    setParsedPreview(null);
+    if (!quickImport.trim()) return;
+    const parsed = parseQuestionImport(quickImport);
+    if (!parsed.A || !parsed.B || !parsed.C || !parsed.D) {
       toast({ title: "Formato inválido", description: "Não foi possível identificar as 4 alternativas (A, B, C, D).", variant: "destructive" });
       return;
     }
-
-    // Strip optional "Comentário:" / "Comentário da questão" header from comment
-    let comentario = comentarioLines.join("\n").trim();
-    comentario = comentario.replace(/^\s*(?:coment[áa]rio|comment)\b[^\n]*\n?/i, "").trim();
-
-    setParsedPreview({
-      enunciado: enunciadoLines.join("\n").trim(),
-      A: alts.A.join("\n").trim(),
-      B: alts.B.join("\n").trim(),
-      C: alts.C.join("\n").trim(),
-      D: alts.D.join("\n").trim(),
-      gabarito: gabarito || "A",
-      comentario,
-    });
+    if (!parsed.gabarito) {
+      toast({ title: "Gabarito não identificado", description: "Inclua uma linha como Gabarito: C antes do comentário.", variant: "destructive" });
+      return;
+    }
+    setParsedPreview(parsed);
   };
 
   const applyPreviewToForm = () => {

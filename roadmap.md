@@ -1,5 +1,7 @@
 # Roadmap
 
+- Em andamento: corrigir a separação de alternativas, gabarito e comentário ao colar perguntas; validar com o texto enviado sem alterar questões salvas.
+
 - Concluído: configuração PWA de tela inicial com nome AUMAKUA, ícones da logo em 192/512px, apple-touch-icon e abertura standalone; manifest e arquivos conferidos no navegador, build OK. Sem modo offline; falta publicar e conferir a instalação física no celular.
 
 - Concluído: escolha de mentoria e pagamento removida do formulário público; dados e aceites são registrados sem presumir plano/preço, e seleção acontece só na InfinitePay. Fluxo real e registros conferidos, 8 testes passaram; publicar a página.
