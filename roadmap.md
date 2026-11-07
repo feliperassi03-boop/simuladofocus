@@ -1,5 +1,7 @@
 # Roadmap
 
+- Concluído: processadores normalizam quebras Unicode; importação de múltipla escolha separa alternativas, gabarito e comentário sem assumir resposta A. Texto enviado validado com gabarito C, 10 testes passaram, build OK; nenhuma questão salva alterada. Conferência no painel bloqueada pela sessão presa em “Carregando”; falta publicar.
+
 - Concluído: configuração PWA de tela inicial com nome AUMAKUA, ícones da logo em 192/512px, apple-touch-icon e abertura standalone; manifest e arquivos conferidos no navegador, build OK. Sem modo offline; falta publicar e conferir a instalação física no celular.
 
 - Concluído: escolha de mentoria e pagamento removida do formulário público; dados e aceites são registrados sem presumir plano/preço, e seleção acontece só na InfinitePay. Fluxo real e registros conferidos, 8 testes passaram; publicar a página.
