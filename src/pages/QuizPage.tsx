@@ -9,6 +9,7 @@ import { normalizeQuestionText } from "@/lib/utils";
 import { CheckCircle, XCircle, ArrowRight, RotateCcw, Trophy, BookOpen, ClipboardList, Clock, Target, Timer } from "lucide-react";
 import quizBanner from "@/assets/quiz-banner.png";
 import QuestionVideo from "@/components/QuestionVideo";
+import QuestionEagle from "@/components/QuestionEagle";
 
 interface Question {
   id: string;

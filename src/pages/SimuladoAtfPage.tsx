@@ -11,6 +11,7 @@ import { Clock, Trophy, Lock, ArrowLeft, ArrowRight, Send } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
 import logoAsset from "@/assets/aumakua-logo.jpeg.asset.json";
 import coverBg from "@/assets/simulado-atf-cover.jpeg.asset.json";
+import QuestionEagle from "@/components/QuestionEagle";
 import {
   AlertDialog,
   AlertDialogAction,

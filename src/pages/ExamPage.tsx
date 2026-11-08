@@ -12,9 +12,8 @@ import { normalizeQuestionText } from "@/lib/utils";
 import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock, User, MessageSquareText, Home, BookOpen, Eye, EyeOff } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
 import DoubtDialog from "@/components/DoubtDialog";
-import aumakuaEagle from "@/assets/aumakua-eagle.png";
-
-const EAGLE_EXAM_IDS = new Set(["ef94bcd5-7f7d-4348-a251-7be464488132"]);
+import QuestionEagle from "@/components/QuestionEagle";
+import { shouldShowQuestionEagle } from "@/lib/question-branding";
 import {
   AlertDialog,
   AlertDialogAction,

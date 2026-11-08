@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ArrowRight, ArrowLeft, Trophy, Eye, EyeOff, CheckCircle, XCircle, Home, RotateCcw, MessageSquareText } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
+import QuestionEagle from "@/components/QuestionEagle";
+import { shouldShowQuestionEagle } from "@/lib/question-branding";
 
 const POINTS_PER_ITEM = 0.52;
 

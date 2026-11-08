@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle, CheckCircle2, PlayCircle, XCircle, ArrowLeft, ArrowRight, Trophy, BookOpen, Clock, MessageSquareText, Eye } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
+import QuestionEagle from "@/components/QuestionEagle";
+import { shouldShowQuestionEagle } from "@/lib/question-branding";
 
 interface Attempt {
   id: string;
