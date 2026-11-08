@@ -599,6 +599,7 @@ export default function ExamPage() {
                   <CardHeader>
                     <div className="flex items-start justify-between gap-3 flex-wrap">
                       <CardTitle className="font-display text-lg leading-relaxed flex-1 min-w-0">
+                        {shouldShowQuestionEagle(exam?.title, examId) && <QuestionEagle />}
                         <span className="text-primary font-bold mr-2">{i + 1}.</span>
                         {normalizeQuestionText(q.question_text)}
                       </CardTitle>
