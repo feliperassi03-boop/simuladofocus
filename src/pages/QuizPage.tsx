@@ -266,6 +266,7 @@ export default function QuizPage() {
       <Card className="shadow-elevated mb-6">
         <CardHeader>
           <CardTitle className="font-display text-xl leading-relaxed whitespace-normal break-words">
+            <QuestionEagle />
             {normalizeQuestionText(currentQuestion?.question_text)}
           </CardTitle>
           {currentQuestion?.image_url && (

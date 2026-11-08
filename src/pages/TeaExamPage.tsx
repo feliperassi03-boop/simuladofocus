@@ -255,6 +255,7 @@ export default function TeaExamPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg leading-relaxed whitespace-pre-wrap break-words">
+              {shouldShowQuestionEagle(exam?.title, examId) && <QuestionEagle />}
               {normalizeQuestionText(q.question_text)}
             </CardTitle>
             {q.image_url && <img src={q.image_url} alt="" className="mt-3 rounded max-h-80 object-contain bg-muted" />}

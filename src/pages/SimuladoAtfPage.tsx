@@ -350,6 +350,7 @@ export default function SimuladoAtfPage() {
         <Card className="shadow-elevated mb-6">
           <CardHeader>
             <CardTitle className="font-display text-lg leading-relaxed break-words whitespace-pre-wrap">
+              <QuestionEagle />
               {q.question_text}
             </CardTitle>
             {q.image_url && (

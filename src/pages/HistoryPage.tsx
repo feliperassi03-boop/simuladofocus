@@ -257,6 +257,7 @@ export default function HistoryPage() {
         <Card className="shadow-elevated mb-6">
           <CardHeader>
             <CardTitle className="font-display text-xl leading-relaxed whitespace-normal break-words">
+              {shouldShowQuestionEagle(reviewAttempt.exam_title, reviewAttempt.exam_id) && <QuestionEagle />}
               {normalizeQuestionText(currentQuestion.question_text)}
             </CardTitle>
             {currentQuestion.image_url && (

@@ -446,7 +446,7 @@ export default function ExamPage() {
             <CardHeader>
               <div className="flex items-start justify-between gap-3 flex-wrap">
                 <CardTitle className="font-display text-lg sm:text-xl leading-relaxed basis-full sm:basis-0 sm:flex-1 min-w-0">
-{examId && EAGLE_EXAM_IDS.has(examId) && (<img src={aumakuaEagle} alt="AUMAKUA" className="float-left w-10 sm:w-14 h-auto mr-3 mt-1" />)}
+{shouldShowQuestionEagle(exam?.title, examId) && <QuestionEagle />}
                   {normalizeQuestionText(currentQuestion.question_text)}
                 </CardTitle>
                 <DoubtDialog
@@ -785,7 +785,7 @@ export default function ExamPage() {
           <CardHeader>
             <div className="flex items-start justify-between gap-3 flex-wrap">
               <CardTitle className="font-display text-lg sm:text-xl leading-relaxed basis-full sm:basis-0 sm:flex-1 min-w-0">
-{examId && EAGLE_EXAM_IDS.has(examId) && (<img src={aumakuaEagle} alt="AUMAKUA" className="float-left w-10 sm:w-14 h-auto mr-3 mt-1" />)}
+{shouldShowQuestionEagle(exam?.title, examId) && <QuestionEagle />}
                 {normalizeQuestionText(currentQuestion?.question_text)}
               </CardTitle>
               <div className="flex items-center gap-2 shrink-0">
