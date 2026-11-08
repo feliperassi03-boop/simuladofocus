@@ -11,6 +11,7 @@ import { Clock, Trophy, Lock, ArrowLeft, ArrowRight, Send } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
 import logoAsset from "@/assets/aumakua-logo.jpeg.asset.json";
 import coverBg from "@/assets/simulado-atf-cover.jpeg.asset.json";
+import QuestionEagle from "@/components/QuestionEagle";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -349,6 +350,7 @@ export default function SimuladoAtfPage() {
         <Card className="shadow-elevated mb-6">
           <CardHeader>
             <CardTitle className="font-display text-lg leading-relaxed break-words whitespace-pre-wrap">
+              <QuestionEagle />
               {q.question_text}
             </CardTitle>
             {q.image_url && (

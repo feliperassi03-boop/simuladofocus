@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle, CheckCircle2, PlayCircle, XCircle, ArrowLeft, ArrowRight, Trophy, BookOpen, Clock, MessageSquareText, Eye } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
+import QuestionEagle from "@/components/QuestionEagle";
+import { shouldShowQuestionEagle } from "@/lib/question-branding";
 
 interface Attempt {
   id: string;
@@ -255,6 +257,7 @@ export default function HistoryPage() {
         <Card className="shadow-elevated mb-6">
           <CardHeader>
             <CardTitle className="font-display text-xl leading-relaxed whitespace-normal break-words">
+              {shouldShowQuestionEagle(reviewAttempt.exam_title, reviewAttempt.exam_id) && <QuestionEagle />}
               {normalizeQuestionText(currentQuestion.question_text)}
             </CardTitle>
             {currentQuestion.image_url && (

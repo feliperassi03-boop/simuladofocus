@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ArrowRight, ArrowLeft, Trophy, Eye, EyeOff, CheckCircle, XCircle, Home, RotateCcw, MessageSquareText } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
+import QuestionEagle from "@/components/QuestionEagle";
+import { shouldShowQuestionEagle } from "@/lib/question-branding";
 
 const POINTS_PER_ITEM = 0.52;
 
@@ -253,6 +255,7 @@ export default function TeaExamPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg leading-relaxed whitespace-pre-wrap break-words">
+              {shouldShowQuestionEagle(exam?.title, examId) && <QuestionEagle />}
               {normalizeQuestionText(q.question_text)}
             </CardTitle>
             {q.image_url && <img src={q.image_url} alt="" className="mt-3 rounded max-h-80 object-contain bg-muted" />}

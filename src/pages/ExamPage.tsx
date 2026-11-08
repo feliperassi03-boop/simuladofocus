@@ -12,9 +12,8 @@ import { normalizeQuestionText } from "@/lib/utils";
 import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Trophy, Lock, Send, Clock, User, MessageSquareText, Home, BookOpen, Eye, EyeOff } from "lucide-react";
 import QuestionVideo from "@/components/QuestionVideo";
 import DoubtDialog from "@/components/DoubtDialog";
-import aumakuaEagle from "@/assets/aumakua-eagle.png";
-
-const EAGLE_EXAM_IDS = new Set(["ef94bcd5-7f7d-4348-a251-7be464488132"]);
+import QuestionEagle from "@/components/QuestionEagle";
+import { shouldShowQuestionEagle } from "@/lib/question-branding";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -447,7 +446,7 @@ export default function ExamPage() {
             <CardHeader>
               <div className="flex items-start justify-between gap-3 flex-wrap">
                 <CardTitle className="font-display text-lg sm:text-xl leading-relaxed basis-full sm:basis-0 sm:flex-1 min-w-0">
-{examId && EAGLE_EXAM_IDS.has(examId) && (<img src={aumakuaEagle} alt="AUMAKUA" className="float-left w-10 sm:w-14 h-auto mr-3 mt-1" />)}
+{shouldShowQuestionEagle(exam?.title, examId) && <QuestionEagle />}
                   {normalizeQuestionText(currentQuestion.question_text)}
                 </CardTitle>
                 <DoubtDialog
@@ -600,6 +599,7 @@ export default function ExamPage() {
                   <CardHeader>
                     <div className="flex items-start justify-between gap-3 flex-wrap">
                       <CardTitle className="font-display text-lg leading-relaxed flex-1 min-w-0">
+                        {shouldShowQuestionEagle(exam?.title, examId) && <QuestionEagle />}
                         <span className="text-primary font-bold mr-2">{i + 1}.</span>
                         {normalizeQuestionText(q.question_text)}
                       </CardTitle>
@@ -786,7 +786,7 @@ export default function ExamPage() {
           <CardHeader>
             <div className="flex items-start justify-between gap-3 flex-wrap">
               <CardTitle className="font-display text-lg sm:text-xl leading-relaxed basis-full sm:basis-0 sm:flex-1 min-w-0">
-{examId && EAGLE_EXAM_IDS.has(examId) && (<img src={aumakuaEagle} alt="AUMAKUA" className="float-left w-10 sm:w-14 h-auto mr-3 mt-1" />)}
+{shouldShowQuestionEagle(exam?.title, examId) && <QuestionEagle />}
                 {normalizeQuestionText(currentQuestion?.question_text)}
               </CardTitle>
               <div className="flex items-center gap-2 shrink-0">
