@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2, X, Search, Copy, Play, Wrench, Save } from "lucide-react";
 import { normalizeImportLines } from "@/lib/question-import";
+import { examPath, secondPhaseLabel, type SecondPhaseType } from "@/lib/second-phase";
 
 interface TeaQuestion {
   id: string;
@@ -69,7 +70,8 @@ async function uploadFile(file: File, bucket: "question-images" | "question-vide
   return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl;
 }
 
-export default function TeaTab() {
+export default function TeaTab({ examType = "tea" }: { examType?: SecondPhaseType }) {
+  const label = secondPhaseLabel(examType);
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -175,14 +177,14 @@ export default function TeaTab() {
   const [examSearch, setExamSearch] = useState("");
 
   const fetchQuestions = async () => {
-    const { data } = await supabase.from("tea_questions").select("*").order("created_at", { ascending: false });
+    const { data } = await supabase.from("tea_questions").select("*").eq("exam_type", examType).order("created_at", { ascending: false });
     setQuestions((data ?? []) as TeaQuestion[]);
   };
   const fetchExams = async () => {
     const { data } = await supabase
       .from("exams")
       .select("*")
-      .eq("exam_type", "tea")
+      .eq("exam_type", examType)
       .order("created_at", { ascending: false });
     if (!data) return;
     const ids = data.map((e) => e.id);
@@ -197,7 +199,7 @@ export default function TeaTab() {
   useEffect(() => {
     fetchQuestions();
     fetchExams();
-  }, []);
+  }, [examType]);
 
   const openNewQ = () => {
     setForm(emptyForm);
@@ -215,12 +217,13 @@ export default function TeaTab() {
       toast({ title: "Preencha o enunciado e as 3 perguntas.", variant: "destructive" });
       return;
     }
-    const payload: any = { ...form };
+    const payload: any = { ...form, exam_type: examType };
+    delete payload.id;
     ["image_url","video_url","comment","comment_image_url","sub1_image_url","sub2_image_url","sub3_image_url"].forEach((k) => {
       if (!payload[k]) payload[k] = null;
     });
     const { error } = editingId
-      ? await supabase.from("tea_questions").update(payload).eq("id", editingId)
+      ? await supabase.from("tea_questions").update(payload).eq("id", editingId).eq("exam_type", examType)
       : await supabase.from("tea_questions").insert(payload);
     if (error) {
       toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
@@ -232,8 +235,8 @@ export default function TeaTab() {
   };
 
   const deleteQuestion = async (id: string) => {
-    if (!confirm("Excluir esta questão TEA?")) return;
-    const { error } = await supabase.from("tea_questions").delete().eq("id", id);
+    if (!confirm(`Excluir esta questão ${label}?`)) return;
+    const { error } = await supabase.from("tea_questions").delete().eq("id", id).eq("exam_type", examType);
     if (error) return toast({ title: "Erro", description: error.message, variant: "destructive" });
     toast({ title: "Questão excluída" });
     fetchQuestions();
@@ -255,20 +258,21 @@ export default function TeaTab() {
   };
 
   const createExam = async () => {
+    if (!user) return;
     if (!examTitle.trim() || !examPassword.trim() || selectedQs.length === 0) {
       toast({ title: "Preencha todos os campos e selecione ao menos uma questão.", variant: "destructive" });
       return;
     }
     const { data: exam, error } = await supabase
       .from("exams")
-      .insert({ title: examTitle, password: examPassword, exam_type: "tea", created_by: user!.id })
+      .insert({ title: examTitle, password: examPassword, exam_type: examType, created_by: user.id })
       .select()
       .single();
-    if (error) return toast({ title: "Erro", description: error.message, variant: "destructive" });
+    if (error || !exam) return toast({ title: "Erro", description: error?.message, variant: "destructive" });
     const rows = selectedQs.map((qid, i) => ({ exam_id: exam.id, tea_question_id: qid, question_order: i }));
     const { error: e2 } = await supabase.from("tea_exam_questions").insert(rows);
     if (e2) return toast({ title: "Erro", description: e2.message, variant: "destructive" });
-    toast({ title: "Prova TEA criada!" });
+    toast({ title: `Prova ${label} criada!` });
     setExamDialogOpen(false);
     setExamTitle("");
     setExamPassword("");
@@ -277,7 +281,7 @@ export default function TeaTab() {
   };
 
   const deleteExam = async (id: string) => {
-    if (!confirm("Excluir esta prova TEA?")) return;
+    if (!confirm(`Excluir esta prova ${label}?`)) return;
     const { error } = await supabase.from("exams").delete().eq("id", id);
     if (error) return toast({ title: "Erro", description: error.message, variant: "destructive" });
     toast({ title: "Prova excluída" });
@@ -285,7 +289,7 @@ export default function TeaTab() {
   };
 
   const copyLink = (examId: string) => {
-    navigator.clipboard.writeText(`${window.location.origin}/#/prova-tea/${examId}`);
+    navigator.clipboard.writeText(`${window.location.origin}/#${examPath(examType, examId)}`);
     toast({ title: "Link copiado!" });
   };
 
@@ -309,7 +313,7 @@ export default function TeaTab() {
       const { data: qData, error: qError } = await supabase
         .from("tea_questions")
         .select("*")
-        .in("id", ids);
+        .in("id", ids).eq("exam_type", examType);
       if (qError) throw qError;
       const map = new Map((qData ?? []).map((q: any) => [q.id, q]));
       const ordered: FullTeaQuestion[] = (eqData ?? [])
@@ -342,7 +346,7 @@ export default function TeaTab() {
       sub3_text: q.sub3_text,
       sub3_answer_key: q.sub3_answer_key,
     };
-    const { error } = await supabase.from("tea_questions").update(payload).eq("id", q.id);
+    const { error } = await supabase.from("tea_questions").update(payload).eq("id", q.id).eq("exam_type", examType);
     setSavingQuestionId(null);
     if (error) toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
     else toast({ title: "Questão atualizada!" });
@@ -370,7 +374,8 @@ export default function TeaTab() {
       const { data: newQ, error: qError } = await supabase
         .from("tea_questions")
         .insert({
-          question_text: "Nova questão TEA",
+          question_text: `Nova questão ${label}`,
+          exam_type: examType,
           sub1_text: "Pergunta 1",
           sub1_answer_key: "",
           sub2_text: "Pergunta 2",
@@ -381,6 +386,7 @@ export default function TeaTab() {
         .select()
         .single();
       if (qError) throw qError;
+      if (!newQ) throw new Error("Não foi possível criar a questão.");
 
       const nextOrder = examQuestions.length;
       const { error: eqError } = await supabase
@@ -433,24 +439,24 @@ export default function TeaTab() {
   return (
     <Tabs defaultValue="tea-questions">
       <TabsList>
-        <TabsTrigger value="tea-questions">Questões TEA</TabsTrigger>
-        <TabsTrigger value="tea-exams">Provas TEA</TabsTrigger>
+        <TabsTrigger value="tea-questions">Questões {label}</TabsTrigger>
+        <TabsTrigger value="tea-exams">Provas {label}</TabsTrigger>
       </TabsList>
 
       <TabsContent value="tea-questions" className="space-y-4">
         <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center">
           <div className="relative w-full sm:max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input placeholder="Buscar questão TEA..." value={qSearch} onChange={(e) => setQSearch(e.target.value)} className="pl-9" />
+            <Input placeholder={`Buscar questão ${label}...`} value={qSearch} onChange={(e) => setQSearch(e.target.value)} className="pl-9" />
           </div>
           <Dialog open={qDialogOpen} onOpenChange={setQDialogOpen}>
             <DialogTrigger asChild>
               <Button onClick={openNewQ} className="gradient-primary text-primary-foreground">
-                <Plus className="w-4 h-4 mr-1" /> Nova Questão TEA
+                <Plus className="w-4 h-4 mr-1" /> Nova Questão {label}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader><DialogTitle>{editingId ? "Editar" : "Nova"} Questão TEA 2 Fase</DialogTitle></DialogHeader>
+              <DialogHeader><DialogTitle>{editingId ? "Editar" : "Nova"} Questão {label} 2 Fase</DialogTitle></DialogHeader>
               <div className="space-y-4">
                 <div className="rounded-lg border border-dashed p-3 bg-muted/30">
                   <Label className="text-xs uppercase tracking-wide text-muted-foreground">Importação rápida (colar texto)</Label>
@@ -525,7 +531,7 @@ export default function TeaTab() {
               </CardContent>
             </Card>
           ))}
-          {filteredQuestions.length === 0 && <p className="text-center text-sm text-muted-foreground py-8">Nenhuma questão TEA cadastrada.</p>}
+          {filteredQuestions.length === 0 && <p className="text-center text-sm text-muted-foreground py-8">Nenhuma questão {label} cadastrada.</p>}
         </div>
       </TabsContent>
 
@@ -533,10 +539,10 @@ export default function TeaTab() {
         <div className="flex justify-end">
           <Dialog open={examDialogOpen} onOpenChange={setExamDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="gradient-primary text-primary-foreground"><Plus className="w-4 h-4 mr-1" /> Nova Prova TEA</Button>
+              <Button className="gradient-primary text-primary-foreground"><Plus className="w-4 h-4 mr-1" /> Nova Prova {label}</Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader><DialogTitle>Nova Prova TEA 2 Fase</DialogTitle></DialogHeader>
+              <DialogHeader><DialogTitle>Nova Prova {label} 2 Fase</DialogTitle></DialogHeader>
               <div className="space-y-3">
                 <div><Label>Título *</Label><Input value={examTitle} onChange={(e) => setExamTitle(e.target.value)} /></div>
                 <div><Label>Senha *</Label><Input value={examPassword} onChange={(e) => setExamPassword(e.target.value)} /></div>
@@ -556,7 +562,7 @@ export default function TeaTab() {
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">{selectedQs.length} selecionada(s)</p>
                 </div>
-                <Button onClick={createExam} className="w-full gradient-primary text-primary-foreground">Criar Prova TEA</Button>
+                <Button onClick={createExam} className="w-full gradient-primary text-primary-foreground">Criar Prova {label}</Button>
               </div>
             </DialogContent>
           </Dialog>
@@ -571,7 +577,7 @@ export default function TeaTab() {
                   <p className="text-xs text-muted-foreground">{e.question_count} questões · senha: {e.password}</p>
                 </div>
                 <div className="flex gap-1">
-                  <Button variant="ghost" size="icon" onClick={() => navigate(`/prova-tea/${e.id}`)} title="Iniciar prova">
+                  <Button variant="ghost" size="icon" onClick={() => navigate(examPath(examType, e.id))} title="Iniciar prova">
                     <Play className="w-4 h-4 text-primary" />
                   </Button>
                   <Button variant="ghost" size="icon" onClick={() => openManageExam(e)} title="Gerenciar conteúdo da prova">
@@ -587,7 +593,7 @@ export default function TeaTab() {
               </CardContent>
             </Card>
           ))}
-          {exams.length === 0 && <p className="text-center text-sm text-muted-foreground py-8">Nenhuma prova TEA criada.</p>}
+          {exams.length === 0 && <p className="text-center text-sm text-muted-foreground py-8">Nenhuma prova {label} criada.</p>}
         </div>
       </TabsContent>
 

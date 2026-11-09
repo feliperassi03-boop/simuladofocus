@@ -643,6 +643,7 @@ export type Database = {
           comment: string | null
           comment_image_url: string | null
           created_at: string
+          exam_type: string
           id: string
           image_url: string | null
           question_text: string
@@ -662,6 +663,7 @@ export type Database = {
           comment?: string | null
           comment_image_url?: string | null
           created_at?: string
+          exam_type?: string
           id?: string
           image_url?: string | null
           question_text: string
@@ -681,6 +683,7 @@ export type Database = {
           comment?: string | null
           comment_image_url?: string | null
           created_at?: string
+          exam_type?: string
           id?: string
           image_url?: string | null
           question_text?: string
