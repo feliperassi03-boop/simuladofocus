@@ -172,7 +172,6 @@ export default function TeaTab({ examType = "tea" }: { examType?: SecondPhaseTyp
 
   const [examDialogOpen, setExamDialogOpen] = useState(false);
   const [examTitle, setExamTitle] = useState("");
-  const [examPassword, setExamPassword] = useState("");
   const [selectedQs, setSelectedQs] = useState<string[]>([]);
   const [examSearch, setExamSearch] = useState("");
 
@@ -259,13 +258,13 @@ export default function TeaTab({ examType = "tea" }: { examType?: SecondPhaseTyp
 
   const createExam = async () => {
     if (!user) return;
-    if (!examTitle.trim() || !examPassword.trim() || selectedQs.length === 0) {
+    if (!examTitle.trim() || selectedQs.length === 0) {
       toast({ title: "Preencha todos os campos e selecione ao menos uma questão.", variant: "destructive" });
       return;
     }
     const { data: exam, error } = await supabase
       .from("exams")
-      .insert({ title: examTitle, password: examPassword, exam_type: examType, created_by: user.id })
+      .insert({ title: examTitle, password: "", exam_type: examType, created_by: user.id })
       .select()
       .single();
     if (error || !exam) return toast({ title: "Erro", description: error?.message, variant: "destructive" });
@@ -275,7 +274,6 @@ export default function TeaTab({ examType = "tea" }: { examType?: SecondPhaseTyp
     toast({ title: `Prova ${label} criada!` });
     setExamDialogOpen(false);
     setExamTitle("");
-    setExamPassword("");
     setSelectedQs([]);
     fetchExams();
   };
@@ -545,7 +543,6 @@ export default function TeaTab({ examType = "tea" }: { examType?: SecondPhaseTyp
               <DialogHeader><DialogTitle>Nova Prova {label} 2 Fase</DialogTitle></DialogHeader>
               <div className="space-y-3">
                 <div><Label>Título *</Label><Input value={examTitle} onChange={(e) => setExamTitle(e.target.value)} /></div>
-                <div><Label>Senha *</Label><Input value={examPassword} onChange={(e) => setExamPassword(e.target.value)} /></div>
                 <div>
                   <Label>Selecione as questões</Label>
                   <div className="relative mt-1 mb-2">
@@ -574,7 +571,7 @@ export default function TeaTab({ examType = "tea" }: { examType?: SecondPhaseTyp
               <CardContent className="py-3 flex items-center justify-between gap-3 flex-wrap">
                 <div>
                   <p className="font-medium">{e.title}</p>
-                  <p className="text-xs text-muted-foreground">{e.question_count} questões · senha: {e.password}</p>
+                  <p className="text-xs text-muted-foreground">{e.question_count} questões</p>
                 </div>
                 <div className="flex gap-1">
                   <Button variant="ghost" size="icon" onClick={() => navigate(examPath(examType, e.id))} title="Iniciar prova">
