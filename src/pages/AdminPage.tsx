@@ -67,7 +67,7 @@ export default function AdminPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
-  const TABS = ["questions", "exams", "tea", "results", "doubts", "allowed-emails", "signups", "atf", "videoaulas", "assinaturas"];
+  const TABS = ["questions", "exams", "tea", "tsa2", "results", "doubts", "allowed-emails", "signups", "atf", "videoaulas", "assinaturas"];
   const tabParam = searchParams.get("tab") || "";
   const activeTab = TABS.includes(tabParam) ? tabParam : "questions";
   const changeTab = (v: string) => setSearchParams(v === "questions" ? {} : { tab: v }, { replace: true });
@@ -340,6 +340,7 @@ export default function AdminPage() {
           <TabsTrigger value="questions">Perguntas</TabsTrigger>
           <TabsTrigger value="exams">Provas</TabsTrigger>
           <TabsTrigger value="tea">TEA 2 Fase</TabsTrigger>
+          <TabsTrigger value="tsa2">TSA 2 FASE</TabsTrigger>
           <TabsTrigger value="results">Resultados</TabsTrigger>
           <TabsTrigger value="doubts">Dúvidas dos Alunos</TabsTrigger>
           <TabsTrigger value="allowed-emails">Emails Autorizados</TabsTrigger>
@@ -651,6 +652,10 @@ export default function AdminPage() {
           <TeaTab />
         </TabsContent>
 
+
+        <TabsContent value="tsa2">
+          <TeaTab examType="tsa2" />
+        </TabsContent>
 
         <TabsContent value="results">
           <div className="flex justify-end mb-4">

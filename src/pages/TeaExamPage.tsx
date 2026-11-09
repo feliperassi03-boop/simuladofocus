@@ -17,6 +17,8 @@ import QuestionVideo from "@/components/QuestionVideo";
 import QuestionEagle from "@/components/QuestionEagle";
 import { shouldShowQuestionEagle } from "@/lib/question-branding";
 
+import { type SecondPhaseType } from "@/lib/second-phase";
+
 const POINTS_PER_ITEM = 0.52;
 
 interface TeaQ {
@@ -40,7 +42,7 @@ type AnsState = { s1: string; s2: string; s3: string };
 const emptyAns: AnsState = { s1: "", s2: "", s3: "" };
 const emptyCheck: CheckState = { s1: null, s2: null, s3: null };
 
-export default function TeaExamPage() {
+export default function TeaExamPage({ examType = "tea" }: { examType?: SecondPhaseType }) {
   const { id: examId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -57,20 +59,20 @@ export default function TeaExamPage() {
 
   const storageKey = useMemo(() => {
     const email = (user?.email ?? user?.id ?? "anon").toLowerCase();
-    return `tea-progress::${email}::${examId}`;
-  }, [user, examId]);
+    return `${examType}-progress::${email}::${examId}`;
+  }, [user, examId, examType]);
 
   useEffect(() => {
     if (!user) { navigate("/auth"); return; }
     if (!examId) return;
     (async () => {
-      const { data } = await supabase.from("exams").select("*").eq("id", examId).eq("exam_type", "tea").maybeSingle();
+      const { data } = await supabase.from("exams").select("*").eq("id", examId).eq("exam_type", examType).maybeSingle();
       if (!data || !data.is_active) { setState("error"); return; }
       setExam(data as Exam);
       const { data: eq } = await supabase.from("tea_exam_questions").select("tea_question_id, question_order").eq("exam_id", data.id).order("question_order");
       const ids = (eq ?? []).map((r) => r.tea_question_id);
       if (ids.length === 0) { toast({ title: "Prova sem questões", variant: "destructive" }); setState("error"); return; }
-      const { data: qs } = await supabase.from("tea_questions").select("*").in("id", ids);
+      const { data: qs } = await supabase.from("tea_questions").select("*").in("id", ids).eq("exam_type", examType);
       const map = new Map((qs ?? []).map((q: any) => [q.id, q]));
       const ordered = ids.map((i) => map.get(i)).filter(Boolean) as TeaQ[];
       setQuestions(ordered);
@@ -88,7 +90,7 @@ export default function TeaExamPage() {
       } catch {}
       setState("playing");
     })();
-  }, [examId, user, storageKey]);
+  }, [examId, user, storageKey, examType]);
 
   // Auto-save progress
   useEffect(() => {
@@ -131,6 +133,7 @@ export default function TeaExamPage() {
   };
 
   const finish = async () => {
+    if (!user || !exam) return;
     let correct = 0;
     questions.forEach((qq) => {
       const c = selfCheck[qq.id] ?? emptyCheck;
@@ -140,7 +143,7 @@ export default function TeaExamPage() {
     setFinalScore(score);
     try {
       const { data: attempt } = await supabase.from("tea_attempts").insert({
-        user_id: user!.id, exam_id: exam!.id, total_items: totalItems,
+        user_id: user.id, exam_id: exam.id, total_items: totalItems,
         correct_items: correct, score, completed_at: new Date().toISOString(),
       }).select().single();
       if (attempt?.id) {

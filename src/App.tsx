@@ -90,7 +90,8 @@ const App = () => (
             <Route path="/assinaturas" element={<ProtectedRoute><AdminRoute><AssinaturasTab /></AdminRoute></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><AdminRoute><AdminPage /></AdminRoute></ProtectedRoute>} />
             <Route path="/prova/:id" element={<ExamPage />} />
-            <Route path="/prova-tea/:id" element={<TeaExamPage />} />
+            <Route path="/prova-tea/:id" element={<TeaExamPage key="tea" />} />
+            <Route path="/prova-tsa2/:id" element={<TeaExamPage key="tsa2" examType="tsa2" />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

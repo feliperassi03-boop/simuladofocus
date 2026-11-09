@@ -13,6 +13,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import provasBg from "@/assets/provas-bg.jpeg";
 import laryngoscopeIcon from "@/assets/laryngoscope-icon.jpeg.asset.json";
 
+import { examPath, isSecondPhase, matchesExamView, secondPhaseLabel, type SecondPhaseType } from "@/lib/second-phase";
+
 interface ExamItem {
   id: string;
   title: string;
@@ -41,7 +43,7 @@ export default function ProvasPage() {
   const [exams, setExams] = useState<ExamItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [unreadDoubts, setUnreadDoubts] = useState(0);
-  const [viewMode, setViewMode] = useState<"standard" | "tea">("standard");
+  const [viewMode, setViewMode] = useState<"standard" | SecondPhaseType>("standard");
   const [rankingOpen, setRankingOpen] = useState(false);
   const [rankingLoading, setRankingLoading] = useState(false);
   const [rankingScores, setRankingScores] = useState<{ score: number; total: number }[]>([]);
@@ -133,8 +135,8 @@ export default function ProvasPage() {
 
 
 
-      const standardIds = examsData.filter((e) => e.exam_type !== "tea").map((e) => e.id);
-      const teaIds = examsData.filter((e) => e.exam_type === "tea").map((e) => e.id);
+      const standardIds = examsData.filter((e) => !isSecondPhase(e.exam_type)).map((e) => e.id);
+      const teaIds = examsData.filter((e) => isSecondPhase(e.exam_type)).map((e) => e.id);
       const counts: Record<string, number> = {};
 
       const pageSize = 1000;
@@ -172,13 +174,13 @@ export default function ProvasPage() {
 
   const grouped = useMemo(() => {
     const filtered = exams.filter((e) =>
-      viewMode === "tea" ? e.exam_type === "tea" : e.exam_type !== "tea"
+      matchesExamView(e.exam_type, viewMode)
     );
     const map = new Map<string, ExamItem[]>();
     for (const exam of filtered) {
       const cat = getCategory(exam.title);
       if (!map.has(cat)) map.set(cat, []);
-      map.get(cat)!.push(exam);
+      map.get(cat)?.push(exam);
     }
     const collator = new Intl.Collator("pt-BR", { sensitivity: "base", numeric: true });
     const strip = (s: string) =>
@@ -217,33 +219,23 @@ export default function ProvasPage() {
       className="space-y-6 -mx-4 -my-8 px-4 py-8 min-h-[calc(100vh-4rem)] bg-cover bg-center bg-no-repeat bg-fixed"
       style={{ backgroundImage: `linear-gradient(to bottom, hsl(var(--background)/0.85), hsl(var(--background)/0.92)), url(${provasBg})` }}
     >
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground">Provas Disponíveis</h1>
           <p className="text-muted-foreground mt-1">Escolha uma categoria e selecione a prova</p>
-          <div className="mt-3 inline-flex rounded-lg border border-border bg-card p-1 shadow-card">
-            <button
-              type="button"
-              onClick={() => setViewMode("standard")}
-              className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
-                viewMode === "standard"
-                  ? "gradient-primary text-primary-foreground shadow"
-                  : "text-foreground hover:bg-accent/40"
-              }`}
-            >
-              TSA 1 FASE
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode("tea")}
-              className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
-                viewMode === "tea"
-                  ? "gradient-primary text-primary-foreground shadow"
-                  : "text-foreground hover:bg-accent/40"
-              }`}
-            >
-              TEA 2 Fase
-            </button>
+          <div className="mt-3 inline-flex flex-wrap rounded-lg border border-border bg-card p-1 shadow-card">
+            {(["standard", "tea", "tsa2"] as const).map((mode) => (
+              <Button
+                key={mode}
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setViewMode(mode)}
+                className={viewMode === mode ? "gradient-primary text-primary-foreground shadow" : "text-foreground hover:bg-accent/40"}
+              >
+                {mode === "standard" ? "TSA 1 FASE" : `${secondPhaseLabel(mode)} 2 FASE`}
+              </Button>
+            ))}
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -347,8 +339,8 @@ export default function ProvasPage() {
                           <div className="min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               <p className="font-medium break-words">{exam.title}</p>
-                              {exam.exam_type === "tea" && (
-                                <Badge variant="secondary" className="text-[10px] uppercase">TEA 2 Fase</Badge>
+                              {isSecondPhase(exam.exam_type) && (
+                                <Badge variant="secondary" className="text-[10px] uppercase">{secondPhaseLabel(exam.exam_type)} 2 FASE</Badge>
                               )}
                             </div>
                             <p className="text-xs text-muted-foreground">
@@ -371,7 +363,7 @@ export default function ProvasPage() {
                             <Button
                               size="sm"
                               className="gradient-primary text-primary-foreground"
-                              onClick={() => navigate(exam.exam_type === "tea" ? `/prova-tea/${exam.id}` : `/prova/${exam.id}`)}
+                              onClick={() => navigate(examPath(exam.exam_type, exam.id))}
                             >
                               <Play className="w-4 h-4 mr-2" /> Iniciar
                             </Button>
