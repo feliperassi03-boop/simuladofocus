@@ -22,4 +22,4 @@
 - Pendente do lado do Asaas: cadastrar o webhook no painel de produção para liberar os 12 meses automaticamente.
 - Migração Asaas para produção concluída: chave atualizada no campo seguro; URLs de API e pagamento atualizadas nas duas funções e implantadas. Nenhuma cobrança real criada no teste.
 
-- Em andamento: criar TSA 2 FASE com cadastro de questões e provas no mesmo modelo da TEA, preservando conteúdos existentes.
+- Concluído: TSA 2 FASE no painel e na lista de provas, com banco separado e mesmo modelo TEA; 16 testes passaram. Cadastro de questão, criação e abertura de prova conferidos como administrador; registros temporários removidos, conteúdos existentes preservados. Falta publicar.
