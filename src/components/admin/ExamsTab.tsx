@@ -302,15 +302,17 @@ export default function ExamsTab() {
 
     // Get question counts
     const examIds = sorted.map((e) => e.id);
-    const { data: eqData } = await supabase
-      .from("exam_questions")
-      .select("exam_id")
-      .in("exam_id", examIds);
-
     const counts: Record<string, number> = {};
-    eqData?.forEach((eq) => {
-      counts[eq.exam_id] = (counts[eq.exam_id] || 0) + 1;
-    });
+    if (examIds.length) {
+      for (let from = 0; ; from += 1000) {
+        const { data: eqData, error } = await supabase.from("exam_questions")
+          .select("exam_id").in("exam_id", examIds)
+          .order("exam_id").order("question_id").range(from, from + 999);
+        if (error) { toast({ title: "Erro ao contar questões", description: error.message, variant: "destructive" }); return; }
+        eqData?.forEach((eq) => { counts[eq.exam_id] = (counts[eq.exam_id] || 0) + 1; });
+        if (!eqData || eqData.length < 1000) break;
+      }
+    }
 
     setExams(sorted.map((e) => ({ ...e, question_count: counts[e.id] || 0 })));
   };

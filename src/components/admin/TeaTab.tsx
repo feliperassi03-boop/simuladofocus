@@ -191,8 +191,13 @@ export default function TeaTab({ examType = "tea" }: { examType?: SecondPhaseTyp
     const ids = data.map((e) => e.id);
     const counts: Record<string, number> = {};
     if (ids.length) {
-      const { data: eq } = await supabase.from("tea_exam_questions").select("exam_id").in("exam_id", ids);
-      eq?.forEach((r) => (counts[r.exam_id] = (counts[r.exam_id] || 0) + 1));
+      for (let from = 0; ; from += 1000) {
+        const { data: eq, error } = await supabase.from("tea_exam_questions").select("exam_id").in("exam_id", ids)
+          .order("exam_id").order("tea_question_id").range(from, from + 999);
+        if (error) { toast({ title: "Erro ao contar questões", description: error.message, variant: "destructive" }); return; }
+        eq?.forEach((r) => (counts[r.exam_id] = (counts[r.exam_id] || 0) + 1));
+        if (!eq || eq.length < 1000) break;
+      }
     }
     setExams(data.map((e) => ({ ...e, question_count: counts[e.id] || 0 })));
   };
