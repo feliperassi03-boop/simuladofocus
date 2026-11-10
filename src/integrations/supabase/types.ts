@@ -918,6 +918,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_view_question: { Args: { _question_id: string }; Returns: boolean }
       get_bud5_ranking: {
         Args: never
         Returns: {
@@ -932,6 +933,7 @@ export type Database = {
           total_questions: number
         }[]
       }
+      has_app_role: { Args: never; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
