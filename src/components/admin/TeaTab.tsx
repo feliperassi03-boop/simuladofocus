@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2, X, Search, Copy, Play, Wrench, Save } from "lucide-react";
 import { normalizeImportLines } from "@/lib/question-import";
 import { examPath, secondPhaseLabel, type SecondPhaseType } from "@/lib/second-phase";
+import { AddExamQuestionsDialog } from "./AddExamQuestionsDialog";
 
 interface TeaQuestion {
   id: string;
@@ -91,6 +92,7 @@ export default function TeaTab({ examType = "tea" }: { examType?: SecondPhaseTyp
   const [manageLoading, setManageLoading] = useState(false);
   const [savingQuestionId, setSavingQuestionId] = useState<string | null>(null);
   const [manageSearch, setManageSearch] = useState("");
+  const [addingQuestionsExam, setAddingQuestionsExam] = useState<TeaExam | null>(null);
 
   const handleQuickImport = () => {
     const raw = normalizeImportLines(quickImport);
@@ -573,7 +575,10 @@ export default function TeaTab({ examType = "tea" }: { examType?: SecondPhaseTyp
                   <p className="font-medium">{e.title}</p>
                   <p className="text-xs text-muted-foreground">{e.question_count} questões</p>
                 </div>
-                <div className="flex gap-1">
+                <div className="flex flex-wrap gap-1">
+                  <Button variant="outline" size="sm" onClick={() => setAddingQuestionsExam(e)}>
+                    <Plus className="w-4 h-4 mr-1" /> Adicionar questões
+                  </Button>
                   <Button variant="ghost" size="icon" onClick={() => navigate(examPath(examType, e.id))} title="Iniciar prova">
                     <Play className="w-4 h-4 text-primary" />
                   </Button>
@@ -595,6 +600,7 @@ export default function TeaTab({ examType = "tea" }: { examType?: SecondPhaseTyp
       </TabsContent>
 
       {/* Manage exam content dialog */}
+      <AddExamQuestionsDialog exam={addingQuestionsExam} examType={examType} onClose={() => setAddingQuestionsExam(null)} onAdded={() => { void fetchExams(); }} />
       <Dialog open={!!managingExam} onOpenChange={(o) => { if (!o) { setManagingExam(null); setExamQuestions([]); } }}>
         <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>

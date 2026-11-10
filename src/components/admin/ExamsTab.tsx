@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { normalizeQuestionText } from "@/lib/utils";
+import { AddExamQuestionsDialog } from "./AddExamQuestionsDialog";
 import { Plus, Copy, Trash2, Link2, Eye, EyeOff, Play, Pencil, ListChecks, Wrench, X, Save, Search } from "lucide-react";
 
 interface Question {
@@ -74,6 +75,7 @@ export default function ExamsTab() {
   const [manageLoading, setManageLoading] = useState(false);
   const [savingQuestionId, setSavingQuestionId] = useState<string | null>(null);
   const [manageSearch, setManageSearch] = useState("");
+  const [addingQuestionsExam, setAddingQuestionsExam] = useState<Exam | null>(null);
 
   const openManageExam = async (exam: Exam) => {
     setManagingExam(exam);
@@ -163,7 +165,7 @@ export default function ExamsTab() {
   };
 
   const addNewQuestionToExam = async () => {
-    if (!managingExam) return;
+    if (!managingExam || !user) return;
     setManageLoading(true);
     try {
       const { data: newQ, error: qError } = await supabase
@@ -175,7 +177,7 @@ export default function ExamsTab() {
           option_c: "",
           option_d: "",
           correct_option: "A",
-          created_by: user!.id,
+          created_by: user.id,
         })
         .select()
         .single();
@@ -342,6 +344,7 @@ export default function ExamsTab() {
   }, []);
 
   const handleCreate = async () => {
+    if (!user) return;
     if (!title.trim() || !password.trim() || selectedQuestions.length === 0) {
       toast({ title: "Preencha todos os campos e selecione ao menos uma pergunta.", variant: "destructive" });
       return;
@@ -350,7 +353,7 @@ export default function ExamsTab() {
     try {
       const { data: exam, error } = await supabase
         .from("exams")
-        .insert({ title, password, created_by: user!.id })
+        .insert({ title, password, created_by: user.id })
         .select()
         .single();
       if (error) throw error;
@@ -510,7 +513,10 @@ export default function ExamsTab() {
                   </span>
                 </TableCell>
                 <TableCell>
-                  <div className="flex gap-1">
+                  <div className="flex flex-wrap gap-1">
+                    <Button variant="outline" size="sm" onClick={() => setAddingQuestionsExam(exam)}>
+                      <Plus className="w-4 h-4 mr-1" /> Adicionar questões
+                    </Button>
                     <Button variant="ghost" size="icon" onClick={() => navigate(`/prova/${exam.id}`)} title="Iniciar prova">
                       <Play className="w-4 h-4 text-primary" />
                     </Button>
@@ -551,6 +557,8 @@ export default function ExamsTab() {
           </TableBody>
         </Table>
       </Card>
+
+      <AddExamQuestionsDialog exam={addingQuestionsExam} onClose={() => setAddingQuestionsExam(null)} onAdded={() => { void fetchExams(); }} />
 
       <Dialog open={!!editingExam} onOpenChange={(o) => !o && setEditingExam(null)}>
         <DialogContent>
