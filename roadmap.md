@@ -1,6 +1,6 @@
 # Roadmap
 
-- Em andamento: corrigir a confirmação e os erros da lixeira de módulos de videoaulas, preservando provas e conferindo a exclusão com dados temporários.
+- Concluído: lixeiras de videoaulas usam confirmação no aplicativo, exibem erros e confirmam a exclusão antes de remover mídia; cancelamento e exclusão conferidos como administrador com módulo temporário e ausência após recarregar, janela móvel conferida sem apagar conteúdo existente; quatro testes passaram. Falta publicar.
 
 - Concluído: botão Adicionar questões em provas existentes, inclusive TEA/TSA 2 FASE, com busca e seleção em lote; preserva questões atuais e evita duplicatas. Inclusões e leitura de volta conferidas como administrador numa prova temporária removida ao final; celular/desktop conferidos, sete testes passaram. Contagens paginadas corrigidas; falta publicar.
 

@@ -1,5 +1,7 @@
 # Project rules
 
+- Video-content deletion uses in-app confirmation, verifies the deleted database row before removing media, and reports failures. Why: embedded previews may block native confirmation and failed deletes must not leave playable lessons with missing files.
+
 - Existing exams use a shared bulk-add dialog that appends only missing question links after the highest saved order and filters second-phase banks by exam type. Why: fast selection must not replace content, duplicate questions, or mix banks.
 
 - Pasted question processors normalize Unicode and legacy line separators before identifying blocks; multiple-choice parsing is isolated in a tested helper and never defaults an unidentified answer to A. Why: pasted mobile/document text must keep alternatives, answers and explanations separate without inventing a correct answer.

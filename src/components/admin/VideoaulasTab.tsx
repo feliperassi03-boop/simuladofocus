@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Upload, Send, FileUp, FileText, Folder, Pencil, Check, X } from "lucide-react";
 
@@ -14,6 +15,7 @@ type Module = { id: string; title: string; sort_order: number };
 type Lesson = { id: string; module_id: string; title: string; video_path: string; pdf_path: string | null; sort_order: number };
 type Doubt = { id: string; student_name: string; student_email: string | null; lesson_title: string; doubt_text: string; admin_response: string | null; created_at: string };
 type ModFile = { id: string; module_id: string; file_name: string; file_path: string; folder: string | null };
+type DeleteTarget = { kind: "module"; item: Module } | { kind: "lesson"; item: Lesson } | { kind: "file"; item: ModFile };
 
 const safeName = (n: string) => n.normalize("NFD").replace(/[^\w.-]+/g, "_");
 
@@ -35,6 +37,8 @@ export default function VideoaulasTab() {
   const [folderByModule, setFolderByModule] = useState<Record<string, string>>({});
   const [editingLesson, setEditingLesson] = useState<string | null>(null);
   const [lessonTitle, setLessonTitle] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const load = async () => {
     const [m, l, d, f] = await Promise.all([
@@ -72,29 +76,36 @@ export default function VideoaulasTab() {
     load();
   };
 
-  const deleteFile = async (f: ModFile) => {
-    if (!confirm(`Excluir o arquivo "${f.file_name}"?`)) return;
-    await supabase.storage.from("lesson-media").remove([f.file_path]);
-    await supabase.from("video_module_files").delete().eq("id", f.id);
-    load();
-  };
-
-  const deleteModule = async (id: string) => {
-    if (!confirm("Excluir este módulo e todas as suas aulas?")) return;
-    const paths = [
-      ...lessons.filter((l) => l.module_id === id).flatMap((l) => [l.video_path, l.pdf_path].filter(Boolean) as string[]),
-      ...files.filter((f) => f.module_id === id).map((f) => f.file_path),
-    ];
-    if (paths.length) await supabase.storage.from("lesson-media").remove(paths);
-    await supabase.from("video_modules").delete().eq("id", id);
-    load();
-  };
-
-  const deleteLesson = async (l: Lesson) => {
-    if (!confirm(`Excluir a aula "${l.title}"?`)) return;
-    await supabase.storage.from("lesson-media").remove([l.video_path, l.pdf_path].filter(Boolean) as string[]);
-    await supabase.from("video_lessons").delete().eq("id", l.id);
-    load();
+  const confirmDelete = async () => {
+    if (!deleteTarget || deleting) return;
+    const target = deleteTarget;
+    setDeleting(true);
+    try {
+      const paths = target.kind === "module" ? [
+        ...lessons.filter((l) => l.module_id === target.item.id).flatMap((l) => [l.video_path, l.pdf_path]),
+        ...files.filter((f) => f.module_id === target.item.id).map((f) => f.file_path),
+      ] : target.kind === "lesson" ? [target.item.video_path, target.item.pdf_path] : [target.item.file_path];
+      const table = target.kind === "module" ? "video_modules" : target.kind === "lesson" ? "video_lessons" : "video_module_files";
+      const { data, error } = await supabase.from(table).delete().eq("id", target.item.id).select("id").single();
+      if (error) throw error;
+      if (!data) throw new Error("Não foi possível confirmar a exclusão. Atualize a página e tente novamente.");
+      if (target.kind === "module" && moduleId === target.item.id) setModuleId("");
+      setDeleteTarget(null);
+      await load();
+      const mediaPaths = [...new Set(paths.filter((path): path is string => !!path))];
+      if (mediaPaths.length) {
+        const { error: mediaError } = await supabase.storage.from("lesson-media").remove(mediaPaths);
+        if (mediaError) {
+          toast({ title: "Conteúdo excluído", description: "Não foi possível remover todos os arquivos de mídia armazenados.", variant: "destructive" });
+          return;
+        }
+      }
+      toast({ title: target.kind === "module" ? "Módulo excluído!" : target.kind === "lesson" ? "Aula excluída!" : "Arquivo excluído!" });
+    } catch (error) {
+      toast({ title: "Não foi possível excluir", description: error instanceof Error ? error.message : (error as { message?: string })?.message || "Tente novamente.", variant: "destructive" });
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const renameLesson = async (l: Lesson) => {
@@ -147,6 +158,20 @@ export default function VideoaulasTab() {
 
   return (
     <div className="space-y-6">
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open && !deleting) setDeleteTarget(null); }}>
+        <AlertDialogContent className="max-w-[calc(100%-2rem)] sm:max-w-lg">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription className="break-words">
+              {deleteTarget?.kind === "module" ? `Excluir o módulo “${deleteTarget.item.title}” e todas as suas aulas, materiais, dúvidas e registros de aulas assistidas?` : deleteTarget?.kind === "lesson" ? `Excluir a aula “${deleteTarget.item.title}”, suas dúvidas e registros de aula assistida?` : deleteTarget ? `Excluir o arquivo “${deleteTarget.item.file_name}”?` : ""} Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button variant="outline" disabled={deleting} onClick={() => setDeleteTarget(null)}>Cancelar</Button>
+            <Button variant="destructive" disabled={deleting} onClick={confirmDelete}><Trash2 className="w-4 h-4 mr-1" />{deleting ? "Excluindo..." : "Excluir"}</Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <Card>
         <CardHeader><CardTitle className="font-display">Módulos (temas)</CardTitle></CardHeader>
         <CardContent className="space-y-3">
@@ -161,7 +186,7 @@ export default function VideoaulasTab() {
             <div key={m.id} className="rounded-lg border border-border p-3 space-y-2">
               <div className="flex items-center justify-between gap-2">
                 <p className="font-semibold break-words">{m.title}</p>
-                <Button size="icon" variant="ghost" onClick={() => deleteModule(m.id)}><Trash2 className="w-4 h-4" /></Button>
+                <Button size="icon" variant="ghost" aria-label={`Excluir módulo ${m.title}`} onClick={() => setDeleteTarget({ kind: "module", item: m })}><Trash2 className="w-4 h-4" /></Button>
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <Input
@@ -196,7 +221,7 @@ export default function VideoaulasTab() {
                   {mFiles.filter((f) => (f.folder || "") === fo).map((f) => (
                     <div key={f.id} className="flex items-center justify-between gap-2 text-sm pl-3">
                       <span className="break-words flex items-center gap-1"><FileText className="w-4 h-4 shrink-0" />{f.file_name}</span>
-                      <Button size="icon" variant="ghost" onClick={() => deleteFile(f)}><Trash2 className="w-4 h-4" /></Button>
+                      <Button size="icon" variant="ghost" aria-label={`Excluir arquivo ${f.file_name}`} onClick={() => setDeleteTarget({ kind: "file", item: f })}><Trash2 className="w-4 h-4" /></Button>
                     </div>
                   ))}
                 </div>
@@ -227,7 +252,7 @@ export default function VideoaulasTab() {
                         >
                           <Pencil className="w-4 h-4" />
                         </Button>
-                        <Button size="icon" variant="ghost" onClick={() => deleteLesson(l)}><Trash2 className="w-4 h-4" /></Button>
+                        <Button size="icon" variant="ghost" aria-label={`Excluir aula ${l.title}`} onClick={() => setDeleteTarget({ kind: "lesson", item: l })}><Trash2 className="w-4 h-4" /></Button>
                       </span>
                     </>
                   )}
