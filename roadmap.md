@@ -1,5 +1,7 @@
 # Roadmap
 
+- Em andamento: corrigir a confirmação e os erros da lixeira de módulos de videoaulas, preservando provas e conferindo a exclusão com dados temporários.
+
 - Concluído: botão Adicionar questões em provas existentes, inclusive TEA/TSA 2 FASE, com busca e seleção em lote; preserva questões atuais e evita duplicatas. Inclusões e leitura de volta conferidas como administrador numa prova temporária removida ao final; celular/desktop conferidos, sete testes passaram. Contagens paginadas corrigidas; falta publicar.
 
 - Concluído: processadores normalizam quebras Unicode; importação de múltipla escolha separa alternativas, gabarito e comentário sem assumir resposta A. Texto enviado validado com gabarito C, 10 testes passaram, build OK; nenhuma questão salva alterada. Conferência no painel bloqueada pela sessão presa em “Carregando”; falta publicar.
