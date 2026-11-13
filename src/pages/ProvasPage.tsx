@@ -324,9 +324,6 @@ export default function ProvasPage() {
                       <span className="font-display font-semibold text-base sm:text-lg break-words">
                         {category}
                       </span>
-                      <span className="text-xs text-muted-foreground font-normal">
-                        ({items.length} {items.length === 1 ? "prova" : "provas"})
-                      </span>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
